@@ -1,0 +1,12 @@
+---
+- name: Restart nagios
+  ansible.builtin.service:
+    name: nagios
+    state: restarted
+  run_once: true
+  delegate_to: "{{ nagios_server_fqdn }}"
+
+- name: Restart nrpe
+  ansible.builtin.service:
+    name: nagios-nrpe-server
+    state: restarted

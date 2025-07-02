@@ -1,0 +1,61 @@
+---
+- name: Install NRPE and Nagios plugins.
+  ansible.builtin.package:
+    update-cache: true
+    name:
+      - nagios-nrpe-server
+      - nagios-plugins
+    state: present
+
+- name: Add system admin user to the nagios group.
+  ansible.builtin.user:
+    name: "{{ admin_username }}"
+    groups: nagios
+    append: true
+
+- name: Add the nagios user to the docker group, if this is a docker server.
+  ansible.builtin.user:
+    name: nagios
+    groups: docker
+    append: true
+  when: "'docker' in group_names"
+
+- name: Set up allowed hosts in NRPE config file.
+  ansible.builtin.lineinfile:
+    path: /etc/nagios/nrpe.cfg
+    regexp: '^allowed_hosts='
+    line: allowed_hosts=127.0.0.1,10.13.37.25
+  notify: Restart nrpe
+
+- name: Create the directory to store my NRPE plugins.
+  ansible.builtin.file:
+    path: /opt/nagios
+    state: directory
+    mode: "0755"
+
+- name: Copy over custom NRPE plugins.
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ nagios_custom_plugin_path }}/{{ item }}"
+    owner: root
+    group: root
+    mode: u=rwx,g=rx,o=rx
+  with_items: "{{ nagios_custom_plugins }}"
+  notify: Restart nrpe
+
+- name: Add NRPE include file with my command definitions.
+  ansible.builtin.template:
+    src: custom-nrpe.cfg
+    dest: /etc/nagios/nrpe.d/custom-nrpe.cfg
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+  notify: Restart nrpe
+
+- name: Copy sudoers file for Nagios
+  copy:
+    src: files/sudoers_sanoid
+    dest: /etc/sudoers.d/nagios
+    owner: root
+    group: root
+    mode: 0440

@@ -1,0 +1,10 @@
+## Host definition for "{{ inventory_hostname }}"
+
+
+define host {
+
+    host_name   {{inventory_hostname }} 
+    address     {{inventory_hostname }}
+    use {{ nagios_host_template }} 
+
+}

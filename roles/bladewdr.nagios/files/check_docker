@@ -1,0 +1,45 @@
+#!/bin/bash
+#
+
+faults=()
+status=0
+
+# First check to make sure that the nagios user is in the docker group.
+username=nagios
+if ! getent group docker | grep -qw "$username"
+then
+    echo "User is not in the docker group!" 
+    exit 2
+fi
+
+# Get the names of every container.
+containers=$(docker container ls -a --format="{{.Names}}")
+
+# then iterate through the list and check the status.
+
+for container in $containers
+do
+  running=$(docker inspect --format="{{.State.Running}}" $container 2> /dev/null)
+  if [ "$running" =  "false" ]
+  then
+    faults+=("$container")
+    status=2
+  fi
+done
+
+
+if [ $status -ne 0 ]
+then
+  echo "CRITICAL - the following containers are not running: "
+  for i in "${faults[@]}"
+  do
+    echo "$i"
+    exit 2
+  done
+fi
+
+if [ $status -eq 0 ]
+then
+  echo "OK - All containers running."
+  exit 0
+fi
