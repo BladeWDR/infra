@@ -21,9 +21,6 @@
     checksum: "sha1:{{ pihole_ftl_download_url }}.sha1"
     mode: '0755'
 
-- name: Populate service facts.
-  ansible.builtin.service_facts:
-
 # I don't care about any systems not using systemd right now, so I'm just going to assume that everything is using it.
 # Maybe I'll support other init systems in the future but it's not a priority.
 
@@ -36,7 +33,7 @@
 - name: Move the pihole-FTL binary to its final location.
   ansible.builtin.copy:
     src: "{{ pihole_temp_dir }}/{{ pihole_ftl_binary_name }}"
-    dest: "/usr/bin/pihole-FTL"
+    dest: "{{ pihole_ftl_location }}"
     remote_src: true
     owner: root
     group: root
@@ -57,6 +54,14 @@
     single_branch: true
     version: master
 
+- name: Create the pihole installation directory.
+  ansible.builtin.file:
+    path: "{{ pihole_install_dir }}"
+    owner: root
+    group: root
+    state: directory
+    mode: '0755'
+
 - name: Copy gravity.sh into place.
   ansible.builtin.copy:
     remote_src: true
@@ -75,14 +80,14 @@
     src: "{{ pihole_local_repo }}/gravity.sh"
     dest: "{{ pihole_install_dir }}/gravity.sh"
 
-- name: Copy gravity.sh into place.
+- name: Copy uninstall.sh into place.
   ansible.builtin.copy:
     remote_src: true
     owner: root
     group: root
     mode: '0755'
-    src: "{{ pihole_local_repo }}/gravity.sh"
-    dest: "{{ pihole_install_dir }}/gravity.sh"
+    src: "{{ pihole_local_repo }}/automated install/uninstall.sh"
+    dest: "{{ pihole_install_dir }}/uninstall.sh"
 
 - name: Copy advanced scripts.
   ansible.builtin.copy:
@@ -147,22 +152,30 @@
     owner: root
     group: root
     mode: '0755'
-    src: "{{ pihole_local_repo }}/{{ item }}"
+    src: "{{ pihole_local_repo }}/advanced/Templates/{{ item }}"
     dest: "{{ pihole_install_dir }}/{{ item }}"
   loop: "{{ pihole_FTL_scripts }}"
 
 - name: Check if a custom hosts file exists.
   ansible.builtin.stat:
-    path: "{{ pihole_install_dir }}/hosts/custom.list"
+    path: "{{ pihole_config_dir }}/hosts/custom.list"
   register: hosts_file_exist
 
-- name: Create the custom hosts file.
+- name: Ensure the custom hosts directory exists.
   ansible.builtin.file:
-    path: "{{ pihole_install_dir }}/hosts/custom.list"
+    path: "{{ pihole_config_dir }}/hosts"
+    state: directory
+    owner: pihole
+    group: pihole
+    mode: '0755'
+
+- name: Create the custom hosts file if it does not exist.
+  ansible.builtin.copy:
+    dest: "{{ pihole_config_dir }}/hosts/custom.list"
+    content: ""
     owner: pihole
     group: pihole
     mode: '0660'
-    state: file
   when: not (hosts_file_exist.stat.exists and hosts_file_exist.stat.isfile)
 
 - name: Check that manpage directories exist.
@@ -230,6 +243,13 @@
 - name: Reset the Pi-hole password to 'password'.
   ansible.builtin.shell: |
     pihole setpassword "{{ pihole_default_password }}"
+
+# I tried doing this in a more idempotent way, such as generating it from a Jinja template, but it appeares that pihole-FTL overwrites this file on startup.
+- name: Set pihole.toml config options.
+  ansible.builtin.shell: |
+    {{ pihole_ftl_location }} --config '{{ item.key }}' '{{ item.value }}'
+  loop: "{{ pihole_ftl_config | dict2items }}"
+  notify: pihole-FTL
 
 - name: Clean up temp directory.
   ansible.builtin.file:

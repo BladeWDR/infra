@@ -1,5 +1,8 @@
 ---
 
+- name: Populate service facts.
+  ansible.builtin.service_facts:
+
 - name: Set variables based on the host architecture.
   ansible.builtin.set_fact:
     pihole_ftl_binary_name: "pihole-FTL-{{ pihole_architecture_mapping[ansible_facts.architecture] }}"
@@ -41,12 +44,34 @@
     path: "{{ pihole_v6_config_path }}"
   register: pihole_config
 
-- name: Set Pi-hole FTL config values in TOML
-  ansible.builtin.replace:
-    path: "{{ pihole_v6_config_path }}"
-    regexp: '^{{ item.key | regex_escape }}\s*=.*$'
-    replace: '{{ item.key }} = {{ item.value }}'
-    backup: true
-  loop: "{{ pihole_ftl_config | dict2items }}"
-  notify: pihole-FTL
-  when: pihole_config.stat.exists
+- name: Disable systemd‑resolved DNSStubListener (free port 53 for FTL).
+  when:
+    - "'systemd-resolved.service' in ansible_facts.services"
+    - ansible_facts.services['systemd-resolved.service'].state == 'running'
+  block:
+    - name: Ensure drop‑in directory for systemd-resolved dexists.
+      ansible.builtin.file:
+        path: /etc/systemd/resolved.conf.d
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Install 90‑pi‑hole‑disable‑stub‑listener.conf.
+      ansible.builtin.copy:
+        dest: /etc/systemd/resolved.conf.d/90-pi-hole-disable-stub-listener.conf
+        content: |
+          [Resolve]
+          DNSStubListener=no
+        owner: root
+        group: root
+        mode: '0644'
+      notify:
+        - reload systemd‑resolved
+        - pihole-FTL
+
+- name: Make sure that pihole-FTL is started and enabled.
+  ansible.builtin.service:
+    name: pihole-FTL
+    state: started
+    enabled: true
