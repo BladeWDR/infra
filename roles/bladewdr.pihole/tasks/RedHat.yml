@@ -1,0 +1,7 @@
+---
+
+- name: Install Pi-hole dependencies (DNF).
+  ansible.builtin.dnf:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ pihole_dependencies_apt }}"

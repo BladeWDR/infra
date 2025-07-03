@@ -1,0 +1,52 @@
+---
+
+- name: Set variables based on the host architecture.
+  ansible.builtin.set_fact:
+    pihole_ftl_binary_name: "pihole-FTL-{{ pihole_architecture_mapping[ansible_facts.architecture] }}"
+
+- name: Set download URL for FTL.
+  ansible.builtin.set_fact:
+    pihole_ftl_download_url: "https://ftl.pi-hole.net/{{ pihole_ftl_branch }}/{{ pihole_ftl_binary_name }}"
+
+- name: Check if /etc/pihole already exists.
+  ansible.builtin.stat:
+    path: /etc/pihole
+  register: pihole_dir_exists
+
+- name: Create the pihole group.
+  ansible.builtin.group:
+    name: pihole
+    state: present
+
+- name: Create the pihole user.
+  ansible.builtin.user:
+    name: pihole
+    groups: pihole
+    shell: /usr/sbin/nologin
+    append: true
+
+- name: OS-specific tasks.
+  ansible.builtin.include_tasks: "{{ ansible_os_family }}.yml"
+
+- name: Include Pi-hole installation tasks.
+  ansible.builtin.include_tasks: Pihole-install.yml
+  when: not pihole_dir_exists.stat.exists
+
+# Check if SELinux is installed and is Enforcing.
+# Can i have the playbook error out and fail if it is?
+# SELinux is not officially supported, though there is an environment variable PIHOLE_SELINUX you can set to true to bypass this requirement.
+
+- name: Make sure pihole.toml has been created.
+  ansible.builtin.stat:
+    path: "{{ pihole_v6_config_path }}"
+  register: pihole_config
+
+- name: Set Pi-hole FTL config values in TOML
+  ansible.builtin.replace:
+    path: "{{ pihole_v6_config_path }}"
+    regexp: '^{{ item.key | regex_escape }}\s*=.*$'
+    replace: '{{ item.key }} = {{ item.value }}'
+    backup: true
+  loop: "{{ pihole_ftl_config | dict2items }}"
+  notify: pihole-FTL
+  when: pihole_config.stat.exists

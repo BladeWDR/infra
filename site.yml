@@ -1,0 +1,16 @@
+---
+
+- hosts: all
+
+  pre_tasks:
+
+  - name: Update package cache.
+    ansible.builtin.package:
+      update_cache: true
+      cache_valid_time: true
+    become: true
+
+- hosts: all
+  become: true
+  roles:
+    - bladewdr.pihole
