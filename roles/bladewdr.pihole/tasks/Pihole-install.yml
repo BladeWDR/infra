@@ -71,15 +71,6 @@
     src: "{{ pihole_local_repo }}/gravity.sh"
     dest: "{{ pihole_install_dir }}/gravity.sh"
 
-- name: Copy advanced scripts into place.
-  ansible.builtin.copy:
-    remote_src: true
-    owner: root
-    group: root
-    mode: '0755'
-    src: "{{ pihole_local_repo }}/gravity.sh"
-    dest: "{{ pihole_install_dir }}/gravity.sh"
-
 - name: Copy uninstall.sh into place.
   ansible.builtin.copy:
     remote_src: true
@@ -234,11 +225,6 @@
     src: "{{ pihole_local_repo }}/advanced/Templates/pihole.cron"
     dest: "/etc/cron.d/pihole"
   when: not cron_exists.stat.exists
-
-# Assume that we need to run gravity if if we needed to create /etc/pihole, so regenerate the hosts list.
-- name: Run gravity to generate the hosts list.
-  ansible.builtin.shell: |
-    sudo -u pihole bash /opt/pihole/gravity.sh --force
 
 - name: Reset the Pi-hole password to 'password'.
   ansible.builtin.shell: |

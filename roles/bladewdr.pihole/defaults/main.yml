@@ -25,7 +25,12 @@ pihole_v6_config_path: "{{ pihole_config_dir }}/pihole.toml"
 pihole_ftl_location: "/usr/bin/pihole-FTL"
 pihole_fresh_install: true
 pihole_install_log: "{{ pihole_config_dir }}/install.log"
-pihole_adlist_file: "{[ pihole_config_dir ]}/adlists.list"
+pihole_adlist_file: "{{ pihole_config_dir }}/adlists.list"
+
+pihole_adlists:
+  - https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
+  - https://v.firebog.net/hosts/static/w3kbl.txt
+
 pihole_dependencies_apt:
   - bash-completion
   - binutils

@@ -1,5 +1,15 @@
 ---
 
+# - name: Check SELinux status
+#   ansible.builtin.command: getenforce
+#   register: selinux_status
+#   changed_when: false
+# 
+# - name: Fail if SELinux is enforcing
+#   ansible.builtin.fail:
+#     msg: "SELinux is enforcing. Please disable or set to permissive before continuing."
+#   when: selinux_status.stdout == "Enforcing"
+
 - name: Populate service facts.
   ansible.builtin.service_facts:
 
@@ -35,9 +45,19 @@
   ansible.builtin.include_tasks: Pihole-install.yml
   when: not pihole_dir_exists.stat.exists
 
-# Check if SELinux is installed and is Enforcing.
-# Can i have the playbook error out and fail if it is?
-# SELinux is not officially supported, though there is an environment variable PIHOLE_SELINUX you can set to true to bypass this requirement.
+- name: Configure adlists.
+  ansible.builtin.lineinfile:
+    path: "{{ pihole_adlist_file }}"
+    state: present
+    line: "{{ item }}"
+    create: yes
+    owner: root
+    group: root
+    mode: '0644'
+  loop: "{{ pihole_adlists }}"
+  notify: 
+    - update-gravity
+    - pihole-FTL
 
 - name: Make sure pihole.toml has been created.
   ansible.builtin.stat:
