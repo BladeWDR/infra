@@ -1,0 +1,6 @@
+---
+collections:
+  - name: grafana.grafana
+
+roles:
+  - name: geerlingguy.docker

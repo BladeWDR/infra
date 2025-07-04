@@ -15,3 +15,11 @@
   become: true
   roles:
     - bladewdr.pihole
+    - bladewdr.bind9
+  tags: dns
+
+- hosts: alloy
+  become: true
+  roles:
+    - bladewdr.baseline
+  tags: alloy
