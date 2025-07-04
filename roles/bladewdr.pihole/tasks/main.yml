@@ -1,15 +1,5 @@
 ---
 
-# - name: Check SELinux status
-#   ansible.builtin.command: getenforce
-#   register: selinux_status
-#   changed_when: false
-# 
-# - name: Fail if SELinux is enforcing
-#   ansible.builtin.fail:
-#     msg: "SELinux is enforcing. Please disable or set to permissive before continuing."
-#   when: selinux_status.stdout == "Enforcing"
-
 - name: Populate service facts.
   ansible.builtin.service_facts:
 
@@ -50,12 +40,12 @@
     path: "{{ pihole_adlist_file }}"
     state: present
     line: "{{ item }}"
-    create: yes
+    create: true
     owner: root
     group: root
     mode: '0644'
   loop: "{{ pihole_adlists }}"
-  notify: 
+  notify:
     - update-gravity
     - pihole-FTL
 
@@ -63,6 +53,28 @@
   ansible.builtin.stat:
     path: "{{ pihole_v6_config_path }}"
   register: pihole_config
+
+- name: Set Pi-hole DNS upstreams.
+  when: pihole_dir_exists.stat.exists
+  block:
+    - name: Check the current Pi-hole upstream DNS servers.
+      ansible.builtin.shell: |
+        pihole-FTL --config -q "dns.upstreams"
+      register: pihole_ftl_stdout
+      changed_when: false
+
+    - name: Parse current upstreams into a list.
+      ansible.builtin.set_fact:
+        current_pihole_upstreams: "{{ pihole_ftl_stdout.stdout | regex_findall('[0-9.]+') }}"
+
+    - name: Normalize desired upstreams.
+      ansible.builtin.set_fact:
+        desired_pihole_upstreams: "{{ pihole_upstream_dns_servers | sort }}"
+
+    - name: Set Pi-hole DNS upstreams if needed.
+      ansible.builtin.shell: |
+        pihole-FTL --config dns.upstreams '{{ pihole_upstream_dns_servers | to_json }}'
+      when: (current_pihole_upstreams | sort) != (desired_pihole_upstreams)
 
 - name: Disable systemd‑resolved DNSStubListener (free port 53 for FTL).
   when:

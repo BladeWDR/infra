@@ -15,7 +15,7 @@ All needed variables are set via defaults, but you can override whatever you lik
 ```yaml
 pihole_upstream_dns_servers:
   - "8.8.8.8"
-  - "1.1.1.1"
+  - "127.0.0.1#5335" # If you need a port other than 53.
 ```
 
 Dependencies
@@ -32,9 +32,11 @@ A list of other roles hosted on Galaxy should go here, plus any details in regar
 
 ## To Do
 
-- [ ] Finish work checking on SELinux enforcement state.
+- [x] Finish work checking on SELinux enforcement state.
 - [ ] Clean up
 - [ ] Documentation
+- [x] Make it so that the upstream DNS servers can be changed upon subsequent runs of the playbook.
+- [ ] Same thing with adlists.
 
 ## License
 
