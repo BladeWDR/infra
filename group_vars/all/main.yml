@@ -1,0 +1,11 @@
+---
+
+pihole_upstream_dns_servers:
+  - "127.0.0.1#5335"
+
+bind_dns_listen_port: 5335
+bind_dns_listen_address: 127.0.0.1
+
+grafana_loki_endpoint: "http://localhost:3100"
+alloy_env_file_vars:
+  CUSTOM_ARGS: "--server.http.listen-addr=0.0.0.0:12345"
