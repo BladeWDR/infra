@@ -1,5 +1,7 @@
 ---
 
+admin_username: "scott"
+
 pihole_upstream_dns_servers:
   - "127.0.0.1#5335"
 
