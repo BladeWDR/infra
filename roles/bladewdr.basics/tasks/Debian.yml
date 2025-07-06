@@ -1,0 +1,45 @@
+---
+
+- name: Install basic packages.
+  ansible.builtin.apt:
+    name: "{{ basic_packages_deb }}"
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+  when: ansible_os_family == 'Debian'
+
+- name: Configure unattended-upgrades.
+  block:
+    - name: Copy 20auto-upgrades.
+      ansible.builtin.template:
+        src: 20auto-upgrades
+        dest: /etc/apt/apt.conf.d/20auto-upgrades
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Copy 50unattended-upgrades.
+      ansible.builtin.template:
+        src: 50unattended-upgrades
+        dest: /etc/apt/apt.conf.d/50unattended-upgrades
+        owner: root
+        group: root
+        mode: '0644'
+
+- name: Check if Homebrew directory already exists.
+  ansible.builtin.stat:
+    path: "/home/linuxbrew/.linuxbrew"
+  register: brew_installed
+
+- name: Install Homebrew.
+  ansible.builtin.include_tasks: Homebrew.yml
+  when: not brew_installed.stat.exists and ansible_os_family == "Debian"
+
+- name: Install specific packages via Homebrew.
+  community.general.homebrew:
+    name: "{{ item }}"
+    state: present
+    update_homebrew: true
+  loop: "{{ brew_packages }}"
+  become: false
+  when: ansible_os_family == "Debian"

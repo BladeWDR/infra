@@ -1,0 +1,37 @@
+#SPDX-License-Identifier: MIT-0
+---
+
+basic_packages_deb:
+  - zsh
+  - zsh-autosuggestions
+  - zsh-syntax-highlighting
+  - git
+  - tmux
+  - htop
+  - nagios-nrpe-server
+  - nagios-plugins
+  - ncdu
+  - direnv
+  - curl
+  - wget
+  - make
+  - software-properties-gtk
+  - python3-pip
+  - build-essential
+
+brew_packages:
+  - neovim
+  - ripgrep
+  - fd
+  - fzf
+  - eza
+  - zoxide
+
+# For most of my cloud servers I override the bind address to use the Wireguard management interface only.
+# Specifying this here makes it easier for me to do that and override the setting per host when needed.
+ssh_listen_address: "0.0.0.0"
+
+starship_version: "latest"
+starship_url: https://github.com/starship/starship/releases/latest/download/starship-{{ ansible_architecture }}-unknown-linux-gnu.tar.gz
+starship_download_path: "/tmp/starship.tar.gz"
+starship_installation_directory: "/usr/local/bin"

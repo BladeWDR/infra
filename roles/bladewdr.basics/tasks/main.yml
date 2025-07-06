@@ -1,0 +1,75 @@
+#SPDX-License-Identifier: MIT-0
+---
+
+- name: OS specific tasks.
+  ansible.builtin.include_tasks: "{{ ansible_os_family }}.yml"
+
+- name: Configure timesyncd.
+  ansible.builtin.template:
+    src: timesyncd.conf
+    dest: /etc/systemd/timesyncd.conf
+    mode: "0644"
+    owner: root
+    group: root
+  notify: restart timesyncd
+
+- name: Set timezone using timedatectl.
+  ansible.builtin.command: "timedatectl set-timezone {{ timezone }}"
+  changed_when: false
+
+- name: Check if the .local folder already exists.
+  ansible.builtin.stat:
+    path: "/home/{{ admin_username }}/.local"
+  register: local_exist
+
+- name: Make sure that sshd config includes Include directive.
+  ansible.builtin.lineinfile:
+    regexp: "^Include /etc/ssh/sshd_config.d/*.conf"
+    line: "Include /etc/ssh/sshd_config.d/*.conf"
+    path: "/etc/ssh/sshd_config"
+    state: present
+  notify: restart-ssh
+
+- name: Create SSH options.conf.
+  ansible.builtin.template:
+    src: options.conf.j2
+    dest: /etc/ssh/sshd_config.d/options.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart-ssh
+
+- name: Create the .local folder if it doesn't exist.
+  ansible.builtin.file:
+    path: "/home/{{ admin_username }}/.local"
+    state: directory
+    owner: "{{ admin_username}}"
+    group: "{{ admin_username }}"
+    mode: "0755"
+  when: not local_exist.stat.exists
+
+- name: Check if Starship is already installed.
+  ansible.builtin.stat:
+    path: "/usr/local/bin/starship"
+  register: starship_installed
+
+- name: Install Starship.
+  ansible.builtin.include_tasks: Starship.yml
+  when: not starship_installed.stat.exists
+
+- name: Check if Lazygit is already installed.
+  ansible.builtin.stat:
+    path: "/usr/local/bin/lazygit"
+  register: lazygit_installed
+
+- name: Install Lazygit.
+  ansible.builtin.include_tasks: Lazygit.yml
+  when: not lazygit_installed.stat.exists
+
+- name: Copy sudoers file for Nagios Remote Plugin Executor (NRPE).
+  ansible.builtin.copy:
+    src: sudoers_sanoid
+    dest: /etc/sudoers.d/nagios
+    owner: root
+    group: root
+    mode: "0440"
