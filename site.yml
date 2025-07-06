@@ -14,12 +14,27 @@
 - hosts: all
   become: true
   roles:
+    #- bladewdr.alloy
+    - bladewdr.basics
+  tags: basics
+
+- hosts: dns
+  become: true
+  roles:
     - bladewdr.pihole
     - bladewdr.bind9
   tags: dns
 
-- hosts: alloy
+- hosts: unifi
   become: true
   roles:
-    - bladewdr.baseline
-  tags: alloy
+    #- bladewdr.basics
+    - bladewdr.qemu
+    - bladewdr.unifi
+  tags: unifi
+
+- hosts: docker
+  become: true
+  roles:
+    - geerlingguy.docker
+  tags: docker
