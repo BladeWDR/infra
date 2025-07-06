@@ -73,3 +73,25 @@
     owner: root
     group: root
     mode: "0440"
+
+- name: Set up my dotfiles.
+  block:
+    - name: Make sure that my home directory exists already.
+      ansible.builtin.stat:
+        path: "/home/{{ admin_username }}"
+      register: dotfiles_folder
+
+    - name: Clone the dotfiles repo.
+      ansible.builtin.git:
+        repo: https://github.com/bladewdr/dotfiles.git 
+        dest: "{{ home_directory }}/dotfiles" 
+        recursive: true
+        clone: true
+        update: true
+      register: dotfiles_updated
+      become: false
+
+    - name: Run Dotbot to create the needed symlinks.
+      ansible.builtin.command: "{{ home_directory }}/dotfiles/install"
+      when: dotfiles_updated.changed
+      become: false

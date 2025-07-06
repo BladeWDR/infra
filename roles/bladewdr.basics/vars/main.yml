@@ -2,3 +2,4 @@
 ---
 brew_user: "{{ admin_username }}"  # Replace with your target user
 sudoers_file: "/etc/sudoers.d/homebrew_temp"
+home_directory: "/home/{{ admin_username }}"
