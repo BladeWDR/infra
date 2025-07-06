@@ -11,3 +11,7 @@ unifi_dependencies:
 ubuntu_version_codename: noble
 
 mongodb_version: 8.0
+
+# If you want to specify a specific version, override this variable.
+# e.g. Replace 'unifi' with 'unifi=9.2.87' to install version 9.2.87
+unifi_package_name: unifi

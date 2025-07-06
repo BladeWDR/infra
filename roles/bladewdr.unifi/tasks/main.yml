@@ -45,6 +45,5 @@
 
 - name: Install Unifi Network Application.
   ansible.builtin.apt:
-    name: unifi
+    name: "{{ unifi_package_name }}"
     state: present
-  become: true
