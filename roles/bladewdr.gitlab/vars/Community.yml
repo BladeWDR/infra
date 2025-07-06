@@ -1,0 +1,2 @@
+gitlab_package_name: "{{ gitlab_version }}-ce.0"
+gitlab_edition_full: "GitLab Community Edition"

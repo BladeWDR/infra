@@ -1,0 +1,62 @@
+---
+
+# I think I need an include_vars here so I can avoid a bunch of messy logic.
+# Load vars based on whether or not the user is using Community or Enterprise.
+
+- name: Load additional vars for Community edition.
+  ansible.builtin.include_vars:
+    file: Community.yml
+  when: gitlab_edition == 'gitlab-ce'
+
+- name: Load additional vars for Enterprise edition.
+  ansible.builtin.include_vars:
+    file: Enterprise.yml
+  when: gitlab_edition == 'gitlab-ee'
+
+- name: Check if the Gitlab repository has already been added. (APT)
+  ansible.builtin.stat:
+    path: "/etc/apt/sources.list.d/gitlab_{{ gitlab_edition }}.list"
+  register: gitlab_repo_check_deb
+  when: ansible_os_family == 'Debian'
+
+- name: Check if the Gitlab repository has already been added. (RPM)
+  ansible.builtin.stat:
+    path: "/etc/yum.repos.d/gitlab_{{ gitlab_edition }}.repo"
+  register: gitlab_repo_check_rpm
+  when: ansible_os_family == 'RedHat'
+
+- name: "Add the {{ gitlab_edition_full }} deb repository."
+  ansible.builtin.shell: |
+    curl "https://packages.gitlab.com/install/repositories/gitlab/{{ gitlab_edition }}/script.deb.sh" | sudo bash
+  when: ansible_os_family == 'Debian' and not gitlab_repo_check_deb.stat.exists
+
+- name: "Add the {{ gitlab_edition_full }} rpm repository."
+  ansible.builtin.shell: |
+    curl "https://packages.gitlab.com/install/repositories/gitlab/{{ gitlab_edition }}/script.rpm.sh" | sudo bash
+  when: ansible_os_family == 'RedHat' and not gitlab_repo_check_rpm.stat.exists
+
+- name: "Install or upgrade {{ gitlab_edition_full }} (Debian / Ubuntu)."
+  ansible.builtin.apt:
+    name: "{{ gitlab_edition }}={{ gitlab_package_name }}"
+    update_cache: true
+  environment:
+    EXTERNAL_URL: "{{ gitlab_external_url }}"
+    GITLAB_ROOT_EMAIL: "{{ gitlab_root_email }}"
+    GITLAB_ROOT_PASSWORD: "{{ gitlab_root_password }}"
+  when: ansible_os_family == 'Debian'
+
+- name: "Install or upgrade {{ gitlab_edition_full }} (Red Hat / Alma / Fedora)."
+  ansible.builtin.yum:
+    name: "{{ gitlab_edition }}={{ gitlab_package_name }}"
+    update_cache: true
+  environment:
+    EXTERNAL_URL: "{{ gitlab_external_url }"
+    GITLAB_ROOT_EMAIL: "{{ gitlab_root_email }}"
+    GITLAB_ROOT_PASSWORD: "{{ gitlab_root_password }}"
+  when: ansible_os_family == 'RedHat'
+  register: gitlab_install
+
+- name: Run gitlab-ctl reconfigure for first time setup or updates.
+  ansible.builtin.shell: |
+    gitlab-ctl reconfigure
+  when: gitlab_install.changed
