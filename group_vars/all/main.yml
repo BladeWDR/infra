@@ -2,6 +2,8 @@
 
 admin_username: "scott"
 
+timezone: "America/New_York"
+
 pihole_upstream_dns_servers:
   - "127.0.0.1#5335"
 
