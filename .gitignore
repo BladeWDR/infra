@@ -1,3 +1,5 @@
 .venv
+vaultpass
 roles/*
 !roles/bladewdr.*
+!roles/ansible-role-docker-compose-generator
