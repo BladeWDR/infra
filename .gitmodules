@@ -1,2 +1,0 @@
-[submodule "roles/ansible-role-docker-compose-generator"]
-	path = roles/ansible-role-docker-compose-generator
