@@ -7,3 +7,5 @@ gitlab_version: "18.1.1"
 gitlab_external_url: ""
 gitlab_root_email: ""
 gitlab_root_password: ""
+gitlab_smtp_enabled: false
+gitlab_smtp_port: '465'

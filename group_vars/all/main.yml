@@ -13,3 +13,7 @@ bind_dns_listen_address: 127.0.0.1
 grafana_loki_endpoint: "http://localhost:3100"
 alloy_env_file_vars:
   CUSTOM_ARGS: "--server.http.listen-addr=0.0.0.0:12345"
+
+docker_compose_generator_output_path: /apps
+docker_compose_generator_uid: 1000
+docker_compose_generator_gid: 1000

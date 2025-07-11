@@ -2,7 +2,7 @@
 
 - name: restart timesyncd
   ansible.builtin.service:
-    name: timesyncd
+    name: systemd-timesyncd
     state: restarted
 
 - name: restart-ssh

@@ -1,7 +1,7 @@
 ---
 
-# I think I need an include_vars here so I can avoid a bunch of messy logic.
-# Load vars based on whether or not the user is using Community or Enterprise.
+# Setting the root user and password via env vars is not working.
+# Need to redo my logic here.
 
 - name: Load additional vars for Community edition.
   ansible.builtin.include_vars:
@@ -39,24 +39,32 @@
   ansible.builtin.apt:
     name: "{{ gitlab_edition }}={{ gitlab_package_name }}"
     update_cache: true
-  environment:
-    EXTERNAL_URL: "{{ gitlab_external_url }}"
-    GITLAB_ROOT_EMAIL: "{{ gitlab_root_email }}"
-    GITLAB_ROOT_PASSWORD: "{{ gitlab_root_password }}"
   when: ansible_os_family == 'Debian'
+  notify: Gitlab Reconfigure
 
 - name: "Install or upgrade {{ gitlab_edition_full }} (Red Hat / Alma / Fedora)."
   ansible.builtin.yum:
     name: "{{ gitlab_edition }}={{ gitlab_package_name }}"
     update_cache: true
-  environment:
-    EXTERNAL_URL: "{{ gitlab_external_url }"
-    GITLAB_ROOT_EMAIL: "{{ gitlab_root_email }}"
-    GITLAB_ROOT_PASSWORD: "{{ gitlab_root_password }}"
   when: ansible_os_family == 'RedHat'
-  register: gitlab_install
+  notify: Gitlab Reconfigure
 
-- name: Run gitlab-ctl reconfigure for first time setup or updates.
-  ansible.builtin.shell: |
-    gitlab-ctl reconfigure
-  when: gitlab_install.changed
+- name: Configure GitLab SMTP settings.
+  ansible.builtin.blockinfile:
+    path: /etc/gitlab/gitlab.rb
+    marker: "# {mark} ANSIBLE MANAGED BLOCK"
+    block: |
+      # SMTP settings:
+      gitlab_rails['smtp_enable'] = true
+      gitlab_rails['smtp_address'] = "{{ gitlab_smtp_server }}"
+      gitlab_rails['smtp_port'] = {{ gitlab_smtp_port }}
+      gitlab_rails['smtp_user_name'] = "{{ gitlab_smtp_username }}"
+      gitlab_rails['smtp_password'] = "{{ gitlab_smtp_password }}"
+      gitlab_rails['smtp_domain'] = "{{ gitlab_smtp_domain }}"
+      gitlab_rails['smtp_authentication'] = "login"
+      gitlab_rails['smtp_enable_starttls_auto'] = true
+      gitlab_rails['smtp_openssl_verify_mode'] = 'peer'
+      gitlab_rails['gitlab_email_from'] = '{{ gitlab_email_from }}'
+      gitlab_rails['gitlab_email_reply_to'] = '{{ gitlab_email_reply_to }}'
+  notify: Gitlab Reconfigure
+  when: gitlab_smtp_enabled | bool
