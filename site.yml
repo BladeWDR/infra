@@ -16,6 +16,7 @@
   roles:
     #- bladewdr.alloy
     - bladewdr.basics
+    - bladewdr.chezmoi
   tags: basics
 
 # - hosts: dns

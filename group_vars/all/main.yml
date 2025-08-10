@@ -17,3 +17,5 @@ alloy_env_file_vars:
 docker_compose_generator_output_path: /apps
 docker_compose_generator_uid: 1000
 docker_compose_generator_gid: 1000
+
+chezmoi_dotfiles_repo: "https://github.com/bladewdr/dotfiles.git"
