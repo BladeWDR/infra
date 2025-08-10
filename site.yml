@@ -47,7 +47,7 @@
   roles:
     - ansible-role-docker-compose-generator
   tags: compose
-  
+
   tasks:
     - name: Run docker compose up.
       ansible.builtin.shell: |
