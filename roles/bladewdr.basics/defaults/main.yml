@@ -26,6 +26,7 @@ brew_packages:
   - fzf
   - eza
   - zoxide
+  - npm
 
 # For most of my cloud servers I override the bind address to use the Wireguard management interface only.
 # Specifying this here makes it easier for me to do that and override the setting per host when needed.
