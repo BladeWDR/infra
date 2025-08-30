@@ -92,3 +92,12 @@
     owner: "{{ admin_username }}"
     group: "{{ admin_username }}"
     mode: '0600'
+
+- name: Create a cron job to automatically run dockcheck.
+  ansible.builtin.cron:
+    name: Dockcheck.sh
+    weekday: "{{ dockcheck_cron.weekday }}"
+    minute: "{{ dockcheck_cron.minute }}"
+    hour: "{{ dockcheck_cron.hour }}"
+    user: "{{ admin_username }}"
+    job: "/home/{{ admin_username }}/.local/bin/dockcheck.sh -i"

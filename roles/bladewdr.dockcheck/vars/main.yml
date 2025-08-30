@@ -2,3 +2,7 @@ dockcheck_notify_templates:
   - "https://raw.githubusercontent.com/mag37/dockcheck/main/notify_templates/notify_smtp.sh"
   - "https://raw.githubusercontent.com/mag37/dockcheck/main/notify_templates/notify_discord.sh"
   - "https://raw.githubusercontent.com/mag37/dockcheck/main/notify_templates/notify_v2.sh"
+dockcheck_cron: 
+  weekday: '7,2'
+  hour: '4'
+  minute: '0'
