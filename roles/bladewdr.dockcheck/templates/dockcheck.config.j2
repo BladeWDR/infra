@@ -1,0 +1,44 @@
+### Custom user variables
+## Copy this file to "dockcheck.config" to make it active
+## Can be placed in ~/.config/ or alongside dockcheck.sh
+##
+## Uncomment and set your preferred configuration variables here
+## This will not be replaced on updates
+
+Timeout=30    # Set a timeout (in seconds) per container for registry checkups.
+AutoMode=true    # Automatic updates, without interaction.
+#DontUpdate=true    # No updates; only checking availability without interaction.
+AutoPrune=true    # Auto-Prune dangling images after update.
+#AutoSelfUpdate=true    # Allow automatic self updates - caution as this will pull new code and autorun it.
+Notify=true    # Inform - send a preconfigured notification.
+Exclude="gluetun"    # Exclude containers, separated by comma.
+#DaysOld="5"    # Only update to new images that are N+ days old. Lists too recent with +prefix and age. 2xSlower.
+#Stopped="-a"    # Include stopped containers in the check. (Logic: docker ps -a).
+#OnlyLabel=true    # Only update if label is set. See readme.
+#ForceRestartStacks=true    # Force stop+start stack after update. Caution: restarts once for every updated container within stack.
+#DRunUp=true    # Allow updating images for docker run, wont update the container.
+#MonoMode=true    # Monochrome mode, no printf colour codes and hides progress bar.
+
+### Notify settings
+# NOTIFY_CHANNELS="apprise discord DSM generic HA gotify matrix ntfy pushbullet pushover slack smtp telegram"
+NOTIFY_CHANNELS="discord smtp"
+## Uncomment the line below and specify the number of seconds to delay notifications to enable snooze
+# SNOOZE_SECONDS=86400
+#
+## Uncomment and set to true to disable notifications when dockcheck itself has updates.
+# DISABLE_DOCKCHECK_NOTIFICATION=false
+## Uncomment and set to true to disable notifications when notify scripts themselves have updates.
+# DISABLE_NOTIFY_NOTIFICATION=false
+#
+## Apprise configuration variables. Set APPRISE_PAYLOAD to make a CLI call or set APPRISE_URL to make an API request instead.
+# APPRISE_PAYLOAD='mailto://myemail:mypass@gmail.com
+#                 mastodons://{token}@{host}
+#                 pbul://o.gn5kj6nfhv736I7jC3cj3QLRiyhgl98b
+#                 tgram://{bot_token}/{chat_id}/'
+# APPRISE_URL="http://apprise.mydomain.tld:1234/notify/apprise"
+
+DISCORD_WEBHOOK_URL="{{ DOCKCHECK_DISCORD_WEBHOOK }}"
+
+SMTP_MAIL_FROM="no-reply@ssb-tech.net"
+SMTP_MAIL_TO="scott@ssb-tech.net"
+SMTP_SUBJECT_TAG="Dockcheck - {{ ansible_hostname }}"

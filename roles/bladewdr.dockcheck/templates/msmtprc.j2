@@ -1,0 +1,20 @@
+# Set default values for all following accounts.
+defaults
+auth           on
+tls            on
+tls_starttls off
+tls_trust_file /etc/ssl/certs/ca-certificates.crt
+logfile        ~/.msmtp.log
+
+# ssb-tech.net
+account       {{ SMTP_DOMAIN }}
+host           {{ SMTP_SERVER_ADDRESS }}
+port          465
+tls  on
+from           {{ SMTP_FROM }}
+user           {{ SMTP_USERNAME }}
+password    {{ SMTP_PASSWORD }}
+
+# Set a default account
+account default: {{ SMTP_DOMAIN }}
+
