@@ -1,0 +1,41 @@
+#SPDX-License-Identifier: MIT-0
+---
+
+- name: Install Alloy
+  ansible.builtin.include_role:
+    name: grafana.grafana.alloy
+  vars:
+    alloy_config: |
+      logging {
+        level  = "info"
+        format = "logfmt"
+      }
+
+      discovery.docker "local" {
+        host = "unix:///var/run/docker.sock"
+      }
+
+      discovery.relabel "logs_integrations_docker" {
+      targets = []
+
+      rule {
+        source_labels = ["__meta_docker_container_name"]
+        regex = "/(.*)"
+        target_label = "service_name"
+      }
+      }
+
+      loki.write "local" {
+        endpoint {
+          url = "{{ grafana_loki_endpoint }}/loki/api/v1/push"
+        }
+      }
+
+      loki.source.docker "default" {
+        host       = "unix:///var/run/docker.sock"
+        targets    = discovery.docker.local.targets
+        labels     = {"platform" = "docker"}
+        relabel_rules = discovery.relabel.logs_integrations_docker.rules
+        forward_to = [loki.write.local.receiver]
+      }
+

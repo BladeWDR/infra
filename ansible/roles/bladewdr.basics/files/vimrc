@@ -1,0 +1,19 @@
+" map leader to space
+let mapleader = " " 
+
+" open netrw
+map <leader>e :Ex<CR>
+
+set number
+set relativenumber
+set nocompatible
+set encoding=utf8
+set scrolloff=8
+set tabstop=4
+set softtabstop=4
+set showbreak=↪\
+set list
+set listchars=tab:→\ ,eol:↲,nbsp:␣,trail:•,extends:⟩,precedes:⟨
+filetype indent on
+autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
+autocmd FileType yml setlocal ts=2 sts=2 sw=2 expandtab

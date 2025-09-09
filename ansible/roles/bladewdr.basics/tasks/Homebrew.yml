@@ -1,0 +1,30 @@
+---
+
+- name: Grant passwordless sudo for Homebrew install
+  ansible.builtin.copy:
+    dest: "{{ sudoers_file }}"
+    content: "{{ brew_user }} ALL=(ALL) NOPASSWD:ALL"
+    owner: root
+    group: root
+    mode: "0440"
+    validate: "/usr/sbin/visudo --check --file=%s"
+
+- name: Install Homebrew via the shell script.
+  ansible.builtin.shell: |
+    NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  become: false
+
+- name: Check if brew is installed
+  ansible.builtin.stat:
+   path: "/home/linuxbrew/.linuxbrew/bin/brew"
+  register: brew_stat
+
+- name: Fail if brew was not installed
+  ansible.builtin.fail:
+    msg: "Homebrew installation failed!"
+  when: not brew_stat.stat.exists
+
+- name: Remove temporary sudoers rule
+  ansible.builtin.file:
+    path: "{{ sudoers_file }}"
+    state: absent

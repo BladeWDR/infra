@@ -1,0 +1,6 @@
+#!/usr/bin/bash
+
+# Depends on Jim Salter's Sanoid tool to check zpool health on a ZFS system.
+# User must have a sudoer's policy that allows running this command with no password.
+
+sudo /usr/sbin/sanoid --monitor-health

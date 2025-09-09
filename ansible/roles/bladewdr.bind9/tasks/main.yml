@@ -1,0 +1,20 @@
+#SPDX-License-Identifier: MIT-0
+---
+
+- name: Install needed packages for BIND.
+  ansible.builtin.apt:
+    name:
+      - bind9
+      - bind9utils
+      - bind9-doc
+    state: present
+
+- name: Create BIND configuration files from templates.
+  ansible.builtin.template:
+    src: "{{ item }}.j2"
+    dest: "/etc/bind/{{ item }}"
+    owner: root
+    group: root
+    mode: '0644'
+  loop: "{{ bind_config_files }}"
+  notify: Restart BIND

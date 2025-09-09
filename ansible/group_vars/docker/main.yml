@@ -1,0 +1,7 @@
+---
+
+docker_users:
+  - "{{ admin_username }}"
+
+alloy_user_groups:
+  - docker

@@ -1,0 +1,8 @@
+---
+gitlab_smtp_enabled: true
+# gitlab_smtp_server: smtp.gmail.com
+# gitlab_smtp_domain: domain.com
+# gitlab_email_from: no-reply@domain.com
+# gitlab_email_reply_to: no-reply@domain.com
+# gitlab_smtp_username: example@gmail.com
+# gitlab_smtp_password: NotMyRealPassword

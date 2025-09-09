@@ -1,0 +1,49 @@
+---
+
+- name: Check CPU flags for AVX support.
+  ansible.builtin.command: grep -m1 '^flags' /proc/cpuinfo
+  register: cpu_flags
+  changed_when: false
+  check_mode: false
+
+- name: Fail if AVX is not supported.
+  ansible.builtin.fail:
+    msg: "AVX support is required for MongoDB 8.0+"
+  when: "'avx' not in cpu_flags.stdout"
+
+- name: Add the Unifi APT repository.
+  ansible.builtin.deb822_repository:
+    name: unifi
+    types: deb
+    uris: https://www.ui.com/downloads/unifi/debian
+    suites: stable
+    components: ubiquiti
+    architectures:
+      - amd64
+      - arm64
+    signed_by: https://dl.ui.com/unifi/unifi-repo.gpg
+
+- name: Add the MongoDB APT repository.
+  ansible.builtin.deb822_repository:
+    name: "mongodb-org-{{ mongodb_version }}"
+    types: deb
+    uris: https://repo.mongodb.org/apt/ubuntu
+    suites: "{{ ubuntu_version_codename }}/mongodb-org/{{ mongodb_version }}"
+    components: multiverse
+    signed_by: "https://pgp.mongodb.com/server-{{ mongodb_version }}.asc"
+
+- name: Update the APT package cache.
+  ansible.builtin.apt:
+    update_cache: true
+  changed_when: false
+
+- name: Install Unifi dependencies.
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ unifi_dependencies }}"
+
+- name: Install Unifi Network Application.
+  ansible.builtin.apt:
+    name: "{{ unifi_package_name }}"
+    state: present

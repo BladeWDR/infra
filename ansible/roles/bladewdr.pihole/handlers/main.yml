@@ -1,0 +1,19 @@
+---
+- name: reload systemd‑resolved
+  ansible.builtin.systemd:
+    name: systemd-resolved
+    state: restarted
+    daemon_reload: yes 
+
+- name: update-gravity
+  ansible.builtin.shell: |
+    pihole -g
+
+- name: pihole-FTL
+  ansible.builtin.service:
+    name: pihole-FTL
+    state: restarted
+
+# - name: update-gravity
+#   ansible.builtin.shell: |
+#     sudo -u pihole bash /opt/pihole/gravity.sh --force

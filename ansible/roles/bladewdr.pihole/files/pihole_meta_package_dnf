@@ -1,0 +1,19 @@
+Name: pihole-meta
+Version: 0.2
+Release: 1
+License: EUPL
+BuildArch: noarch
+Summary: Pi-hole dependency meta package
+Requires: bash-completion,bind-utils,binutils,ca-certificates,chkconfig,cronie,curl,dialog,findutils,gawk,git,grep,iproute,jq,libcap,lshw,nmap-ncat,procps-ng,psmisc,sudo,unzip
+%description
+Pi-hole dependency meta package
+%prep
+%build
+%files
+%install
+%changelog
+* Wed May 28 2025 Pi-hole Team - 0.2
+- Add gawk to the list of dependencies
+
+* Sun Sep 29 2024 Pi-hole Team - 0.1
+- First version being packaged

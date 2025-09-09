@@ -1,0 +1,8 @@
+Package: pihole-meta
+Version: 0.4
+Maintainer: Pi-hole team <adblock@pi-hole.net>
+Architecture: all
+Description: Pi-hole dependency meta package
+Depends: awk,bash-completion,binutils,ca-certificates,cron|cron-daemon,curl,dialog,dnsutils,dns-root-data,git,grep,iproute2,iputils-ping,jq,libcap2,libcap2-bin,lshw,netcat-openbsd,procps,psmisc,sudo,unzip
+Section: contrib/metapackages
+Priority: optional

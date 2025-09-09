@@ -1,0 +1,21 @@
+---
+
+- hosts: all
+  become: true
+
+  tasks:
+
+    - name: Create User.
+      user:
+        name: scott
+        groups: sudo
+        append: yes
+        shell: /bin/bash
+        create_home: true
+        password: $6$LAFHbGWZl7AS2xZy$MCBIgWV0wrqpmoqwQ8.2LcZLB2VqtPsvj8nqG/XaK.JGfwfEqu2SnaINx5mAnLXdhIKuhY4z8KpG3z5jrlXxz0
+
+    - name: Set authorized keys taken from url using lookup
+      ansible.posix.authorized_key:
+        user: scott
+        state: present
+        key: "{{ lookup('url', 'https://github.com/bladewdr.keys', split_lines=False) }}"

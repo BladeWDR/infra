@@ -1,0 +1,3 @@
+nagios ALL=(ALL) NOPASSWD: /usr/sbin/sanoid
+scott ALL=(ALL) NOPASSWD: /usr/sbin/sanoid
+nagios ALL=(ALL) NOPASSWD: /opt/nagios/check_unattended_upgrades
