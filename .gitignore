@@ -1,6 +1,7 @@
 .ansible
 .venv
-vaultpass
-roles/*
-!roles/bladewdr.*
-!roles/ansible-role-docker-compose-generator
+ansible/vaultpass
+ansible/roles/*
+!ansible/roles/bladewdr.*
+!ansible/roles/ansible-role-docker-compose-generator
+*.tfvars
