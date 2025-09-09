@@ -1,3 +1,0 @@
-gitlab_package_name: "{{ gitlab_version }}-ee.0"
-gitlab_edition_full: "GitLab Enterprise Edition"
-

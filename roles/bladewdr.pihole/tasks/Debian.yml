@@ -1,7 +1,0 @@
----
-
-- name: Install Pi-hole dependencies (APT).
-  ansible.builtin.apt:
-    name: "{{ item }}"
-    state: present
-  loop: "{{ pihole_dependencies_apt }}"

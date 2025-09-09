@@ -1,9 +1,0 @@
----
-- name: Include Nagios installation tasks.
-  ansible.builtin.import_tasks: install-nagios.yml
-
-- name: Include NRPE tasks.
-  ansible.builtin.import_tasks: nrpe.yml
-
-- name: Include tasks to create Nagios host definitions.
-  ansible.builtin.import_tasks: host-defs.yml

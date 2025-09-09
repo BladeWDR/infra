@@ -1,7 +1,0 @@
----
-collections:
-  - name: grafana.grafana
-  - name: community.general
-
-roles:
-  - name: geerlingguy.docker

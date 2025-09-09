@@ -1,9 +1,0 @@
-#SPDX-License-Identifier: MIT-0
----
-
-bind_dns_listen_port: 53
-bind_dns_listen_address: 0.0.0.0
-
-bind_config_files:
-  - named.conf.local
-  - named.conf.options
