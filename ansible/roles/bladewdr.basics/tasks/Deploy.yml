@@ -1,0 +1,30 @@
+---
+
+- name: Remove the "deploy" user that was created by Packer.
+  ansible.builtin.user:
+    name: deploy
+    state: absent
+    remove: yes
+  register: deploy_user
+
+- name: Update UIDs and GIDs.
+  when: deploy_user is changed
+  block:
+  - name: Update admin user's GID.
+    ansible.builtin.group:
+      name: "{{ admin_username }}"
+      gid: "{{ admin_gid_uid }}"
+
+  - name: Update admin user's UID.
+    ansible.builtin.user:
+      name: "{{ admin_username }}"
+      uid: "{{ admin_gid_uid }}"
+      group: "{{ admin_username }}"
+
+  - name: Fix permissions on admin user's home directory.
+    ansible.builtin.file:
+      recurse: true
+      path: "/home/{{ admin_username }}"
+      owner: "{{ admin_username }}"
+      group: "{{ admin_username }}"
+      mode:  u+rwX,go-rwx
