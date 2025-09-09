@@ -17,7 +17,7 @@
     - secrets.yml
   roles:
     #- bladewdr.alloy
-    # - bladewdr.basics
+    - bladewdr.basics
     #    - bladewdr.chezmoi
   tags: basics
 
@@ -33,7 +33,6 @@
   vars_files:
     - secrets.yml
   roles:
-    #- bladewdr.basics
     - bladewdr.qemu
     - bladewdr.gitlab
   tags: gitlab
@@ -47,14 +46,14 @@
     - bladewdr.dockcheck
   tags: docker
 
-#- hosts: docker
-#  vars_files:
-#    - secrets.yml
-#  become: true
-#  roles:
-#    - ansible-role-docker-compose-generator
-#  tags: compose
-#
+- hosts: docker
+  vars_files:
+    - secrets.yml
+  become: true
+  roles:
+    - ansible-role-docker-compose-generator
+  tags: compose
+
 #  tasks:
 #    - name: Run docker compose up.
 #      ansible.builtin.shell: |
