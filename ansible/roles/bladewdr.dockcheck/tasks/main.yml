@@ -13,14 +13,21 @@
   block:
 
     - name: Get latest regctl download URL.
+      when: not ansible_check_mode
       ansible.builtin.uri:
         url: https://api.github.com/repos/regclient/regclient/releases/latest
         return_content: true
+      check_mode: false
       register: regctl_latest
 
     - name: "Installing regctl {{ regctl_latest.json.tag_name }}"
       loop: "{{ regctl_latest.json.assets }}"
-      when: "'regctl-linux-amd64' in item.name"
+      check_mode: false
+      when:
+        - not ansible_check_mode
+        - regctl_latest is defined
+        - regctl_latest.json is defined
+        - "'regctl-linux-amd64' in item.name"
       ansible.builtin.get_url:
         url: "{{ item.browser_download_url }}"
         dest: "/home/{{ admin_username }}/.local/bin/regctl"
