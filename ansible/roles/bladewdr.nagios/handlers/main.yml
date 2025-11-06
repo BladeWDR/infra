@@ -1,5 +1,6 @@
 ---
 - name: Restart nagios
+  when: not ansible_check_mode
   ansible.builtin.service:
     name: nagios
     state: restarted
@@ -7,6 +8,7 @@
   delegate_to: "{{ nagios_server_fqdn }}"
 
 - name: Restart nrpe
+  when: not ansible_check_mode
   ansible.builtin.service:
     name: nagios-nrpe-server
     state: restarted

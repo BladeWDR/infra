@@ -5,6 +5,6 @@ define host {
 
     host_name   {{inventory_hostname }} 
     address     {{inventory_hostname }}
-    use {{ nagios_host_template }} 
-
+    use         {{ nagios_host_template_list if nagios_host_template_list is defined else nagios_host_template }}
+    hostgroups  {{ nagios_hostgroups }}
 }

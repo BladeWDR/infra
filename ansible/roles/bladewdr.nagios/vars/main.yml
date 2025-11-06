@@ -1,5 +1,6 @@
 nagios_cfg_dir: /usr/local/nagios/etc/objects/infra/home
 nagios_obj_dir: /usr/local/nagios/etc/objects
+nagios_services_dir: /usr/local/nagios/etc/services
 nagios_host_templates:
       - deb-dns
       - deb-server
@@ -18,7 +19,6 @@ nagios_custom_plugins:
       - check_mdadm_raid
       - check_unattended_upgrades
       - check_dns_resolution
-      - gotify
 nagios_dependencies:
       - autoconf
       - gcc
