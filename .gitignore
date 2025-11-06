@@ -1,6 +1,5 @@
 .ansible
 .venv
-ansible/hosts
 ansible/vaultpass
 ansible/roles/*
 !ansible/roles/bladewdr.*

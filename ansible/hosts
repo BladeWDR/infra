@@ -1,0 +1,50 @@
+[webserver]
+app01.bladewdr.xyz nagios_host_template=deb-webserver nagios_hostgroups=deb-webserver
+
+[nagios]
+nagios.bladewdr.xyz
+
+[dns]
+adguard01.bladewdr.xyz
+adguard02.bladewdr.xyz
+adguard03.bladewdr.xyz
+[dns:vars]
+nagios_host_template=deb-dns
+nagios_hostgroups=dns
+
+[gitlab]
+gitlab.bladewdr.xyz nagios_host_template=deb-server nagios_hostgroups=servers,deb-webserver
+
+[docker]
+docker01.bladewdr.xyz
+docker-ubuntu.bladewdr.xyz nagios_host_template_list=deb-docker,deb-webserver nagios_hostgroups=docker,deb-webserver
+deviant.bladewdr.xyz
+heimdall.bladewdr.xyz
+graylog.bladewdr.xyz
+janus.bladewdr.xyz
+jmusicbot.bladewdr.xyz
+onramp.bladewdr.xyz nagios_host_template_list=immich-server,deb-docker,deb-webserver nagios_hostgroups=immich,docker,deb-webserver
+nc.bladewdr.xyz nagios_host_templates_list=deb-docker,deb-webserver nagios_hostgroups=docker,deb-webserver
+sync.bladewdr.xyz nagios_host_templates_list=deb-docker,deb-webserver nagios_hostgroups=docker,deb-webserver
+[docker:vars]
+nagios_host_template=deb-docker
+nagios_hostgroups=docker
+
+
+[unifi]
+unifi-vm.bladewdr.xyz nagios_host_template=deb-server
+
+[nas]
+hades.bladewdr.xyz
+cerberus.bladewdr.xyz
+[nas:vars]
+nagios_host_template=deb-fileserver
+
+[servers:children]
+dns
+docker
+gitlab
+nagios
+nas
+webserver
+unifi
