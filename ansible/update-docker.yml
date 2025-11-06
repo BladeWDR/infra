@@ -1,0 +1,44 @@
+---
+
+- name: Update Docker on Docker hosts.
+  become: true
+  hosts: docker
+
+  tasks:
+
+    - name: Remove old Docker packages.
+      tags:
+        - remove
+        - never
+      ansible.builtin.package:
+        name:
+          - docker
+          - docker.io
+          - docker-engine
+          - docker-doc
+          - docker-compose
+          - docker-compose-v2
+          - podman-docker
+          - containerd
+          - runc
+        state: absent
+
+    - name: Update Docker if it is installed.
+      ansible.builtin.package:
+        name:
+          - docker-compose-plugin
+          - docker-buildx-plugin
+          - docker-ce
+          - docker-ce-cli
+          - docker-ce-rootless-extras
+        update_cache: true
+        cache_valid_time: 3600
+        state: latest
+
+    - name: Get the current version of docker-compose and save it to a register.
+      ansible.builtin.command: docker compose version
+      register: docker_version
+
+    - name: Print docker compose versions on the screen after update.
+      ansible.builtin.debug:
+        msg: "{{ inventory_hostname }}: {{ docker_version.stdout }}"
