@@ -10,6 +10,8 @@
       cache_valid_time: true
     become: true
     changed_when: false
+    tags:
+      - always
 
 - hosts: all
   become: true
