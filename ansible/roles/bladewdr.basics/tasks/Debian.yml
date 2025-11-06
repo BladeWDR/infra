@@ -35,12 +35,31 @@
   ansible.builtin.include_tasks: Homebrew.yml
   when: not brew_installed.stat.exists and ansible_os_family == "Debian"
 
+- name: Get the user ID of the Ansible service account.
+  ansible.builtin.command: whoami
+  register: homebrew_user
+  become: false
+  changed_when: false
+
+- name: Get the current owner of the Homebrew directory.
+  ansible.builtin.stat:
+    path: "/home/linuxbrew/.linuxbrew/"
+  register: homebrew_stat
+
+- name: Set Homebrew directory permissions.
+  ansible.builtin.file:
+    dest: "/home/linuxbrew/.linuxbrew/"
+    owner: "{{ homebrew_user.stdout }}"
+    group: "{{ homebrew_user.stdout }}"
+    mode: '0775'
+    recurse: true
+  when: homebrew_stat.stat.pw_name != homebrew_user.stdout
+
 - name: Install specific packages via Homebrew.
   community.general.homebrew:
     name: "{{ item }}"
     state: present
     update_homebrew: true
-  loop: "{{ brew_packages }}"
-  ignore_errors: true
   become: false
+  loop: "{{ brew_packages }}"
   when: ansible_os_family == "Debian"
