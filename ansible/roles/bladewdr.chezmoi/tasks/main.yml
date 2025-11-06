@@ -2,21 +2,3 @@
 
 - name: Install Chezmoi from Github releases.
   include_tasks: install_chezmoi.yml
-
-- name: Set up dotfiles using Chezmoi.
-  become_user: "{{ admin_username }}"
-  block:
-
-    - name: Initialize Chezmoi repository.
-      ansible.builtin.command: chezmoi init {{ chezmoi_dotfiles_repo }}
-      ignore_errors: true
-      changed_when: false
-
-    - name: Run chezmoi --diff to see if there are any changes to be made.
-      ansible.builtin.command: chezmoi diff
-      changed_when: false
-      register: chezmoi_diff
-
-    - name: Apply pending changes.
-      ansible.builtin.command: chezmoi apply
-      when: chezmoi_diff.stdout_lines | length > 0
