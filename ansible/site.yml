@@ -62,3 +62,11 @@
 #        cd {{ docker_compose_generator_output_path }}
 #        docker compose up -d --remove-orphans
 #      tags: compose
+
+- hosts: all
+  become: true
+  vars_files:
+    - secrets.yml
+  roles:
+    - bladewdr.nagios
+  tags: nagios
