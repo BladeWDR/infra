@@ -4,6 +4,11 @@ app01.bladewdr.xyz nagios_host_template=deb-webserver nagios_hostgroups=deb-webs
 [nagios]
 nagios.bladewdr.xyz
 
+[certbot]
+nc.bladewdr.xyz
+gitlab.bladewdr.xyz
+adguard03.bladewdr.xyz
+
 [dns]
 adguard01.bladewdr.xyz
 adguard02.bladewdr.xyz
@@ -48,3 +53,4 @@ nagios
 nas
 webserver
 unifi
+certbot

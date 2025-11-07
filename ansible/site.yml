@@ -72,3 +72,11 @@
   roles:
     - bladewdr.nagios
   tags: nagios
+
+- hosts: certbot
+  become: true
+  vars_files:
+    - secrets.yml
+  roles:
+    - bladewdr.certbot
+  tags: certbot
