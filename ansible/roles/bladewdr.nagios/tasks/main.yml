@@ -7,3 +7,4 @@
 
 - name: Include tasks to create Nagios host definitions.
   ansible.builtin.import_tasks: host-defs.yml
+  tags: nagios-update

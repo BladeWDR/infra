@@ -63,6 +63,8 @@
 #        docker compose up -d --remove-orphans
 #      tags: compose
 
+
+# Remember you can use the nagios-update tag to only update your host definitions.
 - hosts: all
   become: true
   vars_files:
