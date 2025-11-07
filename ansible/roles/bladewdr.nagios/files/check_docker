@@ -27,19 +27,13 @@ do
   fi
 done
 
-
-if [ $status -ne 0 ]
-then
-  echo "CRITICAL - the following containers are not running: "
-  for i in "${faults[@]}"
-  do
-    echo "$i"
+if [ $status -ne 0 ]; then
+    echo -n "CRITICAL - the following containers are not running: "
+    printf '%s\n' "${faults[@]}"
+    echo
     exit 2
-  done
+else
+    echo "OK - All containers running."
+    exit 0
 fi
 
-if [ $status -eq 0 ]
-then
-  echo "OK - All containers running."
-  exit 0
-fi
