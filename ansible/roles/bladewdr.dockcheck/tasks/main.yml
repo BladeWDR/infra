@@ -58,10 +58,19 @@
     - name: Copy the dockcheck.config file template.
       ansible.builtin.template:
         src: dockcheck.config.j2
-        dest: /home/{{ admin_username }}/.local/bin/dockcheck.config
+        dest: "/home/{{ admin_username }}/.local/bin/dockcheck.config"
         owner: "{{ admin_username }}"
         group: "{{ admin_username }}"
         mode: '0744'
+
+    - name: Set path for notification templates directory.
+      ansible.builtin.set_fact:
+        dockcheck_notify_dir: "/home/{{ admin_username }}/.local/bin/notify_templates"
+
+    - name: Check if notification templates directory already exists.
+      ansible.builtin.stat:
+        path: "{{ dockcheck_notify_dir }}"
+      register: notify_dir
 
     - name: Create notifications template directory.
       ansible.builtin.file:
@@ -70,6 +79,7 @@
         owner: "{{ admin_username }}"
         group: "{{ admin_username }}"
         mode: '0755'
+      when: not notify_dir.stat.exists
 
     - name: Check if notification templates already exist
       ansible.builtin.stat:

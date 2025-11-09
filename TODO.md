@@ -1,0 +1,3 @@
+- [x] Unattended upgrades config
+- [ ] Cloud server config
+- [x] dotfiles config

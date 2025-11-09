@@ -30,9 +30,8 @@ resource "proxmox_vm_qemu" "onramp-lab" {
     pre_enrolled_keys = false
   }
 
-  scsihw   = "virtio-scsi-single"
-  boot     = "order=virtio0;net0"
-  bootdisk = "virtio0"
+  scsihw = "virtio-scsi-single"
+  boot   = "order=virtio0;net0"
 
 
   disks {
@@ -86,9 +85,8 @@ resource "proxmox_vm_qemu" "docker-test" {
     firewall = false
   }
 
-  scsihw   = "virtio-scsi-single"
-  boot     = "order=virtio0;net0"
-  bootdisk = "virtio0"
+  scsihw = "virtio-scsi-single"
+  boot   = "order=virtio0;net0"
 
   efidisk {
     efitype           = "4m"
@@ -101,7 +99,7 @@ resource "proxmox_vm_qemu" "docker-test" {
       virtio0 {
         disk {
           storage = "fast"
-          size    = "32G"
+          size    = "40G"
         }
       }
     }
