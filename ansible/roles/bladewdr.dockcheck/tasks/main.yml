@@ -40,8 +40,9 @@
         name: jq
         state: latest
 
-
+# Might as well exclude this entire block during check_mode, since it all depends upon the .local/bin directory being created beforehand.
 - name: Dockcheck installation.
+  when: not ansible_check_mode
   become: true
   block:
 
