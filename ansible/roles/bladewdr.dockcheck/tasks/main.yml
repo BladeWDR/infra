@@ -53,6 +53,7 @@
         mode: '0755'
         owner: "{{ admin_username }}"
         group: "{{ admin_username }}"
+        force: no
 
     - name: Copy the dockcheck.config file template.
       ansible.builtin.template:
@@ -83,8 +84,10 @@
         owner: "{{ admin_username }}"
         group: "{{ admin_username }}"
         mode: '0744'
+        force: no
       loop: "{{ template_files.results }}"
-      when: not item.stat.exists
+      when: 
+        - not item.stat.exists 
 
 - name: Install msmtp.
   ansible.builtin.package:
