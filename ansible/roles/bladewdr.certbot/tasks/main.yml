@@ -92,21 +92,27 @@
     recurse: false
     file_type: directory
   register: le_live_directories
+  check_mode: false
   changed_when: false
   failed_when: false
 
 - name: Generate certificates using certbot and a DNS challenge
   ansible.builtin.command: >
     certbot certonly
-    -d {{ item }}
+    {% for domain in item.split() %}
+    -d {{ domain }}
+    {% endfor %}
     --dns-cloudflare
     --dns-cloudflare-credentials {{ certbot_secrets_dir }}/{{ certbot_secrets_file }}
     --dns-cloudflare-propagation-seconds {{ certbot_dns_propagation_seconds }}
     --agree-tos
     --email {{ certbot_email }}
     --non-interactive
-  loop: "{{ certbot_domains | difference((le_live_directories.files | map(attribute='path') | map('basename') | list | default([]))) }}"
-  when: certbot_domains is defined and certbot_domains | length > 0
+  loop: "{{ certbot_domains }}"
+  when: 
+    - certbot_domains is defined 
+    - certbot_domains | length > 0
+    - item.split()[0] not in (le_live_directories.files | map(attribute='path') | map('basename') | list | default([]))
 
 - name: Verify certbot.timer is active and enabled
   ansible.builtin.command: systemctl is-enabled --quiet certbot.timer

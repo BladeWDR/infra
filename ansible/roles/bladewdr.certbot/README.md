@@ -6,11 +6,9 @@ This version uses a DNS challenge instead of HTTP01.
 
 ## Variables that need to be set:
 
-- `certbot_cloudflare_api_key`
+- `certbot_cloudflare_api_key` - I recommend putting this in a secrets store. Ansible vault is fine.
 - `certbot_email`
 - `certbot_domains`
-
-I recommend putting this in a secrets store. Ansible vault is fine.
 
 ## Variables and their defaults
 
@@ -21,3 +19,13 @@ I recommend putting this in a secrets store. Ansible vault is fine.
 | `certbot_cloudflare_api_key`      | None                    |
 | `certbot_domains`                 | none. Should be a list. |
 | `certbot_dns_propagation_seconds` | 60                      |
+
+## Specifying multiple domains for a single certificate
+
+If you want multiple domains on a certificate (SANS) - it can be specified like this:
+
+```yaml
+---
+certbot_domains:
+  - domain.tld *.domain.tld
+```
