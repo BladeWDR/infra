@@ -22,7 +22,7 @@
 - name: Check if chezmoi is already installed
   ansible.builtin.command: chezmoi --version
   register: chezmoi_version_output
-  #ignore_errors: true
+  ignore_errors: true
   changed_when: false
 
 - name: Determine chezmoi version and other variables
@@ -49,4 +49,4 @@
   - (chezmoi_install | default(false))
   - ansible_facts['os_family'] == 'RedHat'
   - not ansible_check_mode
-  become: true-
+  become: true
