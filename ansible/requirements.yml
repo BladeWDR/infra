@@ -5,3 +5,7 @@ collections:
 
 roles:
   - name: geerlingguy.docker
+  - name: ansible-role-starship
+    src: https://github.com/bladewdr/ansible-role-starship.git
+    scm: git
+    version: main

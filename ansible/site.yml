@@ -21,6 +21,7 @@
     #- bladewdr.alloy
     - bladewdr.basics
     - bladewdr.chezmoi
+    - ansible-role-starship
   tags: basics
 
 # - hosts: dns
