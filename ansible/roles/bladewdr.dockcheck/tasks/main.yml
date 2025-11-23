@@ -46,6 +46,11 @@
   become: true
   block:
 
+    - name: Check if the Dockcheck script exists already.
+      ansible.builtin.stat:
+        path: "/home/{{ admin_username }}/.local/bin/dockcheck.sh"
+      register: dc_exist
+
     - name: Download the Dockcheck script from Github.
       ansible.builtin.get_url:
         url: https://raw.githubusercontent.com/mag37/dockcheck/main/dockcheck.sh
@@ -54,6 +59,7 @@
         owner: "{{ admin_username }}"
         group: "{{ admin_username }}"
         force: no
+      when: not dc_exist.stat.exists or dockcheck_force_update
 
     - name: Copy the dockcheck.config file template.
       ansible.builtin.template:
