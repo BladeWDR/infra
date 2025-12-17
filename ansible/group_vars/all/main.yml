@@ -14,12 +14,15 @@ grafana_loki_endpoint: "http://localhost:3100"
 alloy_env_file_vars:
   CUSTOM_ARGS: "--server.http.listen-addr=0.0.0.0:12345"
 
-docker_compose_generator_output_path: /apps
-docker_compose_generator_uid: 1000
-docker_compose_generator_gid: 1000
-
 chezmoi_dotfiles_repo: "https://github.com/bladewdr/dotfiles.git"
 
 nagios_server_fqdn: "nagios.bladewdr.xyz"
 nagios_allowed_hosts: "10.13.37.25"
 nagios_hostgroups: servers
+
+# Docker compose generator role
+appdata_path: /apps
+docker_compose_generator_output_path: /apps
+docker_compose_generator_uid: 1000
+docker_compose_generator_gid: 1000
+
