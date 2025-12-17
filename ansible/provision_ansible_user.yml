@@ -1,0 +1,34 @@
+---
+- name: Provisioning playbook.
+  hosts: all
+  become: true
+  # remote_user: root
+  remote_user: scott
+
+  vars:
+    ansible_ssh_private_key_file: /home/scott/.ssh/id_ed25519
+
+  tasks:
+
+    - name: Create ansible user.
+      ansible.builtin.user:
+        name: ansible
+        system: true
+
+    - name: Copy ansible user's ssh key to the remote system.
+      ansible.posix.authorized_key:
+        user: ansible
+        key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGvwq83uQlFvN3qLzon1Tueo/ymX11KyBiec6nC7ZAI4 scott@jumpbox"
+
+    - name: Copy ansible user sudoers file.
+      ansible.builtin.copy:
+        src: files/sudoer_ansible
+        dest: /etc/sudoers.d/ansible
+        owner: root
+        group: root
+        mode: "0440"
+
+    - name: Make sure sudo is installed.
+      ansible.builtin.apt:
+        name: sudo
+        state: present
