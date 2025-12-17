@@ -31,6 +31,7 @@ graylog.bladewdr.xyz
 janus.bladewdr.xyz
 jmusicbot.bladewdr.xyz
 onramp.bladewdr.xyz nagios_host_template_list=immich-server,deb-docker,deb-webserver nagios_hostgroups=immich,docker,deb-webserver
+n8n.bladewdr.xyz nagios_host_template_list=deb-docker
 nc.bladewdr.xyz nagios_host_templates_list=deb-docker,deb-webserver nagios_hostgroups=docker,deb-webserver
 sync.bladewdr.xyz nagios_host_templates_list=deb-docker,deb-webserver nagios_hostgroups=docker,deb-webserver
 [docker:vars]
