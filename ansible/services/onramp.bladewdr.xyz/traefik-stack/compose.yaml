@@ -34,8 +34,8 @@ services:
       - --entrypoints.web.http.redirections.entrypoint.scheme=https
       - --entrypoints.websecure.http.tls=true
       - --entrypoints.websecure.http.tls.certResolver=letsencrypt
-      - --entrypoints.websecure.http.tls.domains[0].main=${HOST_DOMAIN}
-      - --entrypoints.websecure.http.tls.domains[0].sans=*.${HOST_DOMAIN}
+      - --entrypoints.websecure.http.tls.domains[0].main={{ ONRAMP_HOST_DOMAIN }}
+      - --entrypoints.websecure.http.tls.domains[0].sans=*.{{ ONRAMP_HOST_DOMAIN }}
       - --serverstransport.insecureskipverify=true
       - --certificatesresolvers.letsencrypt.acme.dnschallenge=true
       - --certificatesresolvers.letsencrypt.acme.dnschallenge.provider=${DNS_CHALLENGE_PROVIDER:-cloudflare}
@@ -146,7 +146,7 @@ services:
     environment:
       - PUID=${PUID:-1000}
       - PGID=${PGID:-1000}
-      - TZ=${TZ}
+      - TZ={{ host_timezone }}
       - LC_ALL=${LUBELOG_LC_ALL:-en_US.UTF-8}
       - LANG=${LUBELOG_LANG:-en_US.UTF-8}
       - MailConfig__EmailServer={{ SMTP_SERVER_ADDRESS }}
@@ -182,7 +182,7 @@ services:
     environment:
       - PUID=${PUID:-1000}
       - PGID=${PGID:-1000}
-      - TZ=${TZ}
+      - TZ={{ host_timezone }}
       - SKIP_SUPERUSER=false
       #Note: default username for the superuser is "admin", not the email address.
       - SUPERUSER_EMAIL={{ CF_API_EMAIL }}
@@ -253,7 +253,7 @@ services:
     environment:
       - PUID=${PUID:-1000}
       - PGID=${PGID:-1000}
-      - TZ=${TZ}
+      - TZ={{ host_timezone }}
     labels:
       - joyride.host.name=pinchflat.{{ ONRAMP_HOST_DOMAIN }}
       - traefik.enable=${PINCHFLAT_TRAEFIK_ENABLED:-true}
