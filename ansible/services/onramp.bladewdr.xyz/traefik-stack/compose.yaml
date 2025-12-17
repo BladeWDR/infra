@@ -223,8 +223,6 @@ services:
       - POSTGRES_PASSWORD={{ PG_PASS_NETBOX }}
       - POSTGRES_USER=${PG_USER:-netbox}
       - POSTGRES_DB=${PG_DB:-netbox}
-    env_file:
-      - .env
     labels:
       - traefik.enable=false
       - autoheal=true
