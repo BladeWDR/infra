@@ -80,3 +80,11 @@
   roles:
     - bladewdr.certbot
   tags: certbot
+
+- hosts: webservers
+  become: true
+  vars_files:
+    - secrets.yml
+  roles:
+    - bladewdr.apache
+  tags: webserver
