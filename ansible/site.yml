@@ -24,12 +24,11 @@
     - ansible-role-starship
   tags: basics
 
-# - hosts: dns
-#   become: true
-#   roles:
-#     - bladewdr.pihole
-#     - bladewdr.bind9
-#   tags: dns
+- hosts: dns
+  become: true
+  roles:
+    - bladewdr.adguardhome
+  tags: dns
 
 - hosts: gitlab
   become: true

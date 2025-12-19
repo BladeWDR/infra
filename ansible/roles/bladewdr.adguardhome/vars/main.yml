@@ -1,0 +1,3 @@
+adguard_home_install_dir: /opt/AdGuardHome
+adguard_home_github_repo: AdguardTeam/AdGuardHome
+adguard_home_download_location: /tmp/AdGuardHome_linux_amd64.tar.gz

@@ -1,0 +1,9 @@
+---
+- name: reload systemd
+  ansible.builtin.command: systemctl daemon-reload
+
+- name: enable and start AdGuardHome
+  ansible.builtin.service:
+    name: AdGuardHome
+    state: started
+    enabled: true
