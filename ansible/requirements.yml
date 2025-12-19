@@ -9,3 +9,7 @@ roles:
     src: https://github.com/bladewdr/ansible-role-starship.git
     scm: git
     version: main
+  - name: ansible-role-docker-compose-generator
+    src: https://github.com/ironicbadger/ansible-role-docker-compose-generator.git
+    scm: git
+    version: master

@@ -3,7 +3,6 @@
 ansible/vaultpass
 ansible/roles/*
 !ansible/roles/bladewdr.*
-!ansible/roles/ansible-role-docker-compose-generator
 terraform/.terraform
 *.tfstate
 *.tfstate.*
