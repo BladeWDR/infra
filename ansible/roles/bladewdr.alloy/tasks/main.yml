@@ -2,40 +2,60 @@
 ---
 
 - name: Install Alloy
+  when: "'docker' not in group_names"
   ansible.builtin.include_role:
     name: grafana.grafana.alloy
   vars:
     alloy_config: |
-      logging {
-        level  = "info"
-        format = "logfmt"
+      loki.source.journal "host" {
+        forward_to = [loki.relabel.syslog.receiver]
       }
 
-      discovery.docker "local" {
-        host = "unix:///var/run/docker.sock"
+      loki.relabel "syslog" {
+        forward_to = [loki.write.loki.receiver]
+
+        rule {
+          target_label = "job"
+          replacement  = "syslog"
+        }
+
+        rule {
+          target_label = "host"
+          replacement  = "{{ inventory_hostname }}"
+        }
       }
 
-      discovery.relabel "logs_integrations_docker" {
-      targets = []
-
-      rule {
-        source_labels = ["__meta_docker_container_name"]
-        regex = "/(.*)"
-        target_label = "service_name"
-      }
-      }
-
-      loki.write "local" {
+      loki.write "loki" {
         endpoint {
           url = "{{ grafana_loki_endpoint }}/loki/api/v1/push"
         }
       }
 
-      loki.source.docker "default" {
-        host       = "unix:///var/run/docker.sock"
-        targets    = discovery.docker.local.targets
-        labels     = {"platform" = "docker"}
-        relabel_rules = discovery.relabel.logs_integrations_docker.rules
-        forward_to = [loki.write.local.receiver]
-      }
+- name: Docker Alloy install block
+  when: "'docker' in group_names"
+  block:
+    - name: Create target directory.
+      ansible.builtin.file:
+        path: "{{ alloy_docker_config_dir }}/config"
+        state: directory
+        owner: "{{ admin_username }}"
+        group: "{{ admin_username }}"
+        mode: '0755'
 
+    - name: Create Alloy config file for Docker.
+      ansible.builtin.template:
+        src: alloy-docker.j2 
+        dest: "{{ alloy_docker_config_dir }}/config/config.alloy"
+        owner: "{{ admin_username }}"
+        group: "{{ admin_username }}"
+        mode: '0644'
+      notify: restart alloy container
+
+    - name: Copy the Alloy docker-compose file.
+      ansible.builtin.copy:
+        src: docker-compose.yml
+        dest: "{{ alloy_docker_config_dir }}/docker-compose.yml"
+        owner: "{{ admin_username }}"
+        group: "{{ admin_username }}"
+        mode: '0644'
+      notify: reload alloy container

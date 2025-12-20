@@ -1,0 +1,47 @@
+discovery.docker "docker" {
+  host = "unix:///var/run/docker.sock"
+}
+
+loki.source.docker "docker" {
+  host       = "unix:///var/run/docker.sock"
+  targets    = discovery.docker.docker.targets
+  forward_to = [loki.relabel.docker.receiver]
+}
+
+loki.source.journal "host" {
+  forward_to = [loki.relabel.syslog.receiver]
+}
+
+loki.relabel "docker" {
+  forward_to = [loki.write.loki.receiver]
+
+  rule {
+    target_label = "host"
+    replacement  = "{{ inventory_hostname }}"
+  }
+
+  rule {
+    target_label = "job"
+    replacement  = "docker"
+  }
+}
+
+loki.relabel "syslog" {
+  forward_to = [loki.write.loki.receiver]
+
+  rule {
+    target_label = "job"
+    replacement  = "syslog"
+  }
+
+  rule {
+    target_label = "host"
+    replacement  = "{{ inventory_hostname }}"
+  }
+}
+
+loki.write "loki" {
+  endpoint {
+    url = "{{ grafana_loki_endpoint }}/loki/api/v1/push"
+  }
+}

@@ -4,3 +4,16 @@
   ansible.builtin.service:
     name: alloy
     state: restarted
+
+- name: reload alloy container
+  ansible.builtin.command:
+    cmd: docker compose up -d
+    chdir: "{{ alloy_docker_config_dir }}"
+  when:
+    - not ansible_check_mode
+
+- name: restart alloy container
+  ansible.builtin.command:
+    cmd: docker restart alloy
+  when:
+    - not ansible_check_mode
