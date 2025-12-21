@@ -1,6 +1,6 @@
 services:
   mattermost-postgres:
-    image: postgres@sha256:fb9065b6e3e213bdc07edd372a5b2a26245840b7fb65d1fd8b6700106d51805c
+    image: postgres:13-alpine@sha256:fb9065b6e3e213bdc07edd372a5b2a26245840b7fb65d1fd8b6700106d51805c
     container_name: mattermost-postgres
     restart: unless-stopped
     security_opt:
@@ -27,7 +27,7 @@ services:
       - "{{ mattermost_calls_port }}:{{mattermost_calls_port }}/tcp"
     depends_on:
       - mattermost-postgres
-    image: "mattermost/{{ mattermost_image }}@sha256:43e9394f7456ed202f0b9961ae4230aadaecec899329728fc63b6ebb363e0c9e"
+    image: "mattermost/mattermost-team-edition:release-11.3@sha256:43e9394f7456ed202f0b9961ae4230aadaecec899329728fc63b6ebb363e0c9e"
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
