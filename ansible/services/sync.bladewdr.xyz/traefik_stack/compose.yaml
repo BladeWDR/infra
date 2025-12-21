@@ -186,7 +186,7 @@ services:
       - traefik.http.routers.spacebin.middlewares=default-headers@file
       - autoheal=${SPACEBIN_AUTOHEAL_ENABLED:-true}
   spacebin-db:
-    image: postgres:16.3-alpine@sha256:36ed71227ae36305d26382657c0b96cbaf298427b3f1eaeb10d77a6dea3eec41
+    image: postgres:16.11-alpine@sha256:6a388fba16e2a94d6d92bc3c435cdc2e20145add88547615b3d8fa545d703afe
     container_name: spacebin-db
     restart: ${SPACEBIN_RESTART:-unless-stopped}
     networks:
