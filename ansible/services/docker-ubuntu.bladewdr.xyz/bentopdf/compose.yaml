@@ -1,0 +1,23 @@
+services:
+  bentopdf:
+    image: bentopdf/bentopdf@sha256:5273e0ce98a3fb3eba735cf973712351a6c9593930114431db10b180c2c9b6cb
+    container_name: bentopdf
+    restart: unless-stopped
+    networks:
+        - proxy
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.bentopdf.rule=Host(`pdf.lan.bladewdr.xyz`)
+      - traefik.http.routers.bentopdf.entrypoints=https
+      - traefik.http.routers.bentopdf.middlewares=default-headers@file
+      - traefik.http.routers.bentopdf.tls=true
+      - traefik.http.routers.bentopdf.service=bentopdf
+      - traefik.http.services.bentopdf.loadbalancer.server.port=8080
+      - sablier.enable=true
+      - sablier.group=sablier
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/ >/dev/null || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
