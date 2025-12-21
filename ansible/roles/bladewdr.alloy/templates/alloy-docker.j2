@@ -2,28 +2,35 @@ discovery.docker "docker" {
   host = "unix:///var/run/docker.sock"
 }
 
+discovery.relabel "logs_integrations_docker" {
+      targets = []
+  
+      rule {
+          source_labels = ["__meta_docker_container_name"]
+          regex = "/(.*)"
+          target_label = "container_name"
+      }
+
+     rule {
+        target_label = "instance"
+        replacement  = constants.hostname
+    }
+
+    rule {
+      target_label = "host"
+      replacement = "{{ inventory_hostname }}"
+    }
+}
+
 loki.source.docker "docker" {
   host       = "unix:///var/run/docker.sock"
   targets    = discovery.docker.docker.targets
-  forward_to = [loki.relabel.docker.receiver]
+  relabel_rules = discovery.relabel.logs_integrations_docker.rules
+  forward_to = [loki.write.loki.receiver]
 }
 
 loki.source.journal "host" {
   forward_to = [loki.relabel.syslog.receiver]
-}
-
-loki.relabel "docker" {
-  forward_to = [loki.write.loki.receiver]
-
-  rule {
-    target_label = "host"
-    replacement  = "{{ inventory_hostname }}"
-  }
-
-  rule {
-    target_label = "job"
-    replacement  = "docker"
-  }
 }
 
 loki.relabel "syslog" {

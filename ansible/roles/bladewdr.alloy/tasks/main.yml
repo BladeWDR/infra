@@ -93,7 +93,7 @@
         }
 
         rule {
-          target_label = "host"
+          target_label = "hostname"
           replacement  = "{{ inventory_hostname }}"
         }
       }
