@@ -1,6 +1,6 @@
 services:
   mattermost-postgres:
-    image: postgres@sha256:fb9065b6e3e213bdc07edd372a5b2a26245840b7fb65d1fd8b6700106d51805c
+    image: postgres@sha256:38d5c9d522037d8bf0864c9068e4df2f8a60127c6489ab06f98fdeda535560f9
     container_name: mattermost-postgres
     restart: unless-stopped
     security_opt:
