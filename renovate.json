@@ -14,5 +14,5 @@
     {
       "matchPackageNames": ["immich-app/postgres/"],
       "enabled": false
-    },
+    }
 }
