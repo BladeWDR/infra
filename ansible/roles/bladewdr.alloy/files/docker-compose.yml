@@ -11,7 +11,7 @@ services:
       - /apps/alloy/config:/etc/alloy
       - /var/log/journal:/var/log/journal:ro
       - /etc/machine-id:/etc/machine-id:ro
-    image: grafana/alloy:latest
+    image: grafana/alloy@sha256-5bfd2566d0d600e925165c2bf2f431e7b911b03a4aa1565b10c2022ed4abb7a2
     command: run --server.http.listen-addr=0.0.0.0:12345 --disable-reporting /etc/alloy/config.alloy
 
 

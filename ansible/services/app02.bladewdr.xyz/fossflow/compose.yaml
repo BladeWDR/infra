@@ -1,6 +1,6 @@
 services:
   fossflow:
-    image: stnsmith/fossflow:latest
+    image: stnsmith/fossflow@sha256-46d43ead93b339317338c1e74b04c38764238a715980f503c569690891a25990
     restart: unless-stopped
     container_name: fossflow
     ports:

@@ -1,0 +1,40 @@
+services:
+  changedetection:
+    image: ghcr.io/dgtlmoon/changedetection.io@sha256:99cf11f04b5d1f1300b5b68f17dc22e76bdb5d6695d7e6590d2df92eca8fb339
+    container_name: changedetection
+    networks:
+      - proxy
+    hostname: changedetection
+    volumes:
+      - /apps/changedetection:/datastore
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.changedetection.rule=Host(`changedetection.lan.bladewdr.xyz`)
+      - traefik.http.routers.changedetection.entrypoints=https
+      - traefik.http.routers.changedetection.middlewares=default-headers@file
+      - traefik.http.routers.changedetection.tls=true
+      - traefik.http.routers.changedetection.service=changedetection
+      - traefik.http.services.changedetection.loadbalancer.server.port=5000
+    environment:
+      - LOGGER_LEVEL=DEBUG
+      - BASE_URL=https://changedetection.lan.bladewdr.xyz
+      - USE_X_SETTINGS=1
+      - HIDE_REFERER=true
+      - DISABLE_VERSION_CHECK=true
+      - TZ={{ host_timezone }}
+      - PLAYWRIGHT_DRIVER_URL=ws://browser-sockpuppet-chrome:3000
+    restart: unless-stopped
+
+  browser-sockpuppet-chrome:
+    hostname: browser-sockpuppet-chrome
+    networks:
+      - proxy
+    image: dgtlmoon/sockpuppetbrowser@sha256:01a4ab6c9b1bea143af26b864252acb6fe38631ae01cb4aa6fea7286fcbc1cf0
+    cap_add:
+      - SYS_ADMIN
+    restart: unless-stopped
+    environment:
+      - SCREEN_WIDTH=1920
+      - SCREEN_HEIGHT=1024
+      - SCREEN_DEPTH=16
+      - MAX_CONCURRENT_CHROME_PROCESSES=10
