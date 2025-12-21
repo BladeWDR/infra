@@ -1,10 +1,14 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "enabledManagers": ["docker-compose"],
+  "enabledManagers": [
+    "docker-compose"
+  ],
   "dependencyDashboard": true,
   "prConcurrentLimit": 0,
   "prHourlyLimit": 0,
-  "baseBranches": ["main"],
+  "baseBranches": [
+    "main"
+  ],
   "enabled": true,
   "extends": [
     "config:recommended",
@@ -12,7 +16,10 @@
   ],
   "packageRules": [
     {
-      "matchPackageNames": ["immich-app/postgres/"],
+      "matchPackageNames": [
+        "immich-app/postgres/"
+      ],
       "enabled": false
     }
+  ]
 }
