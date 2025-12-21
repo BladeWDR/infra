@@ -1,7 +1,7 @@
 ---
 services:
   traefik:
-    image: traefik:v3
+    image: traefik:v3@sha256:67622638cd88dbfcfba40159bc652ecf0aea0e032f8a3c7e3134ae7c037b9910
     container_name: ${TRAEFIK_CONTAINER_NAME:-traefik}
     restart: ${TRAEFIK_RESTART:-unless-stopped}
     mem_limit: ${TRAEFIK_MEM_LIMIT:-100m}
@@ -186,7 +186,7 @@ services:
       - traefik.http.routers.spacebin.middlewares=default-headers@file
       - autoheal=${SPACEBIN_AUTOHEAL_ENABLED:-true}
   spacebin-db:
-    image: postgres:16.3-alpine
+    image: postgres:16.3-alpine@sha256:36ed71227ae36305d26382657c0b96cbaf298427b3f1eaeb10d77a6dea3eec41
     container_name: spacebin-db
     restart: ${SPACEBIN_RESTART:-unless-stopped}
     networks:

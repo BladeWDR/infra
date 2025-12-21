@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:16
+    image: postgres:16@sha256:d4c3314b2dd74ff23cd6cd07e4d7e737cb6ef791c22a7cbd744cfbfb4815df72
     restart: unless-stopped
     networks:
       - n8n_net
@@ -20,7 +20,7 @@ services:
       retries: 10
 
   n8n:
-    image: docker.n8n.io/n8nio/n8n
+    image: docker.n8n.io/n8nio/n8n@sha256:aa499e07898e1599bd50ba07e967fc47cdc7fc78adb2430f588e0f8386b8ff39
     restart: unless-stopped
     environment:
       - DB_TYPE=postgresdb
