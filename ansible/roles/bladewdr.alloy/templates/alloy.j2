@@ -18,8 +18,18 @@ discovery.relabel "logs_integrations_docker" {
 
     rule {
       target_label = "host"
-      replacement = "{{ inventory_hostname }}"
+      replacement = constants.hostname
     }
+}
+
+local.file_match "unifi_logs" {
+  path_targets = [{"__path__" = "/var/log/unifi/*.log", "job" = "unifi", "hostname" = constants.hostname}]
+}
+
+loki.source.file "unifi_logs" {
+  targets = local.file_match.unifi_logs.targets
+  forward_to = [loki.write.loki.receiver]
+  tail_from_end = true
 }
 
 loki.source.docker "docker" {
@@ -43,7 +53,7 @@ loki.relabel "syslog" {
 
   rule {
     target_label = "host"
-    replacement  = "{{ inventory_hostname }}"
+    replacement  = constants.hostname
   }
 }
 

@@ -1,6 +1,11 @@
 #SPDX-License-Identifier: MIT-0
 ---
 
+- name: Set fact for Alloy config file contents.
+  ansible.builtin.set_fact:
+    alloy_template: "{{ lookup('template', '../templates/alloy.j2') }}"
+    alloy_template_rsyslog: "{{ lookup('template', '../templates/alloy-rsyslog.j2') }}"
+
 - name: Install Alloy
   when:
     - "'docker' not in group_names"
@@ -8,95 +13,14 @@
   ansible.builtin.include_role:
     name: grafana.grafana.alloy
   vars:
-    alloy_config: |
-      loki.source.journal "host" {
-        forward_to = [loki.relabel.syslog.receiver]
-      }
-
-      loki.relabel "syslog" {
-        forward_to = [loki.write.loki.receiver]
-
-        rule {
-          target_label = "job"
-          replacement  = "syslog"
-        }
-
-        rule {
-          target_label = "host"
-          replacement  = "{{ inventory_hostname }}"
-        }
-      }
-
-      loki.write "loki" {
-        endpoint {
-          url = "{{ grafana_loki_endpoint }}/loki/api/v1/push"
-        }
-      }
+    alloy_config: "{{ alloy_template }}"
 
 - name: Install Alloy with rsyslog UDP receiver.
   when: "inventory_hostname == rsyslog_receiver_server"
   ansible.builtin.include_role:
     name: grafana.grafana.alloy
   vars:
-    alloy_config: |
-      // Optional: set Alloy log level
-      logging {
-        level = "warn"
-      }
-
-      loki.write "loki" {
-        endpoint {
-          url = "{{ grafana_loki_endpoint }}/loki/api/v1/push"
-        }
-      }
-
-      // Relabel component using labelmap to extract headers automatically
-      loki.relabel "syslog" {
-        forward_to = [loki.write.loki.receiver]
-
-        // Automatically convert internal __syslog_* labels to normal labels
-        rule {
-          action = "labelmap"
-          regex  = "__syslog_(.+)"
-        }
-
-        // Optionally, labelmap any message_* labels if needed
-        rule {
-          action = "labelmap"
-          regex  = "message_(.+)"
-        }
-      }
-
-      loki.source.syslog "syslog_udp" {
-        listener {
-          address = "0.0.0.0:1514"
-          protocol = "udp"
-          syslog_format = "rfc5424"
-          use_rfc5424_message = true
-          labels = {"job" = "syslog"}
-        }
-
-        relabel_rules = loki.relabel.syslog.rules
-        forward_to = [loki.relabel.syslog.receiver]
-      }
-
-      loki.source.journal "host" {
-        forward_to = [loki.relabel.journal.receiver]
-      }
-
-      loki.relabel "journal" {
-        forward_to = [loki.write.loki.receiver]
-
-        rule {
-          target_label = "job"
-          replacement  = "journal"
-        }
-
-        rule {
-          target_label = "hostname"
-          replacement  = "{{ inventory_hostname }}"
-        }
-      }
+    alloy_config: "{{ alloy_template_rsyslog }}"
 
 - name: Docker Alloy install block
   when:
@@ -113,7 +37,7 @@
 
     - name: Create Alloy config file for Docker.
       ansible.builtin.template:
-        src: alloy-docker.j2 
+        src: alloy.j2 
         dest: "{{ alloy_docker_config_dir }}/config/config.alloy"
         owner: "{{ admin_username }}"
         group: "{{ admin_username }}"
