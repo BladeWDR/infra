@@ -45,7 +45,7 @@
     - secrets.yml
   roles:
     - geerlingguy.docker
-    - bladewdr.dockcheck
+    # - bladewdr.dockcheck
   tags: docker
 
 - hosts: docker
