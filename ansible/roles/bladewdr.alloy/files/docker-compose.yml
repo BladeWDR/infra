@@ -5,13 +5,18 @@ services:
     group_add:
       - "987"
     privileged: true
+    pid: host
+    security_opt:
+      - apparmor=unconfined
+    network_mode: host
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /apps/alloy/config:/etc/alloy
       - /var/log/journal:/var/log/journal:ro
       - /etc/machine-id:/etc/machine-id:ro
+      - /:/rootfs:ro
+      - /sys:/sys:ro
+      - /etc/hostname:/etc/nodename:ro
     image: grafana/alloy:v1.12.1@sha256:c311595156fca7b1131683d383dae1acfd29e8879d347161d2a6f714ebac0c0b
     command: run --server.http.listen-addr=0.0.0.0:12345 --disable-reporting /etc/alloy/config.alloy
-
-

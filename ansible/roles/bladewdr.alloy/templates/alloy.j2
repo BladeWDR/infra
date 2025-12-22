@@ -1,3 +1,26 @@
+prometheus.exporter.unix "local_system" {
+  procfs_path = "/proc"
+  sysfs_path  = "/sys"
+  rootfs_path = "{{ alloy_rootfs_path }}"
+  
+  set_collectors = ["cpu", "meminfo", "diskstats", "netdev", "filesystem", "loadavg"]
+}
+
+prometheus.relabel "add_labels" {
+  forward_to = []
+  
+  rule {
+    target_label = "host"
+    replacement  = constants.hostname
+  }
+}
+
+prometheus.scrape "scrape_metrics" {
+  targets         = prometheus.exporter.unix.local_system.targets
+  forward_to      = [prometheus.relabel.add_labels.receiver]
+  scrape_interval = "10s"
+}
+
 discovery.docker "docker" {
   host = "unix:///var/run/docker.sock"
 }

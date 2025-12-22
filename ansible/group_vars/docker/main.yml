@@ -5,3 +5,5 @@ docker_users:
 
 alloy_user_groups:
   - docker
+
+alloy_rootfs_path: /rootfs

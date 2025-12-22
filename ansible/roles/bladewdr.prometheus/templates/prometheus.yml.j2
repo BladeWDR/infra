@@ -12,12 +12,14 @@ scrape_configs:
     static_configs:
       - targets:
 {% for host in all_hosts %}
-          - '{{ host }}:9100'
+          - '{{ host }}:12345'
 {% endfor %}
+    metrics_path: '/metrics'
 
   - job_name: 'docker_containers'
     static_configs:
       - targets:
 {% for host in docker_hosts %}
-          - '{{ host }}:9100'
+          - '{{ host }}:12345'
 {% endfor %}
+    metrics_path: '/metrics'
