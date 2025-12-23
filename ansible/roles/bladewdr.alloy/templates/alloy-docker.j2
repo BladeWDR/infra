@@ -43,6 +43,11 @@ discovery.relabel "logs_integrations_docker" {
       target_label = "host"
       replacement = constants.hostname
     }
+
+    rule {
+      target_label = "job"
+      replacement = "docker_containers"
+    }
 }
 
 local.file_match "unifi_logs" {
