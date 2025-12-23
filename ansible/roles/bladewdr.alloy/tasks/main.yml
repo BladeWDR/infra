@@ -37,7 +37,7 @@
 
     - name: Create Alloy config file for Docker.
       ansible.builtin.template:
-        src: alloy.j2 
+        src: alloy-docker.j2 
         dest: "{{ alloy_docker_config_dir }}/config/config.alloy"
         owner: "{{ admin_username }}"
         group: "{{ admin_username }}"

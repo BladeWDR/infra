@@ -21,6 +21,30 @@ prometheus.scrape "scrape_metrics" {
   scrape_interval = "10s"
 }
 
+discovery.docker "docker" {
+  host = "unix:///var/run/docker.sock"
+}
+
+discovery.relabel "logs_integrations_docker" {
+      targets = []
+  
+      rule {
+          source_labels = ["__meta_docker_container_name"]
+          regex = "/(.*)"
+          target_label = "container_name"
+      }
+
+     rule {
+        target_label = "instance"
+        replacement  = constants.hostname
+    }
+
+    rule {
+      target_label = "host"
+      replacement = constants.hostname
+    }
+}
+
 local.file_match "unifi_logs" {
   path_targets = [{"__path__" = "/var/log/unifi/*.log", "job" = "unifi", "hostname" = constants.hostname}]
 }
@@ -29,6 +53,13 @@ loki.source.file "unifi_logs" {
   targets = local.file_match.unifi_logs.targets
   forward_to = [loki.write.loki.receiver]
   tail_from_end = true
+}
+
+loki.source.docker "docker" {
+  host       = "unix:///var/run/docker.sock"
+  targets    = discovery.docker.docker.targets
+  relabel_rules = discovery.relabel.logs_integrations_docker.rules
+  forward_to = [loki.write.loki.receiver]
 }
 
 loki.source.journal "host" {
