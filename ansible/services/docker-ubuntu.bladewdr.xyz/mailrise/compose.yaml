@@ -4,7 +4,7 @@ networks:
 
 services:
   mailrise:
-    image: yoryan/mailrise
+    image: yoryan/mailrise@sha256:0b8b1ce3447c83b625c9e8896cd9c3db0205590f92ce4d4adaae69729830f52b
     container_name: mailrise
     volumes:
        - ./mailrise/mailrise.conf:/etc/mailrise.conf:ro
