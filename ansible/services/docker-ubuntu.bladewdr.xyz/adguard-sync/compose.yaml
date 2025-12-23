@@ -1,0 +1,45 @@
+---
+services:
+  adguardhome-sync:
+    image: ghcr.io/bakito/adguardhome-sync:v0.8.2
+    container_name: adguardhome-sync
+    command: run
+    environment:
+      - LOG_LEVEL=info
+    ## Primary instance (Origin)
+      - ORIGIN_URL=https://10.13.37.2
+      - ORIGIN_WEB_URL=https://10.13.37.2
+      - ORIGIN_USERNAME={{ admin_username }}
+      - ORIGIN_PASSWORD={{ adguard_home_password }}
+      - ORIGIN_INSECURE_SKIP_VERIFY=true
+
+      # Replica instance 1 (#1)
+      - REPLICA1_URL=https://10.13.37.48
+      - REPLICA1_WEB_URL=https://10.13.37.48
+      - REPLICA1_USERNAME={{ admin_username }}
+      - REPLICA1_PASSWORD={{ adguard_home_password }}
+      - REPLICA1_INSECURE_SKIP_VERIFY=true
+
+      # Replica instance 2 (#2)
+      - REPLICA2_URL=https://192.168.85.13:4433
+      - REPLICA2_WEB_URL=https://192.168.85.13:4433
+      - REPLICA2_USERNAME={{ admin_username }}
+      - REPLICA2_PASSWORD={{ adguard_home_password }}
+      - REPLICA2_INSECURE_SKIP_VERIFY=true
+
+      # Sync options
+      - CRON=0 */1 * * *
+      - RUN_ON_START=true
+      - PRINT_CONFIG_ONLY=false
+      - CONTINUE_ON_ERROR=true
+
+      # API options (optional)
+      - API_PORT=8080
+      - API_USERNAME={{ admin_username }}
+      - API_PASSWORD={{ adguard_home_password }}
+      - API_DARK_MODE=false
+      #- API_METRICS_ENABLED=false
+
+    ports:
+      - 8080:8080
+    restart: unless-stopped

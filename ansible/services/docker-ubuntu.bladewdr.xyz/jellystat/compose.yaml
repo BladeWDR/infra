@@ -1,0 +1,42 @@
+networks:
+  proxy:
+    external: true
+
+services:
+  jellystat-db:
+    image: 'postgres:15.2'
+    shm_size: 1gb
+    networks:
+      - proxy
+    container_name: jellystat-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: jellystat
+      POSTGRES_PASSWORD: {{ JELLYSTAT_POSTGRES_PASSWORD }}
+    volumes:
+      - './jellystat/database:/var/lib/postgresql/data'
+  jellystat:
+    image: 'cyfershepard/jellystat:1.1.7'
+    container_name: jellystat
+    restart: unless-stopped
+    networks:
+      - proxy
+    environment:
+      POSTGRES_USER: jellystat
+      POSTGRES_PASSWORD: {{ JELLYSTAT_POSTGRES_PASSWORD }}
+      POSTGRES_IP: jellystat-db
+      POSTGRES_PORT: 5432
+      JWT_SECRET: {{ JELLYSTAT_JWT_SECRET }}
+      TZ: America/New_York
+    labels:
+        - traefik.enable=true
+        - traefik.http.routers.jellystat.rule=Host(`jellystat.{{ TRAEFIK_HOST_DOMAIN }}`)
+        - traefik.http.routers.jellystat.entrypoints=https
+        - traefik.http.routers.jellystat.middlewares=default-headers@file
+        - traefik.http.routers.jellystat.tls=true
+        - traefik.http.routers.jellystat.service=jellystat
+        - traefik.http.services.jellystat.loadbalancer.server.port=3000
+    volumes:
+      - './jellystat/backup-data:/app/backend/backup-data'
+    depends_on:
+      - jellystat-db

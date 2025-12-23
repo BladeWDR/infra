@@ -1,0 +1,30 @@
+---
+services:
+  gitlab-runner-wiki:
+    image: gitlab/gitlab-runner:latest
+    container_name: gitlab-runner-wiki
+    networks:
+      - proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./gitlab-runner/config:/etc/gitlab-runner
+      - mkdocs-site:/site
+    restart: unless-stopped
+
+  gitlab-runner-dashboard:
+    image: gitlab/gitlab-runner:latest
+    container_name: gitlab-runner-dashboard
+    networks:
+      - proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./gitlab-runner/dashboard-config:/etc/gitlab-runner
+    restart: unless-stopped
+
+networks:
+  proxy:
+    external: true
+
+volumes:
+  mkdocs-site:
+    external: true

@@ -1,0 +1,33 @@
+networks:
+  proxy:
+    external: true
+
+# description: Open-Source Personal Subscription Tracker
+# https://github.com/ellite/Wallos
+
+services:
+  wallos:
+    image: bellamy/wallos:${WALLOS_DOCKER_TAG:-latest}
+    container_name: ${WALLOS_CONTAINER_NAME:-wallos}
+    restart: ${WALLOS_RESTART:-unless-stopped}
+    networks:
+      - proxy
+    volumes:
+      - ./wallos/db:/var/www/html/db
+      - ./wallos/logos:/var/www/html/images/uploads/logos
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ={{ host_timezone }}
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.wallos.entrypoints=https
+      - traefik.http.routers.wallos.rule=Host(`wallos.{{ TRAEFIK_HOST_DOMAIN }}`)
+      - traefik.http.routers.wallos.tls=true
+      - traefik.http.middlewares.wallos=default-headers@file
+      - traefik.http.middlewares.wallos=https-redirectscheme@file
+      - traefik.http.routers.wallos.middlewares=default-headers@file
+      - traefik.http.services.wallos.loadbalancer.server.port=80
+      - traefik.http.routers.wallos.service=wallos
+      - traefik.docker.network=proxy

@@ -1,0 +1,34 @@
+networks:
+  proxy:
+    external: true
+
+services:
+  olivetin:
+    container_name: olivetin
+    image: jamesread/olivetin:3000.7.0@sha256:a06795b7c7f237c82cfe98c20f99193ca43f2469b9ba94c2743fde93750b2c00
+    user: "root"
+    privileged: true
+    networks:
+      - proxy
+    volumes:
+      - ./olivetin/config:/config
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 1337:1337
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.olivetin.entrypoints=https
+      - traefik.http.routers.olivetin.rule=Host(`olivetin.{{ TRAEFIK_HOST_DOMAIN }}`)
+      - traefik.http.services.olivetin.loadbalancer.server.port=1337
+      - traefik.http.services.olivetin.loadbalancer.server.scheme=http
+      - traefik.http.routers.olivetin.middlewares=default-headers@file,https-redirectscheme@file,dynamic
+      - traefik.http.routers.olivetin.tls=true
+      - sablier.enable=true
+      - sablier.group=sablier
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://127.0.0.1:1337/olivetin.api.v1.OliveTinApiService/GetReadyz"]
+      interval: 10s
+      timeout: 3s
+      start_period: 20s
+      retries: 3

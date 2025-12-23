@@ -1,0 +1,42 @@
+networks:
+  proxy:
+    external: true
+  flare-db:
+
+services:
+  flare:
+      container_name: flare
+      networks:
+        - proxy
+        - flare-db
+      environment:
+        - NEXTAUTH_URL={{ FLARE_NEXTAUTH_URL }}
+        - NEXTAUTH_SECRET={{ FLARE_NEXTAUTH_SECRET }}
+        - DATABASE_URL={{ FLARE_DATABASE_URL }}
+      volumes:
+        - ./flare/uploads:/app/uploads
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.flare.rule=Host(`{{ FLARE_HOST }}`)
+        - traefik.http.routers.flare.service=flare
+        - traefik.http.routers.flare.tls=true
+        - traefik.http.middlewares.flare=default-headers@file
+        - traefik.http.middlewares.flare=https-redirectscheme@file
+        - traefik.http.routers.flare.middlewares=default-headers@file
+        - traefik.http.services.flare.loadbalancer.server.port=3000
+        - traefik.docker.network=proxy
+      image: flintsh/flare:1.6.1
+  postgres:
+      image: postgres:16-alpine
+      restart: unless-stopped
+      networks:
+        - flare-db
+      container_name: flare-db
+      environment:
+        - POSTGRES_USER=flare
+        - POSTGRES_PASSWORD={{ FLARE_POSTGRES_PW }}
+        - POSTGRES_DB=flare
+      ports:
+        - "5432:5432"
+      volumes:
+        - ./flare/database:/var/lib/postgresql/data

@@ -1,0 +1,24 @@
+---
+volumes:
+  kiwix-data:
+    labels:
+      - remove_volume_on=down
+    driver_opts:
+      type: nfs
+      o: "addr=nas01.bladewdr.xyz,nolock,noatime,soft,rw"
+      device: ":/mnt/tank/kiwix"
+
+networks:
+  proxy:
+    external: true
+
+services:
+  kiwix-serve:
+    container_name: kiwix
+    image: ghcr.io/kiwix/kiwix-serve:3.8.0
+    networks:
+      - proxy
+    volumes:
+      - kiwix-data:/data
+    command:
+      - '*.zim'

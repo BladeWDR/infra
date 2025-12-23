@@ -19,7 +19,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.sablier.entrypoints=https
-      - traefik.http.routers.sablier.rule=Host(`sablier.lan.bladewdr.xyz`)
+      - traefik.http.routers.sablier.rule=Host(`sablier.{{ TRAEFIK_HOST_DOMAIN }}`)
       - traefik.http.services.sablier.loadbalancer.server.port=10000
       - traefik.http.middlewares.dynamic.plugin.sablier.group=sablier
       - traefik.http.middlewares.dynamic.plugin.sablier.dynamic.displayName=Sablier

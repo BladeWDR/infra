@@ -1,0 +1,43 @@
+---
+
+networks:
+  proxy:
+    external: true
+
+services:
+  mealie:
+    image: ghcr.io/mealie-recipes/mealie:v3.4.0
+    container_name: mealie
+    restart: always
+    networks:
+      - proxy
+    ports:
+        - "9925:9000" #
+    deploy:
+      resources:
+        limits:
+          memory: 1000M #
+    volumes:
+      - ./mealie/mealie-data:/app/data/
+    environment:
+    # Set Backend ENV Variables Here
+      - ALLOW_SIGNUP=false
+      - ALLOW_PASSWORD_LOGIN=false
+      - OIDC_AUTH_ENABLED=true
+      - OIDC_SIGNUP_ENABLED=true
+      - OIDC_CONFIGURATION_URL=https://{{ AUTHENTIK_HOST }}/application/o/mealie/.well-known/openid-configuration
+      - OIDC_CLIENT_ID={{ MEALIE_OIDC_CLIENT_ID }}
+      - OIDC_CLIENT_SECRET={{ MEALIE_OIDC_CLIENT_SECRET }}
+      - OIDC_AUTO_REDIRECT=true
+      - OIDC_ADMIN_GROUP={{ MEALIE_OIDC_ADMIN_GROUP }}
+      - OIDC_PROVIDER_NAME=Authentik
+      - PUID=1000
+      - PGID=1000
+      - TZ={{ host_timezone }}
+      - BASE_URL=https://recipes.{{ TRAEFIK_HOST_DOMAIN }}
+    labels:
+      - traefik.enabled=true
+      - traefik.http.routers.mealie.host(`recipes.{{ TRAEFIK_HOST_DOMAIN }}`)
+      - traefik.http.routers.mealie.middlewares=default-headers@file
+      - traefik.http.routers.mealie.tls=true
+      - traefik.http.routers.mealie.service.loadbalancer.port=9000

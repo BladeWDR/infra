@@ -1,0 +1,40 @@
+---
+services:
+    freshrss:
+        container_name: freshrss
+        environment:
+            - PUID=1000
+            - PGID=1000
+            - TZ={{ host_timezone }}
+            - TRUSTED_PROXY=172.23.0.0/16
+            - CRON_MIN=2,32
+            - OIDC_ENABLED=1
+            - OIDC_PROVIDER_METADATA_URL="https://{{ AUTHENTIK_HOST }}/application/o/fresh-rss-oidc/.well-known/openid-configuration"
+            - OIDC_REMOTE_USER_CLAIM=preferred_username
+            - OIDC_CLIENT_ID={{ FRESHRSS_OIDC_CLIENT_ID }}
+            - OIDC_CLIENT_SECRET={{ FRESHRSS_OIDC_CLIENT_SECRET }}
+            - OIDC_CLIENT_CRYPTO_KEY={{ FRESHRSS_OIDC_CLIENT_CRYPTO_KEY }}
+            - OIDC_SCOPES=openid email profile
+            - OIDC_X_FORWARDED_HEADERS=X-Forwarded-Host X-Forwarded-Port X-Forwarded-Proto
+
+        ports:
+            - '49999:80'
+        volumes:
+            - ./freshrss/data:/var/www/FreshRSS/data
+            - ./freshrss/extensions:/var/www/FreshRSS/extensions
+        restart: unless-stopped
+        image: 'freshrss/freshrss:1.27.1'
+        labels:
+            - traefik.enable=true
+            - traefik.http.routers.freshrss-external.rule=Host(`{{ FRESHRSS_URL }}`)
+            - traefik.http.routers.freshrss-external.entrypoints=https
+            - traefik.http.routers.freshrss-external.middlewares=default-headers@file
+            - traefik.http.routers.freshrss-external.tls=true
+            - traefik.http.routers.freshrss-external.service=freshrss-external
+            - traefik.http.services.freshrss-external.loadbalancer.server.port=80
+        networks:
+            - proxy
+
+networks:
+  proxy:
+    external: true

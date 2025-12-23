@@ -1,0 +1,24 @@
+---
+services:
+  nginx:
+    container_name: mkdocs-nginx
+    image: nginx
+    volumes:
+      - ./mkdocs-wiki/html:/usr/share/nginx/html:ro
+    networks:
+      - proxy
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.mkdocs-nginx.rule=Host(`wiki.{{ TRAEFIK_HOST_DOMAIN }}`)
+      - traefik.http.routers.mkdocs-nginx.service=wiki
+      - traefik.http.routers.mkdocs-nginx.tls=true
+      - traefik.http.middlewares.mkdocs-nginx=default-headers@file
+      - traefik.http.middlewares.mkdocs-nginx=https-redirectscheme@file
+      - traefik.http.routers.mkdocs-nginx.middlewares=default-headers@file
+      - traefik.http.services.wiki.loadbalancer.server.port=80
+      - traefik.docker.network=proxy
+
+networks:
+  proxy:
+    external: true

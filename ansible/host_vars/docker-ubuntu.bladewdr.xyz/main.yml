@@ -1,0 +1,1 @@
+docker_compose_generator_output_path: /home/{{ admin_username }}/docker/

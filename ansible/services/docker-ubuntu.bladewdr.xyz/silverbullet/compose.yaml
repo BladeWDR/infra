@@ -1,0 +1,21 @@
+networks:
+  proxy:
+    external: true
+
+services:
+  silverbullet:
+    restart: unless-stopped
+    container_name: silverbullet
+    volumes:
+      - ./silverbullet/space:/space
+    image: ghcr.io/silverbulletmd/silverbullet:2.3.0
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.silverbullet.rule=Host(`sb.{{ TRAEFIK_HOST_DOMAIN }}`)
+      - traefik.http.routers.silverbullet.entrypoints=https
+      - traefik.http.routers.silverbullet.middlewares=default-headers@file
+      - traefik.http.routers.silverbullet.tls=true
+      - traefik.http.routers.silverbullet.service=silverbullet
+      - traefik.http.services.silverbullet.loadbalancer.server.port=3000
+    networks:
+      - proxy

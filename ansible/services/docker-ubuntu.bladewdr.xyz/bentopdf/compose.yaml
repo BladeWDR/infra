@@ -7,7 +7,7 @@ services:
         - proxy
     labels:
       - traefik.enable=true
-      - traefik.http.routers.bentopdf.rule=Host(`pdf.lan.bladewdr.xyz`)
+      - traefik.http.routers.bentopdf.rule=Host(`pdf.{{ TRAEFIK_HOST_DOMAIN }}`)
       - traefik.http.routers.bentopdf.entrypoints=https
       - traefik.http.routers.bentopdf.middlewares=default-headers@file
       - traefik.http.routers.bentopdf.tls=true

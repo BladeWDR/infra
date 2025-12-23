@@ -9,7 +9,7 @@ services:
       - /apps/changedetection:/datastore
     labels:
       - traefik.enable=true
-      - traefik.http.routers.changedetection.rule=Host(`changedetection.lan.bladewdr.xyz`)
+      - traefik.http.routers.changedetection.rule=Host(`changedetection.{{ TRAEFIK_HOST_DOMAIN }}`)
       - traefik.http.routers.changedetection.entrypoints=https
       - traefik.http.routers.changedetection.middlewares=default-headers@file
       - traefik.http.routers.changedetection.tls=true
@@ -17,7 +17,7 @@ services:
       - traefik.http.services.changedetection.loadbalancer.server.port=5000
     environment:
       - LOGGER_LEVEL=DEBUG
-      - BASE_URL=https://changedetection.lan.bladewdr.xyz
+      - BASE_URL=https://changedetection.{{ TRAEFIK_HOST_DOMAIN }}
       - USE_X_SETTINGS=1
       - HIDE_REFERER=true
       - DISABLE_VERSION_CHECK=true

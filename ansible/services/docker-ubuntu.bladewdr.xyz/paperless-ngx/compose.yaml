@@ -1,0 +1,123 @@
+networks:
+  proxy:
+    external: true
+
+volumes:
+  paperless-scans-ingest:
+    driver_opts:
+      type: nfs
+      o: "addr=10.13.37.22,nfsvers=4,nolock,noatime,soft,rw"
+      device: ":/mnt/tank/scans"
+
+services:
+  paperless-ai:
+    image: clusterzx/paperless-ai:${PAPERLESS_AI_DOCKER_TAG:-latest}
+    container_name: ${PAPERLESS_AI_CONTAINER_NAME:-paperless-ai}
+    restart: ${PAPERLESS_AI_RESTART:-unless-stopped}
+    mem_limit: ${PAPERLESS_AI_MEM_LIMIT:-200g}
+    env_file:
+      - .env
+    networks:
+      - proxy
+    volumes:
+      - ./paperless-ai/etc/paperless-ai:/app/data
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ={{ host_timezone }}
+    labels:
+      - traefik.enable=${PAPERLESS_AI_TRAEFIK_ENABLED:-true}
+      - traefik.http.routers.paperless-ai.entrypoints=https
+      - traefik.http.routers.paperless-ai.rule=Host(`paperless-ai.${TRAEFIK_HOST_DOMAIN}`)
+      - traefik.http.routers.paperless-ai.tls=true
+      - traefik.http.routers.paperless-ai.middlewares=default-headers@file
+      - traefik.http.services.paperless-ai.loadbalancer.server.port=3000
+
+  broker:
+    image: docker.io/library/redis:8
+    restart: unless-stopped
+    networks:
+      - proxy
+    volumes:
+      - ./paperless-ngx/etc/paperless-ngx-postgres/redisdata:/data
+
+  db:
+    image: postgres:17
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./paperless-ngx/etc/paperless-ngx-postgres/pgdata:/var/lib/postgresql/data
+    networks:
+      - proxy
+    environment:
+      POSTGRES_DB: paperless
+      POSTGRES_USER: paperless
+      POSTGRES_PASSWORD: ${PAPERLESS_DB_PASS:-paperless}
+
+  gotenberg:
+    image: docker.io/gotenberg/gotenberg:8.20
+    restart: unless-stopped
+    networks:
+      - proxy
+    command:
+      - "gotenberg"
+      - "--chromium-disable-javascript=true"
+      - "--chromium-allow-list=file:///tmp/.*"
+
+  tika:
+    image: ghcr.io/paperless-ngx/tika:latest
+    restart: unless-stopped
+    networks:
+      - proxy
+
+  paperless-ngx-postgres:
+    image: ghcr.io/paperless-ngx/paperless-ngx:${PAPERLESS_NGX_DOCKER_TAG:-latest}
+    container_name: ${PAPERLESS_NGX_CONTAINER_NAME:-paperless-ngx-postgres}
+    restart: ${PAPERLESS_NGX_RESTART:-unless-stopped}
+    env_file:
+      - .env
+    networks:
+      - proxy
+    depends_on:
+      - broker
+      - db
+      - gotenberg
+      - tika
+    volumes:
+      - ./paperless-ngx/etc/paperless-ngx-postgres/data:/usr/src/paperless/data
+      - ./paperless-ngx/etc/paperless-ngx-postgres/media:/usr/src/paperless/media
+      - ./paperless-ngx/etc/paperless-ngx-postgres/export:/usr/src/paperless/export
+      - paperless-scans-ingest:/usr/src/paperless/consume
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ={{ host_timezone }}
+       #PAPERLESS_URL Required for proper authentication behind traefik
+      - PAPERLESS_URL=https://paperless.${TRAEFIK_HOST_DOMAIN}
+      - PAPERLESS_REDIS=redis://broker:6379
+      - PAPERLESS_TIKA_ENABLED=1
+      - PAPERLESS_TIKA_GOTENBERG_ENDPOINT=http://gotenberg:3000
+      - PAPERLESS_TIKA_ENDPOINT=http://tika:9998
+      - PAPERLESS_DBENGINE=${PAPERLESS_DB_ENGINE:-postgres}
+      # - PAPERLESS_DBPORT=${PAPERLESS_DB_PORT:-3306}
+      - PAPERLESS_DBHOST=${PAPERLESS_DB_HOST:-db}
+      - PAPERLESS_DBNAME=${PAPERLESS_DB_NAME:-paperless}
+      - PAPERLESS_DBUSER=${PAPERLESS_DB_USER:-paperless}
+      - PAPERLESS_DBPASS=${PAPERLESS_DB_PASS:-paperless}
+      - PAPERLESS_ADMIN_USER=${PAPERLESS_ADMINUSER:-admin}
+      - PAPERLESS_ADMIN_MAIL=${PAPERLESS_ADMINMAIL:-admin@yourmail.com}
+      - PAPERLESS_ADMIN_PASSWORD=${PAPERLESS_ADMINPASSWORD:-admin}
+      - PAPERLESS_CONSUMER_POLLING=300
+      - USERMAP_UID=1000
+      - USERMAP_GID=1000
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.paperless-ngx-postgres.entrypoints=https
+      - traefik.http.routers.paperless-ngx-postgres.rule=Host(`paperless.${TRAEFIK_HOST_DOMAIN}`)
+      - traefik.http.routers.paperless-ngx-postgres.middlewares=default-headers@file
+      - traefik.http.routers.paperless-ngx-postgres.tls=true
+      - traefik.http.services.paperless-ngx-postgres.loadbalancer.server.port=8000
