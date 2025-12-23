@@ -27,7 +27,6 @@ docker01.bladewdr.xyz
 docker-ubuntu.bladewdr.xyz nagios_host_template_list=deb-docker,deb-webserver nagios_hostgroups=docker,deb-webserver
 deviant.bladewdr.xyz
 heimdall.bladewdr.xyz
-graylog.bladewdr.xyz
 janus.bladewdr.xyz
 jmusicbot.bladewdr.xyz
 onramp.bladewdr.xyz nagios_host_template_list=immich-server,deb-docker,deb-webserver nagios_hostgroups=immich,docker,deb-webserver
