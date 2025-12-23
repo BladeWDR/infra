@@ -23,7 +23,7 @@ services:
             - ./freshrss/data:/var/www/FreshRSS/data
             - ./freshrss/extensions:/var/www/FreshRSS/extensions
         restart: unless-stopped
-        image: 'freshrss/freshrss:1.27.1'
+        image: 'freshrss/freshrss:1.27.1@sha256:9a56be99f3927cc8fab4c6bbd5723ae098824792d4d98a84007a95eb64e8f905'
         labels:
             - traefik.enable=true
             - traefik.http.routers.freshrss-external.rule=Host(`{{ FRESHRSS_URL }}`)

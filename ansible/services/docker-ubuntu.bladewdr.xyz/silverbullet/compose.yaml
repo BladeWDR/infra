@@ -8,7 +8,7 @@ services:
     container_name: silverbullet
     volumes:
       - ./silverbullet/space:/space
-    image: ghcr.io/silverbulletmd/silverbullet:2.3.0
+    image: ghcr.io/silverbulletmd/silverbullet:2.3.0@sha256:a4b60f3adf29e65b207310c3db9864c76974d667a72b8131680dd487f6a9c148
     labels:
       - traefik.enable=true
       - traefik.http.routers.silverbullet.rule=Host(`sb.{{ TRAEFIK_HOST_DOMAIN }}`)

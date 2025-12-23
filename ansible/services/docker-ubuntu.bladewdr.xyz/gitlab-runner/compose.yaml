@@ -1,7 +1,7 @@
 ---
 services:
   gitlab-runner-wiki:
-    image: gitlab/gitlab-runner:latest
+    image: gitlab/gitlab-runner:latest@sha256:1e7605f50b5e76b8781ac34cf4fff36b13f0c3d0ff5e75e87b843a9f9ed4b8df
     container_name: gitlab-runner-wiki
     networks:
       - proxy
@@ -12,7 +12,7 @@ services:
     restart: unless-stopped
 
   gitlab-runner-dashboard:
-    image: gitlab/gitlab-runner:latest
+    image: gitlab/gitlab-runner:latest@sha256:1e7605f50b5e76b8781ac34cf4fff36b13f0c3d0ff5e75e87b843a9f9ed4b8df
     container_name: gitlab-runner-dashboard
     networks:
       - proxy

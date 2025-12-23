@@ -1,7 +1,7 @@
 ---
 services:
   ntp:
-    image: cturra/ntp:latest
+    image: cturra/ntp:latest@sha256:7224d4e7c7833aabbcb7dd70c46c8a8dcccda365314c6db047b9b10403ace3bc
     container_name: ntp
     environment:
       - NTP_SERVERS="time.cloudflare.com"

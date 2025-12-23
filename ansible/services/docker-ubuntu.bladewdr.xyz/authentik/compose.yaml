@@ -2,7 +2,7 @@
 
 services:
   postgresql:
-    image: docker.io/library/postgres:16-alpine
+    image: docker.io/library/postgres:16-alpine@sha256:23e88eb049fd5d54894d70100df61d38a49ed97909263f79d4ff4c30a5d5fca2
     container_name: authentik-postgresql
     restart: unless-stopped
     networks:
@@ -125,7 +125,7 @@ services:
       - postgresql
 
   authentik-proxy:
-    image: ghcr.io/goauthentik/proxy:2025.10.0
+    image: ghcr.io/goauthentik/proxy:2025.10.0@sha256:db9d498357e174851bb1d9f67a2f3428b50560684b9ca5cd753cea40b33b726b
     container_name: authentik-proxy
     networks:
       - proxy
