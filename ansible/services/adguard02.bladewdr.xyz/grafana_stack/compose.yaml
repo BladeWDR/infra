@@ -1,7 +1,7 @@
 services:
   loki:
     container_name: loki
-    image: docker.io/grafana/loki:3.5.1@sha256:a74594532eec4cc313401beedc4dd2708c43674c032084b1aeb87c14a5be1745
+    image: docker.io/grafana/loki:3.6.3@sha256:cd6e176883a90c21755f0315688668991634143423f75bdedfef41441b0fdc3c
     command: "-config.file=/etc/loki/config.yaml"
     ports:
       - "3100:3100"
