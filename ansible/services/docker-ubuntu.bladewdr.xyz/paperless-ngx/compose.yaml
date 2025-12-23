@@ -37,6 +37,7 @@ services:
   broker:
     image: docker.io/library/redis:8@sha256:3906b477e4b60250660573105110c28bfce93b01243eab37610a484daebceb04
     restart: unless-stopped
+    container_name: paperless-broker
     networks:
       - proxy
     volumes:
@@ -45,6 +46,7 @@ services:
   db:
     image: postgres:17@sha256:dca7512acaa113409df7e40d977d801e53c0c8088e45d4311a45b4065ccfdcd3
     restart: unless-stopped
+    container_name: paperless-db
     env_file:
       - .env
     volumes:
@@ -58,6 +60,7 @@ services:
 
   gotenberg:
     image: docker.io/gotenberg/gotenberg:8.20@sha256:cda4386c7ed38f18bc6897828be01ba7361c99929a5c84ec5e293d7916e29bac
+    container_name: paperless-gotenberg
     restart: unless-stopped
     networks:
       - proxy
@@ -69,6 +72,7 @@ services:
   tika:
     image: ghcr.io/paperless-ngx/tika:latest
     restart: unless-stopped
+    container_name: paperless-tika
     networks:
       - proxy
 
