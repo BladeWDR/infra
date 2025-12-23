@@ -23,6 +23,7 @@ nagios_hostgroups=dns
 gitlab.bladewdr.xyz nagios_host_template=deb-server nagios_hostgroups=servers,deb-webserver
 
 [docker]
+adguard02.bladewdr.xyz
 docker01.bladewdr.xyz
 docker-ubuntu.bladewdr.xyz nagios_host_template_list=deb-docker,deb-webserver nagios_hostgroups=docker,deb-webserver
 deviant.bladewdr.xyz
@@ -37,6 +38,8 @@ sync.bladewdr.xyz nagios_host_templates_list=deb-docker,deb-webserver nagios_hos
 nagios_host_template=deb-docker
 nagios_hostgroups=docker
 
+[prometheus]
+adguard02.bladewdr.xyz
 
 [unifi]
 unifi-vm.bladewdr.xyz nagios_host_template=deb-server
