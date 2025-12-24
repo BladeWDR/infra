@@ -47,3 +47,4 @@ services:
         - --storage.tsdb.retention.time=30d
         - --web.enable-lifecycle
         - --web.enable-admin-api
+        - --web.enable-remote-write-receiver
