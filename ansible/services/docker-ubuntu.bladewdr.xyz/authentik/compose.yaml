@@ -19,21 +19,6 @@ services:
       POSTGRES_PASSWORD: {{ AUTHENTIK_PG_PASS }}
       POSTGRES_USER: authentik
       POSTGRES_DB: authentik
-  # redis:
-  #   image: docker.io/library/redis:alpine
-  #   container_name: authentik-redis
-  #   command: --save 60 1 --loglevel warning
-  #   restart: unless-stopped
-  #   networks:
-  #     - proxy
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
-  #     start_period: 20s
-  #     interval: 30s
-  #     retries: 5
-  #     timeout: 3s
-  #   volumes:
-  #     - ./redis:/data
   server:
     image: ghcr.io/goauthentik/server:2025.10.0
     container_name: authentik-server
@@ -75,13 +60,9 @@ services:
     volumes:
       - ./authentik/media:/media
       - ./authentik/custom-templates:/templates
-    # ports:
-    #   - "${COMPOSE_PORT_HTTP:-9000}:9000"
-    #   - "${COMPOSE_PORT_HTTPS:-9443}:9443"
     depends_on:
       postgresql:
         condition: service_healthy
-      #- redis
   worker:
     image: ghcr.io/goauthentik/server:2025.10.0
     container_name: authentik-worker
