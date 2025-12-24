@@ -20,7 +20,7 @@ prometheus.exporter.unix "local_system" {
     sysfs_path  = "/sys"
     rootfs_path = "{{ alloy_rootfs_path }}"
 
-    set_collectors = ["cpu", "meminfo", "diskstats", "netdev", "filesystem", "loadavg"]
+    set_collectors = ["cpu", "meminfo", "diskstats", "netdev", "filesystem", "loadavg", "thermal_zone", "processes"]
 
     filesystem {
       // Exclude filesystem types that aren't relevant for monitoring
