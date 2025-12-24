@@ -2,7 +2,7 @@
 
 services:
   ersatztv:
-    image: jasongdove/ersatztv:v25.9.0
+    image: jasongdove/ersatztv:v25.9.0@sha256:abeaae053c58ab3dce5e4771a1fe61f84b49d58360a110824698aa88402d055f
     container_name: ersatztv
     environment:
       - TZ=${ERSATZ_TZ:-America/New_York}
@@ -21,7 +21,7 @@ services:
 
   jellyfin-newsletter:
       container_name: jellyfin-newsletter
-      image: 'ghcr.io/seaweedbraincy/jellyfin-newsletter:v0.8.2'
+      image: 'ghcr.io/seaweedbraincy/jellyfin-newsletter:v0.8.2@sha256:a3a410ff28292b0d10d9f2d32e84286ac747a214e64ed4ed8f910c41ac5a0cc1'
       environment:
         USER_UID: 1000
         USER_GID: 1000
