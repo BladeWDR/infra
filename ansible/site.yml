@@ -24,14 +24,6 @@
     - ansible-role-starship
   tags: basics
 
-- hosts: all
-  become: true
-  vars_files:
-    - secrets.yml
-  roles:
-    - bladewdr.alloy
-  tags: alloy
-
 - hosts: dns
   become: true
   roles:
@@ -104,3 +96,11 @@
   roles:
     - bladewdr.prometheus
   tags: prometheus
+
+- hosts: all
+  become: true
+  vars_files:
+    - secrets.yml
+  roles:
+    - bladewdr.alloy
+  tags: alloy
