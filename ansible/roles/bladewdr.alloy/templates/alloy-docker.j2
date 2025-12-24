@@ -1,24 +1,59 @@
-prometheus.exporter.unix "local_system" {
-  procfs_path = "/proc"
-  sysfs_path  = "/sys"
-  rootfs_path = "{{ alloy_rootfs_path }}"
-  
-  set_collectors = ["cpu", "meminfo", "diskstats", "netdev", "filesystem", "loadavg"]
-}
+// This block relabels metrics coming from node_exporter to add standard labels
+discovery.relabel "integrations_node_exporter" {
+  targets = prometheus.exporter.unix.local_system.targets
 
-prometheus.relabel "add_labels" {
-  forward_to = []
-  
   rule {
+    // Set the instance label to the hostname of the machine
     target_label = "host"
     replacement  = constants.hostname
   }
+
+  rule {
+    // Set a standard job name for all node_exporter metrics
+    target_label = "job"
+    replacement = "node_exporter"
+  }
+}
+
+prometheus.exporter.unix "local_system" {
+  procfs_path = "/proc"
+    sysfs_path  = "/sys"
+    rootfs_path = "{{ alloy_rootfs_path }}"
+
+    set_collectors = ["cpu", "meminfo", "diskstats", "netdev", "filesystem", "loadavg"]
+
+    filesystem {
+      // Exclude filesystem types that aren't relevant for monitoring
+      fs_types_exclude     = "^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|tmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$"
+        // Exclude mount points that aren't relevant for monitoring
+        mount_points_exclude = "^/(dev|proc|run/credentials/.+|sys|var/lib/docker/.+)($|/)"
+        // Timeout for filesystem operations
+        mount_timeout        = "5s"
+    }
+
+    netclass {
+      // Ignore virtual and container network interfaces
+      ignored_devices = "^(veth.*|cali.*|[a-f0-9]{15})$"
+    }
+
+    netdev {
+      // Exclude virtual and container network interfaces from device metrics
+      device_exclude = "^(veth.*|cali.*|[a-f0-9]{15})$"
+    }
+
 }
 
 prometheus.scrape "scrape_metrics" {
-  targets         = prometheus.exporter.unix.local_system.targets
-  forward_to      = [prometheus.relabel.add_labels.receiver]
+  targets         = discovery.relabel.integrations_node_exporter.output
+  forward_to      = [prometheus.remote_write.prometheus_server.receiver]
   scrape_interval = "10s"
+}
+
+// Define where to send the metrics for storage
+prometheus.remote_write "prometheus_server" {
+  endpoint {
+    url = "http://{{ prometheus_endpoint }}:9090/api/v1/write"
+  }
 }
 
 discovery.docker "docker" {
@@ -51,7 +86,7 @@ discovery.relabel "logs_integrations_docker" {
 }
 
 local.file_match "unifi_logs" {
-  path_targets = [{"__path__" = "/var/log/unifi/*.log", "job" = "unifi", "hostname" = constants.hostname}]
+  path_targets = [{"__path__" = "/var/log/unifi/*.log", "job" = "unifi", "host" = constants.hostname}]
 }
 
 loki.source.file "unifi_logs" {
