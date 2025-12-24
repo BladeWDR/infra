@@ -1,6 +1,6 @@
 services:
   traefik:
-    image: traefik:v3
+    image: traefik:v3@sha256:67622638cd88dbfcfba40159bc652ecf0aea0e032f8a3c7e3134ae7c037b9910
     container_name: ${TRAEFIK_CONTAINER_NAME:-traefik}
     restart: ${TRAEFIK_RESTART:-unless-stopped}
     mem_limit: ${TRAEFIK_MEM_LIMIT:-100m}
@@ -62,7 +62,7 @@ services:
 
   immich:
     container_name: immich
-    image: ghcr.io/immich-app/immich-server:v2.0.1
+    image: ghcr.io/immich-app/immich-server:v2.0.1@sha256:8286638680f0a38a7cb380be64ed77d1d1cfe6d0e0b843f64bff92b24289078d
     volumes:
       - immich-nfs-upload:/usr/src/app/upload
       - /etc/localtime:/etc/localtime:ro
@@ -96,7 +96,7 @@ services:
   immich-machine-learning:
     container_name: immich_machine_learning
     user: "1000"
-    image: ghcr.io/immich-app/immich-machine-learning:v2.0.1
+    image: ghcr.io/immich-app/immich-machine-learning:v2.0.1@sha256:45626a33361ef7ed361de41b0d2dc19e5949442cdf0a8eb64b157dc8a04e9855
     networks:
       - immich-db
     volumes:
@@ -127,7 +127,7 @@ services:
     restart: ${IMMICH_RESTART_POLICY:-unless-stopped}
 
   lubelog:
-    image: ghcr.io/hargata/lubelogger:v1.5.5
+    image: ghcr.io/hargata/lubelogger:v1.5.5@sha256:9fce15cb8c96e5ad36b0dc810b63caf083bb2d66fa2cb6cfb5152bf97fc2a447
     container_name: ${LUBELOG_CONTAINER_NAME:-lubelog}
     restart: ${LUBELOG_RESTART:-unless-stopped}
     mem_limit: ${LUBELOG_MEM_LIMIT:-200g}
@@ -166,7 +166,7 @@ services:
       - autoheal=${LUBELOG_AUTOHEAL_ENABLED:-true}
 
   netbox:
-    image: lscr.io/linuxserver/netbox:v4.4.9-ls320
+    image: lscr.io/linuxserver/netbox:v4.4.9-ls320@sha256:e380494f813bdc35fdb8eacefb16a5ddd5b85acc21c2a3bf07d4722eb1dc0930
     container_name: ${NETBOX_CONTAINER_NAME:-netbox}
     restart: unless-stopped
     depends_on:
@@ -209,7 +209,7 @@ services:
       - autoheal=true
 
   netbox-postgresql:
-    image: postgres:16.4
+    image: postgres:16.4@sha256:e62fbf9d3e2b49816a32c400ed2dba83e3b361e6833e624024309c35d334b412
     container_name: netbox_postgresql
     restart: unless-stopped
     networks:
@@ -228,7 +228,7 @@ services:
       - autoheal=true
 
   netbox-redis:
-    image: redis:alpine
+    image: redis:alpine@sha256:6cbef353e480a8a6e7f10ec545f13d7d3fa85a212cdcc5ffaf5a1c818b9d3798
     container_name: netbox_redis
     restart: unless-stopped
     networks:
@@ -240,7 +240,7 @@ services:
       - autoheal=true
 
   pinchflat:
-    image: ghcr.io/kieraneglin/pinchflat:latest
+    image: ghcr.io/kieraneglin/pinchflat:latest@sha256:01b4f98aabaf3f5fe394213f7a32578c9e84e42080f52e2f8334021a4473b202
     container_name: ${PINCHFLAT_CONTAINER_NAME:-pinchflat}
     restart: ${PINCHFLAT_RESTART:-unless-stopped}
     mem_limit: ${PINCHFLAT_MEM_LIMIT:-200g}
