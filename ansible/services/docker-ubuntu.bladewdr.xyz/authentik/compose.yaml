@@ -20,7 +20,7 @@ services:
       POSTGRES_USER: authentik
       POSTGRES_DB: authentik
   server:
-    image: ghcr.io/goauthentik/server:2025.10.0@sha256:a283f44eefd68bcfc25cdfbdc0372e6384b60468ca042278bde0a4bd8af4680f
+    image: ghcr.io/goauthentik/server:2025.10.3@sha256:d2b66e851246e7299219b72a4ed43630a2c2bac3745eb665834b72963d836e64
     container_name: authentik-server
     restart: unless-stopped
     ports:
@@ -64,7 +64,7 @@ services:
       postgresql:
         condition: service_healthy
   worker:
-    image: ghcr.io/goauthentik/server:2025.10.0@sha256:a283f44eefd68bcfc25cdfbdc0372e6384b60468ca042278bde0a4bd8af4680f
+    image: ghcr.io/goauthentik/server:2025.10.3@sha256:d2b66e851246e7299219b72a4ed43630a2c2bac3745eb665834b72963d836e64
     container_name: authentik-worker
     restart: unless-stopped
     command: worker
