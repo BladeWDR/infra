@@ -1,0 +1,119 @@
+---
+
+services:
+  ersatztv:
+    image: jasongdove/ersatztv:v25.9.0
+    container_name: ersatztv
+    environment:
+      - TZ=${ERSATZ_TZ:-America/New_York}
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility,video
+    ports:
+      - 8409:8409
+    volumes:
+      - /apps/ersatztv/config:/root/.local/share/ersatztv
+      - media:/media:ro
+      - type: tmpfs
+        target: /root/.local/share/etv-transcode
+    devices:
+      - /dev/dri:/dev/dri
+    restart: unless-stopped
+
+  jellyfin-newsletter:
+      container_name: jellyfin-newsletter
+      image: 'ghcr.io/seaweedbraincy/jellyfin-newsletter:v0.8.2'
+      environment:
+        USER_UID: 1000
+        USER_GID: 1000
+        TZ: 'America/New_York'
+      volumes:
+        - '/apps/jellyfin-newsletter/config:/app/config'
+
+  jellyfin:
+    image: linuxserver/jellyfin:10.11.0@sha256:0ffe47d268e9cb2665f52e56fd7756ed984b0f3e7eddaf3882ebdb677af1b341
+    container_name: jellyfin
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - DOTNET_USE_POLLING_FILE_WATCHER=1 # Try to avoid hitting inotify-watchers limits with large libraries.
+      - LIBVA_DRIVER_NAME=iHD
+      - DOCKER_MODS=linuxserver/mods:jellyfin-opencl-intel
+    network_mode: host
+    devices:
+      - /dev/dri:/dev/dri
+    group_add:
+          - "992"
+    volumes:
+      - /apps/jellyfin/config:/config
+      - /apps/jellyfin/cache:/cache
+      - media:/media
+      - type: tmpfs
+        target: /transcode
+        tmpfs:
+          size: "4294967296"
+    restart: 'unless-stopped'
+
+  navidrome:
+    image: deluan/navidrome:0.59.0@sha256:4edc8a1de3e042f30b78a478325839f4395177eb8201c27543dccc0eba674f23
+    user: 1000:1000
+    ports:
+      - 4533:4533
+    restart: unless-stopped
+    container_name: navidrome
+    environment:
+      - ND_SCANSCHEDULE=1h
+      - ND_LOGLEVEL=info
+      - ND_SESSIONTIMEOUT=999h
+      - ND_MUSICFOLDER=/mnt/media/music
+      - ND_BASEURL=https://music.lan.bladewdr.xyz
+      - ND_DEFAULTTHEME=Catppuccin Macchiato
+      - ND_ENABLEINSIGHTSCOLLECTOR=false
+    volumes:
+      - /apps/navidrome/config:/data
+      - media:/mnt/media:ro
+
+  plex:
+    image: plexinc/pms-docker:1.42.2.10156-f737b826c@sha256:9c03c26b9479ba9a09935f3367459bfdc8d21545f42ed2a13258983c5be1b252
+    container_name: plex
+    restart: unless-stopped
+    volumes:
+      - media:/media
+      - /apps/plex/config:/config
+      - /apps/plex/config/transcode:/transcode
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    network_mode: host
+    devices:
+      - /dev/dri:/dev/dri
+    environment:
+      - TZ=America/New_York
+      - PLEX_UID=${PUID:-1000}
+      - PLEX_GID=${PGID:-1000}
+      - HOSTNAME=plex.lan.bladewdr.xyz
+      - ADVERTISE_IP=https://plex.lan.bladewdr.xyz
+      - VERSION=docker
+
+  unmanic:
+    container_name: unmanic
+    image: josh5/unmanic:latest@sha256:f0cdf77d9e18f79f7c27e13e269c1bd74378c5dcc1d644540ba22795076f9eb8
+    devices:
+      - /dev/dri:/dev/dri
+    ports:
+      - 8888:8888
+    group_add:
+          - "992"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+    volumes:
+      - ./config:/config
+      - ./tmp:/tmp/unmanic
+      - media:/mnt/media
+
+volumes:
+  media:
+    driver_opts:
+      type: nfs
+      o: "addr=10.13.37.22,nolock,noatime,soft,rw"
+      device: ":/mnt/tank/media"

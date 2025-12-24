@@ -1,0 +1,42 @@
+---
+
+services:
+  nextcloud-aio:
+    container_name: nextcloud-aio-mastercontainer
+    restart: unless-stopped
+    ports:
+      - 8080:8080
+    environment:
+      - APACHE_PORT=11000
+      - APACHE_IP_BINDING=127.0.0.1
+      - SKIP_DOMAIN_VALIDATION=true
+      - APACHE_ADDITIONAL_NETWORK=proxy
+    volumes:
+      - nextcloud_aio_mastercontainer:/mnt/docker-aio-config
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    image: ghcr.io/nextcloud-releases/all-in-one:latest
+
+  nginx:
+    image: nginx:stable
+    container_name: nginx
+    networks:
+      - proxy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /apps/nextcloud/nginx/conf.d/{{ nextcloud_domain }}.conf:/etc/nginx/conf.d/{{ nextcloud_domain }}.conf:ro
+      - /etc/letsencrypt/live/{{ nextcloud_domain }}/fullchain.pem:/etc/letsencrypt/live/{{ nextcloud_domain }}/fullchain.pem:ro
+      - /etc/letsencrypt/live/{{ nextcloud_domain }}/privkey.pem:/etc/letsencrypt/live/{{ nextcloud_domain }}/privkey.pem:ro
+      - /etc/letsencrypt/live/{{ nextcloud_domain }}/chain.pem:/etc/letsencrypt/live/{{ nextcloud_domain }}/chain.pem:ro
+      - /apps/nextcloud/nginx/logs:/var/log/nginx
+
+volumes:
+  nextcloud_aio_mastercontainer:
+    external: true
+    name: nextcloud_aio_mastercontainer
+
+networks:
+  proxy:
+    external: true
