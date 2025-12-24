@@ -8,6 +8,9 @@ services:
       - traefik
     extra_hosts:
       - host.docker.internal:172.17.0.1
+    environment:
+      - CF_API_EMAIL={{ CF_API_EMAIL }}
+      - CF_DNS_API_TOKEN={{ CF_DNS_API_TOKEN }}
     ports:
       - 80:80
       - 443:443
