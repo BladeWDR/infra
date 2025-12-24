@@ -13,7 +13,8 @@ services:
       - 80:80
       - 443:443
     environment:
-      - CLOUDFLARE_DNS_API_TOKEN={{ CF_DNS_API_TOKEN }}
+      - CF_API_EMAIL={{ CF_API_EMAIL }}
+      - CF_DNS_API_TOKEN={{ CF_DNS_API_TOKEN }}
     volumes:
       - /apps/traefik/letsencrypt:/letsencrypt
       - /apps/traefik/data:/data
