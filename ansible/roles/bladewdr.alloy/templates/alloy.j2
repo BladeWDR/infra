@@ -57,7 +57,7 @@ prometheus.remote_write "prometheus_server" {
 }
 
 local.file_match "unifi_logs" {
-  path_targets = [{"__path__" = "/var/log/unifi/*.log", "job" = "unifi", "host" = constants.hostname}]
+  path_targets = [{"__path__" = "/var/log/unifi/**/*.log", "job" = "unifi", "host" = constants.hostname}]
 }
 
 loki.source.file "unifi_logs" {
