@@ -62,7 +62,7 @@ services:
 
   immich:
     container_name: immich
-    image: ghcr.io/immich-app/immich-server:v2.0.1@sha256:8286638680f0a38a7cb380be64ed77d1d1cfe6d0e0b843f64bff92b24289078d
+    image: ghcr.io/immich-app/immich-server:v2.4.1@sha256:e6a6298e67ae077808fdb7d8d5565955f60b0708191576143fc02d30ab1389d1
     volumes:
       - immich-nfs-upload:/usr/src/app/upload
       - /etc/localtime:/etc/localtime:ro
@@ -96,7 +96,7 @@ services:
   immich-machine-learning:
     container_name: immich_machine_learning
     user: "1000"
-    image: ghcr.io/immich-app/immich-machine-learning:v2.0.1@sha256:45626a33361ef7ed361de41b0d2dc19e5949442cdf0a8eb64b157dc8a04e9855
+    image: ghcr.io/immich-app/immich-machine-learning:v2.4.1@sha256:b3deefd1826f113824e9d7bc30d905e7f823535887d03f869330946b6db3b44a
     networks:
       - immich-db
     volumes:
