@@ -31,6 +31,7 @@ services:
       - DB_POSTGRESDB_PASSWORD={{ n8n_postgres_normal_user_password }}
       - N8N_GIT_NODE_DISABLE_BARE_REPOS=true
       - N8N_RUNNERS_ENABLED=true
+      - WEBHOOK_URL=https://n8n.lan.bladewdr.xyz
     ports:
       - 5678:5678
     networks:
