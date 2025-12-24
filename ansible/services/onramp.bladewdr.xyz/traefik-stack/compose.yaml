@@ -62,7 +62,7 @@ services:
 
   immich:
     container_name: immich
-    image: ghcr.io/immich-app/immich-server:{{ IMMICH_VERSION }}
+    image: ghcr.io/immich-app/immich-server:v2.0.1
     volumes:
       - immich-nfs-upload:/usr/src/app/upload
       - /etc/localtime:/etc/localtime:ro
@@ -96,7 +96,7 @@ services:
   immich-machine-learning:
     container_name: immich_machine_learning
     user: "1000"
-    image: ghcr.io/immich-app/immich-machine-learning:{{ IMMICH_VERSION }}
+    image: ghcr.io/immich-app/immich-machine-learning:v2.0.1
     networks:
       - immich-db
     volumes:
@@ -127,14 +127,12 @@ services:
     restart: ${IMMICH_RESTART_POLICY:-unless-stopped}
 
   lubelog:
-    image: ghcr.io/hargata/lubelogger:${LUBELOG_DOCKER_TAG:-latest}
+    image: ghcr.io/hargata/lubelogger:v1.5.5
     container_name: ${LUBELOG_CONTAINER_NAME:-lubelog}
     restart: ${LUBELOG_RESTART:-unless-stopped}
     mem_limit: ${LUBELOG_MEM_LIMIT:-200g}
-
     networks:
       - traefik
-
     volumes:
       - /apps/lubelog/config:/App/config
       - /apps/lubelog/data:/App/data
@@ -145,7 +143,6 @@ services:
       - /apps/lubelog/log:/App/log
       - /apps/lubelog/keys:/root/.aspnet/DataProtection-Keys
       - /etc/localtime:/etc/localtime:ro
-
     environment:
       - PUID=${PUID:-1000}
       - PGID=${PGID:-1000}
@@ -169,7 +166,7 @@ services:
       - autoheal=${LUBELOG_AUTOHEAL_ENABLED:-true}
 
   netbox:
-    image: lscr.io/linuxserver/netbox:${NETBOX_DOCKER_TAG:-latest}
+    image: lscr.io/linuxserver/netbox:v4.4.9-ls320
     container_name: ${NETBOX_CONTAINER_NAME:-netbox}
     restart: unless-stopped
     depends_on:
@@ -243,7 +240,7 @@ services:
       - autoheal=true
 
   pinchflat:
-    image: ghcr.io/kieraneglin/pinchflat:${PINCHFLAT_DOCKER_TAG:-latest}
+    image: ghcr.io/kieraneglin/pinchflat:latest
     container_name: ${PINCHFLAT_CONTAINER_NAME:-pinchflat}
     restart: ${PINCHFLAT_RESTART:-unless-stopped}
     mem_limit: ${PINCHFLAT_MEM_LIMIT:-200g}
