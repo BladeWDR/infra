@@ -6,6 +6,7 @@ networks:
 services:
   flare:
       container_name: flare
+      restart: unless-stopped
       networks:
         - proxy
         - flare-db
