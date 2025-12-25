@@ -39,6 +39,25 @@ sync.bladewdr.xyz nagios_host_templates_list=deb-docker,deb-webserver nagios_hos
 nagios_host_template=deb-docker
 nagios_hostgroups=docker
 
+[lan]
+adguard01.bladewdr.xyz
+adguard02.bladewdr.xyz
+cerberus.bladewdr.xyz
+deviant.bladewdr.xyz
+docker-ubuntu.bladewdr.xyz
+docker01.bladewdr.xyz
+gitea.bladewdr.xyz
+gitlab.bladewdr.xyz
+hades.bladewdr.xyz
+heimdall.bladewdr.xyz
+janus.bladewdr.xyz
+jmusicbot.bladewdr.xyz
+n8n.bladewdr.xyz
+nagios.bladewdr.xyz
+nc.bladewdr.xyz
+onramp.bladewdr.xyz
+unifi-vm.bladewdr.xyz
+
 [prometheus]
 adguard02.bladewdr.xyz
 
@@ -52,11 +71,13 @@ cerberus.bladewdr.xyz
 nagios_host_template=deb-fileserver
 
 [servers:children]
+certbot
 dns
 docker
 gitlab
+lan
 nagios
 nas
-webservers
+prometheus
 unifi
-certbot
+webservers

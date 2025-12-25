@@ -13,12 +13,19 @@
     tags:
       - always
 
+- hosts: lan
+  become: true
+  vars_files:
+    - secrets.yml
+  roles:
+    - bladewdr.debcache
+  tags: debcache
+
 - hosts: all
   become: true
   vars_files:
     - secrets.yml
   roles:
-    - bladewdr.alloy
     - bladewdr.basics
     - bladewdr.chezmoi
     - ansible-role-starship
