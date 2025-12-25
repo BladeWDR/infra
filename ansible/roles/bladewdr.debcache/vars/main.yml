@@ -1,0 +1,10 @@
+# Original repo name we need to match on the left, the path in your nginx webserver on the right.
+original_repo_targets:
+  http://archive.ubuntu.com/ubuntu: ubuntu
+  http://us.archive.ubuntu.com/ubuntu: ubuntu
+  http://deb.debian.org/debian: debian
+  http://ftp.us.debian.org/debian: debian
+  http://security.debian.org: debsec
+  http://deb.debian.org/debian-security: debsec
+  http://security.ubuntu.com/ubuntu: ubusec
+  http://download.proxmox.com/debian: proxmox

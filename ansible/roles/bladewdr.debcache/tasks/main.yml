@@ -1,0 +1,28 @@
+---
+- name: Edit the sources list
+  become: true
+  when: ansible_facts['os_family'] == 'Debian'
+  notify: Refresh apt cache
+  block:
+
+    - name: Get list of existing files in /etc/apt/sources.list.d folder.
+      ansible.builtin.find:
+        paths: "/etc/apt/sources.list.d"
+        file_type: file
+      register: found_files
+
+    - name: Replace the repository URLs for the files in sources.list.d
+      ansible.builtin.replace:
+        path: "{{ item.0.path }}"
+        backup: true
+        regexp: "{{ item.1[0] | regex_escape() }}"
+        replace: "{{ internal_cache_server_name }}/{{ item.1[1] }}"
+      loop: "{{ found_files.files | product(original_repo_targets.items() | list) | list }}"
+
+    - name: Replace the repository URLs in sources.list
+      ansible.builtin.replace:
+        path: /etc/apt/sources.list
+        backup: true
+        regexp: "{{ item[0] | regex_escape() }}"
+        replace: "{{ internal_cache_server_name }}/{{ item[1] }}"
+      loop: "{{ original_repo_targets.items() }}"
