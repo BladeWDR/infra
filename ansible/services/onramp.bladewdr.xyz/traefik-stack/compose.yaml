@@ -270,6 +270,11 @@ volumes:
       type: nfs
       o: "addr={{ IMMICH_ROOT_NFS_SERVER }},nolock,noatime,soft,rw"
       device: ":{{ IMMICH_UPLOAD_NFS_SERVER_PATH }}"
+ media:
+    driver_opts:
+      type: nfs
+      o: "addr={{ IMMICH_ROOT_NFS_SERVER }},nolock,noatime,soft,rw"
+      device: ":/mnt/tank/media"
 networks:
   traefik:
     external: true
