@@ -29,6 +29,7 @@ services:
       - --entryPoints.metrics.address=:8082
       - --metrics.prometheus.entryPoint=metrics
       - --providers.docker
+      - --providers.docker.exposedByDefault=false
       - --providers.file.watch=true
       - --providers.file.directory=/enabled
       - --entrypoints.web.address=:80
