@@ -55,6 +55,16 @@
     # - bladewdr.dockcheck
   tags: docker
 
+  tasks:
+  
+    - name: Set up cron job to prune old images once a week.
+      ansible.builtin.cron:
+        name: Docker Image Cleanup
+        weekday: 4
+        minute: 0
+        hour: 23
+        job: "docker image prune -af"
+
 - hosts: docker
   vars_files:
     - secrets.yml
