@@ -5,7 +5,7 @@
     name: alloy
     state: restarted
 
-- name: reload alloy container
+- name: reload containers
   ansible.builtin.command:
     cmd: docker compose up -d
     chdir: "{{ alloy_docker_config_dir }}"

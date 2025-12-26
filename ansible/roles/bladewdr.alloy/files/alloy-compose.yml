@@ -21,3 +21,16 @@ services:
       - /etc/hostname:/etc/nodename:ro
     image: grafana/alloy:v1.12.1@sha256:c311595156fca7b1131683d383dae1acfd29e8879d347161d2a6f714ebac0c0b
     command: run --server.http.listen-addr=0.0.0.0:12345 --disable-reporting /etc/alloy/config.alloy
+
+  cadvisor:
+      volumes:
+          - /:/rootfs:ro
+          - /var/run:/var/run:ro
+          - /sys:/sys:ro
+          - /var/lib/docker/:/var/lib/docker:ro
+          - /dev/disk/:/dev/disk:ro
+      container_name: cadvisor
+      privileged: true
+      devices:
+          - /dev/kmsg
+      image: ghcr.io/google/cadvisor:0.55.1

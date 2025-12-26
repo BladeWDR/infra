@@ -1,4 +1,3 @@
-#SPDX-License-Identifier: MIT-0
 ---
 
 - name: Set fact for Alloy config file contents.
@@ -51,4 +50,4 @@
         owner: "{{ admin_username }}"
         group: "{{ admin_username }}"
         mode: '0644'
-      notify: reload alloy container
+      notify: reload containers
