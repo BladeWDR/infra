@@ -1,0 +1,57 @@
+# services:
+#   mattermost-postgres:
+#     image: postgres:13-alpine@sha256:fb9065b6e3e213bdc07edd372a5b2a26245840b7fb65d1fd8b6700106d51805c
+#     container_name: mattermost-postgres
+#     restart: unless-stopped
+#     security_opt:
+#       - no-new-privileges:true
+#     pids_limit: 100
+#     tmpfs:
+#       - /tmp
+#       - /var/run/postgresql
+#     volumes:
+#       - "{{ mattermost_postgres_data_path }}:/var/lib/postgresql/data"
+#     environment:
+#       # timezone inside container
+#       - TZ="America/New_York"
+#       # necessary Postgres options/variables
+#       - "POSTGRES_USER={{ mattermost_postgres_user }}"
+#       - "POSTGRES_PASSWORD={{ mattermost_postgres_password }}"
+#       - "POSTGRES_DB={{ mattermost_postgres_db }}"
+#
+#   mattermost:
+#     container_name: mattermost
+#     ports:
+#       - "{{ mattermost_app_port }}:8065"
+#       - "{{ mattermost_calls_port }}:{{mattermost_calls_port }}/udp"
+#       - "{{ mattermost_calls_port }}:{{mattermost_calls_port }}/tcp"
+#     depends_on:
+#       - mattermost-postgres
+#     image: "mattermost/mattermost-team-edition:release-11.3@sha256:43e9394f7456ed202f0b9961ae4230aadaecec899329728fc63b6ebb363e0c9e"
+#     restart: unless-stopped
+#     security_opt:
+#       - no-new-privileges:true
+#     pids_limit: 200
+#     tmpfs:
+#       - /tmp
+#     volumes:
+#       - "{{ mattermost_config_path }}:/mattermost/config:rw"
+#       - "{{ mattermost_data_path }}:/mattermost/data:rw"
+#       - "{{ mattermost_logs_path }}:/mattermost/logs:rw"
+#       - "{{ mattermost_plugins_path }}:/mattermost/plugins:rw"
+#       - "{{ mattermost_client_plugins_path }}:/mattermost/client/plugins:rw"
+#       - "{{ mattermost_bleve_indexes_path }}:/mattermost/bleve-indexes:rw"
+#       - ./mattermost/app/mattermost/templates:/mattermost/templates:rw
+#       # to avoid Token request failed: certificate signed by unknown authority
+#       # (link: https://github.com/mattermost/mattermost-server/issues/13059 and https://github.com/mattermost/docker/issues/34)
+#       # - ${GITLAB_PKI_CHAIN_PATH}:/etc/ssl/certs/pki_chain.pem:ro
+#     environment:
+#       # timezone inside container
+#       - TZ="America/New_York"
+#       # necessary Mattermost options/variables (see env.example)
+#       - "MM_SQLSETTINGS_DRIVERNAME={{ mmsqlsettings_drivername }}"
+#       - "MM_SQLSETTINGS_DATASOURCE={{ mmsqlsettings_datasource }}"
+#       # necessary for bleve
+#       - "MM_BLEVESETTINGS_INDEXDIR={{ mattermost_bleve_indexes_path }}"
+#       # additional settings
+#       - "MM_SERVICESETTINGS_SITEURL={{ mattermost_servicesettings_siteurl }}"
