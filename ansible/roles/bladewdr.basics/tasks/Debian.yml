@@ -53,7 +53,9 @@
     group: "{{ homebrew_user.stdout }}"
     mode: '0775'
     recurse: true
-  when: homebrew_stat.stat.pw_name != homebrew_user.stdout
+  when: 
+    - homebrew_stat.stat.pw_name != homebrew_user.stdout
+    - not ansible_check_mode
 
 - name: Install specific packages via Homebrew.
   community.general.homebrew:
