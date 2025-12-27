@@ -20,13 +20,11 @@ basic_packages_deb:
   - build-essential
 
 brew_packages:
-  - neovim
   - ripgrep
   - fd
   - fzf
   - eza
   - zoxide
-  - npm
   - atuin
 
 # For most of my cloud servers I override the bind address to use the Wireguard management interface only.
