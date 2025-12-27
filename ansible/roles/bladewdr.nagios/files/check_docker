@@ -2,7 +2,7 @@
 #
 faults=()
 status=0
-exclusions=("stirling-pdf" "olivetin")
+exclusions=("stirling-pdf" "olivetin" "bentopdf")
 
 # First check to make sure that the nagios user is in the docker group.
 username=nagios
