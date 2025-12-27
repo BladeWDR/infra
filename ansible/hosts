@@ -70,6 +70,11 @@ cerberus.bladewdr.xyz
 [nas:vars]
 nagios_host_template=deb-fileserver
 
+[proxmox]
+pve01.bladewdr.xyz
+pve02.bladewdr.xyz
+pve03.bladewdr.xyz
+
 [servers:children]
 certbot
 dns
