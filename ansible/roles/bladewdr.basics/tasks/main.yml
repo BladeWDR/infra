@@ -46,6 +46,17 @@
     mode: '0644'
   notify: restart-ssh
 
+- name: Create SSH service systemd override if SSH is only listening on a specific interface.
+  ansible.builtin.copy:
+    src: ssh-override.conf
+    dest: /etc/systemd/system/ssh.service.d/override.conf
+    owner: root
+    group: root
+    mode: '0644'
+  when:
+    - ssh_listen_address is defined
+    - ssh_listen_address != "0.0.0.0"
+
 - name: Create the .local folder if it doesn't exist.
   ansible.builtin.file:
     path: "/home/{{ admin_username }}/.local"
