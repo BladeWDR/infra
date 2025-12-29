@@ -61,6 +61,9 @@ unifi-vm.bladewdr.xyz
 [prometheus]
 adguard02.bladewdr.xyz
 
+[nextcloud]
+nc.bladewdr.xyz
+
 [unifi]
 unifi-vm.bladewdr.xyz nagios_host_template=deb-server
 

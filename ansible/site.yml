@@ -112,6 +112,37 @@
     - bladewdr.prometheus
   tags: prometheus
 
+- hosts: nextcloud
+  become: true
+  vars_files:
+    - secrets.yml
+  tags: nextcloud
+  tasks:
+    - name: Create /opt/bin if it doesn't exist.
+      ansible.builtin.file:
+        path: /opt/bin
+        owner: root
+        group: root
+        mode: '0755'
+        state: directory
+
+    - name: Create the NextCloud app update script under /opt/bin.
+      ansible.builtin.copy:
+        src: nextcloud-appupdate.sh
+        dest: /opt/bin/nextcloud-appupdate.sh
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Create a cron job to run the script every week on Saturday.
+      ansible.builtin.cron:
+        name: Nextcloud App Update and Database maintenance.
+        job: "/opt/bin/nextcloud-appupdate.sh"
+        minute: "0"
+        hour: "14"
+        weekday: "6"
+        user: root
+
 - hosts: all
   become: true
   vars_files:
