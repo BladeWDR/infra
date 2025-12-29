@@ -31,7 +31,6 @@ write-log "Checking NextCloud database for missing indices..."
 docker exec --user www-data nextcloud-aio-nextcloud php occ db:add-missing-indices
 write-log "NextCloud apps update done."
 
-# Keep only the last 50 lines of the log
 if [ "$(wc -l < "$LOGFILE")" -gt 50 ]; then
   tail -n 50 "$LOGFILE" > "$LOGFILE.tmp" && mv "$LOGFILE.tmp" "$LOGFILE"
   write-log "INFO: Log truncated to 50 lines."
