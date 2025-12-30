@@ -8,6 +8,7 @@
         url: https://api.github.com/repos/twpayne/chezmoi/releases/latest
         return_content: true
       register: chezmoi_release_output
+      run_once: true
       check_mode: false
     - name: Set version
       when: not ansible_check_mode
