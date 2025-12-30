@@ -34,3 +34,4 @@ services:
       devices:
           - /dev/kmsg
       image: ghcr.io/google/cadvisor:0.55.1
+      restart: unless-stopped
