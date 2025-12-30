@@ -72,10 +72,6 @@
     path: "/usr/local/bin/starship"
   register: starship_installed
 
-- name: Install Starship.
-  ansible.builtin.include_tasks: Starship.yml
-  when: not starship_installed.stat.exists
-
 - name: Check if Lazygit is already installed.
   ansible.builtin.stat:
     path: "/usr/local/bin/lazygit"
