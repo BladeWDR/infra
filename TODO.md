@@ -1,3 +1,4 @@
 - [x] Unattended upgrades config
-- [ ] Cloud server config
+- [x] Cloud server config
 - [x] dotfiles config
+- [x] Make sure that the basics role includes qemu-guest-agent for VM guests that are on my LAN.
