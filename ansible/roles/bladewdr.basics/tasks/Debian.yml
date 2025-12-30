@@ -8,6 +8,16 @@
     cache_valid_time: 3600
   when: ansible_os_family == 'Debian'
 
+- name: Install QEMU Guest Agent on KVM virtual machines.
+  ansible.builtin.apt:
+    name: qemu-guest-agent
+    state: present
+  notify: enable and start guest agent
+  when:
+    - ansible_virtualization_role == 'guest'
+    - ansible_virtualization_type == 'kvm'
+    - "'cloud' not in group_names"
+
 - name: Configure unattended-upgrades.
   block:
     - name: Copy 20auto-upgrades.

@@ -9,3 +9,9 @@
   ansible.builtin.service:
     name: ssh
     state: restarted
+
+- name: enable and start guest agent
+  ansible.builtin.service:
+    name: qemu-guest-agent
+    state: started
+    enabled: true
