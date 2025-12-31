@@ -23,3 +23,11 @@ scrape_configs:
           - '{{ host }}:12345'
 {% endfor %}
     metrics_path: '/metrics'
+
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets:
+{% for host in docker_hosts %}
+          - '{{ host }}:12345'
+{% endfor %}
+    metrics_path: '/metrics'

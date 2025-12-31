@@ -52,19 +52,23 @@ prometheus.scrape "scrape_metrics" {
 // Scrape cAdvisor metrics
 prometheus.scrape "cadvisor" {
   targets = [{
-    __address__ = "cadvisor:8080",
+    __address__ = "127.0.0.1:7772",
   }]
-  forward_to      = [prometheus.remote_write.prometheus_server.receiver]
+  
   scrape_interval = "15s"
   scrape_timeout  = "10s"
   metrics_path    = "/metrics"
+  
+  clustering {
+    enabled = false
+  }
+  
+  forward_to = [prometheus.relabel.cadvisor.receiver]
 }
 
-// Optional: Relabel cAdvisor metrics to add standard labels
-discovery.relabel "cadvisor" {
-  targets = [{
-    __address__ = "localhost:8080",
-  }]
+// Relabel to add job, instance, and host labels
+prometheus.relabel "cadvisor" {
+  forward_to = [prometheus.remote_write.prometheus_server.receiver]
   
   rule {
     target_label = "job"
@@ -72,23 +76,15 @@ discovery.relabel "cadvisor" {
   }
   
   rule {
-    target_label = "host"
+    source_labels = ["__address__"]
+    target_label = "instance"
     replacement  = constants.hostname
   }
   
   rule {
-    target_label = "instance"
+    target_label = "host"
     replacement  = constants.hostname
   }
-}
-
-// Use the relabeled targets for scraping
-prometheus.scrape "cadvisor_metrics" {
-  targets         = discovery.relabel.cadvisor.output
-  forward_to      = [prometheus.remote_write.prometheus_server.receiver]
-  scrape_interval = "15s"
-  scrape_timeout  = "10s"
-  metrics_path    = "/metrics"
 }
 
 // Define where to send the metrics for storage

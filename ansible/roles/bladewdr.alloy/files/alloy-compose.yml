@@ -29,6 +29,8 @@ services:
           - /sys:/sys:ro
           - /var/lib/docker/:/var/lib/docker:ro
           - /dev/disk/:/dev/disk:ro
+      ports:
+        - 7772:8080
       container_name: cadvisor
       privileged: true
       devices:
