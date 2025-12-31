@@ -1,0 +1,54 @@
+---
+
+services:
+
+  kimai-db:
+    image: mysql:8.3
+    networks:
+      - kimai-db
+    container_name: kimai-db
+    volumes:
+      - ./kimai/mysql:/var/lib/mysql
+    environment:
+      - MYSQL_DATABASE=kimai
+      - MYSQL_USER=kimai
+      - MYSQL_PASSWORD={{ kimai_mysql_password }}
+      - MYSQL_ROOT_PASSWORD={{ kimai_mysql_root_password }}
+    command: --default-storage-engine innodb
+    restart: unless-stopped
+    healthcheck:
+      test: mysqladmin -p$$MYSQL_ROOT_PASSWORD ping -h localhost
+      interval: 20s
+      start_period: 10s
+      timeout: 10s
+      retries: 3
+
+  kimai:
+    image: kimai/kimai2:apache
+    container_name: kimai-app
+    volumes:
+      - ./kimai/data:/opt/kimai/var/data
+      - ./kimai/plugins:/opt/kimai/var/plugins
+    ports:
+      - 8001:8001
+    networks:
+      - proxy
+      - kimai-db
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.kimai.rule=Host(`kimai.lan.bladewdr.xyz`)
+      - traefik.http.routers.kimai.service=kimai
+      - traefik.http.routers.kimai.tls=true
+      - traefik.http.middlewares.kimai=default-headers@file
+      - traefik.http.middlewares.kimai=https-redirectscheme@file
+      - traefik.http.routers.kimai.middlewares=default-headers@file
+      - traefik.http.services.kimai.loadbalancer.server.port=8001
+      - traefik.docker.network=proxy
+    environment:
+      - ADMINMAIL={{ SMTP_USERNAME }}
+      - ADMINPASS={{ kimai_admin_password }}
+      - "DATABASE_URL=mysql://kimai:{{ kimai_mysql_password }}@kimai-db/kimai?charset=utf8mb4&serverVersion=8.3.0"
+    restart: unless-stopped
+
+networks:
+  kimai-db:
