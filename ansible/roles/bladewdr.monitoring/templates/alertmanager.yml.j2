@@ -1,0 +1,12 @@
+---
+global:
+  resolve_timeout: 5m
+
+route:
+  receiver: ntfy
+
+receivers:
+  - name: ntfy
+    webhook_configs:
+      - url: https://{{ NTFY_ADDRESS }}/{{ ALERTMANAGER_NTFY_TOPIC }}?auth={{ NTFY_AUTH_TOKEN }}
+        send_resolved: true

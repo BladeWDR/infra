@@ -1,0 +1,32 @@
+---
+- name: Build a list of all hosts that we will use to build the Prometheus scrape configs.
+  ansible.builtin.set_fact:
+    docker_hosts: "{{ groups['docker'] }}"
+    all_hosts: "{{ groups['all']}}"
+
+- name: Create the Prometheus config file.
+  ansible.builtin.template:
+    src: prometheus.yml.j2
+    dest: /apps/grafana-stack/prometheus/prometheus.yml
+    owner: 1000
+    group: 1000
+    mode: '0755'
+  notify: restart prometheus
+
+- name: Create the AlertManager config file.
+  ansible.builtin.template:
+    src: alertmanager.yml.j2
+    dest: /apps/grafana-stack/alertmanager/alertmanager.yml
+    owner: 1000
+    group: 1000
+    mode: '0755'
+  notify: restart alertmanager
+
+- name: Configure Prometheus AlertManager rules file.
+  ansible.builtin.template:
+    src: rules.yml.j2
+    dest: /apps/grafana-stack/prometheus/rules.yml
+    owner: 1000
+    group: 1000
+    mode: '0755'
+  notify: restart prometheus

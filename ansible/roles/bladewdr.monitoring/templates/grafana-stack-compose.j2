@@ -1,0 +1,59 @@
+---
+services:
+  loki:
+    container_name: loki
+    image: docker.io/grafana/loki:3.6.3@sha256:cd6e176883a90c21755f0315688668991634143423f75bdedfef41441b0fdc3c
+    command: "-config.file=/etc/loki/config.yaml"
+    ports:
+      - "3100:3100"
+    volumes:
+      - /apps/grafana-stack/loki/config.yaml:/etc/loki/config.yaml:ro
+      - /mnt/logdata/logs:/loki:rw
+    restart: unless-stopped
+  grafana:
+    image: docker.io/grafana/grafana-oss:12.3.1@sha256:adaf2d6b44c7e2b711b931b98be153778d313806582a24eab21178804fac2976
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - /apps/grafana-stack/grafana-data:/var/lib/grafana
+    environment:
+      - GF_SERVER_ROOT_URL={{ grafana_root_url }}
+      - GF_SMTP_ENABLED=true
+      - GF_SMTP_HOST={{ SMTP_SERVER_ADDRESS }}:{{ SMTP_PORT }}
+      - GF_SMTP_USER={{ SMTP_USERNAME }}
+      - GF_SMTP_PASSWORD={{ SMTP_PASSWORD }}
+      - GF_SMTP_FROM_ADDRESS={{ SMTP_FROM }}
+      - GF_SMTP_FROM_NAME=Grafana Notifications
+    restart: unless-stopped
+  prometheus:
+    image: prom/prometheus:v3.8.1@sha256:2b6f734e372c1b4717008f7d0a0152316aedd4d13ae17ef1e3268dbfaf68041b
+    container_name: prometheus
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    user: "1000:1000"
+    ports:
+      - 9090:9090/tcp
+    environment:
+      - TZ={{ host_timezone }}
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - /apps/grafana-stack/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - /apps/grafana-stack/prometheus/rules.yml:/etc/prometheus/rules.yml:ro
+      - /apps/grafana-stack/prometheus/data:/prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=30d
+      - --web.enable-lifecycle
+      - --web.enable-admin-api
+      - --web.enable-remote-write-receiver
+  alertmanager:
+    container_name: alertmanager
+    ports:
+      - 9093:9093
+    image: quay.io/prometheus/alertmanager
+    volumes:
+      - /apps/grafana-stack/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro

@@ -1,4 +1,3 @@
-#SPDX-License-Identifier: MIT-0
 ---
 - name: Restart alloy service
   ansible.builtin.service:
@@ -15,5 +14,17 @@
 - name: restart alloy container
   ansible.builtin.command:
     cmd: docker restart alloy
+  when:
+    - not ansible_check_mode
+
+- name: restart prometheus
+  ansible.builtin.command: docker restart prometheus
+
+- name: restart alertmanager
+  ansible.builtin.command: docker restart alertmanager
+
+- name: grafana compose up
+  ansible.builtin.command:
+    cmd: docker compose -f /apps/compose.yaml up -d
   when:
     - not ansible_check_mode

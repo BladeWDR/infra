@@ -104,14 +104,6 @@
     - bladewdr.apache
   tags: webserver
 
-- hosts: prometheus
-  become: true
-  vars_files:
-    - secrets.yml
-  roles:
-    - bladewdr.prometheus
-  tags: prometheus
-
 - hosts: nextcloud
   become: true
   vars_files:
@@ -148,5 +140,5 @@
   vars_files:
     - secrets.yml
   roles:
-    - bladewdr.alloy
-  tags: alloy
+    - bladewdr.monitoring
+  tags: monitoring

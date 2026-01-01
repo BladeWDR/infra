@@ -1,5 +1,3 @@
----
-
 - name: Set fact for Alloy config file contents.
   ansible.builtin.set_fact:
     alloy_template: "{{ lookup('template', '../templates/alloy.j2') }}"

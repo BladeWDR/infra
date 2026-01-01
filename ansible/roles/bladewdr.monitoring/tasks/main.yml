@@ -1,0 +1,15 @@
+---
+
+- name: Include Alloy tasks.
+  ansible.builtin.include_tasks:
+    file: Alloy.yml
+
+- name: Include Prometheus tasks.
+  ansible.builtin.include_tasks:
+    file: Prometheus.yml
+  when: "inventory_hostname in prometheus_servers"
+
+- name: Include Grafana tasks.
+  ansible.builtin.include_tasks:
+    file: Grafana.yml
+  when: "inventory_hostname in grafana_servers"

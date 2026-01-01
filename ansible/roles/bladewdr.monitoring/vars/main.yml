@@ -1,0 +1,5 @@
+---
+alloy_docker_config_dir: /apps/alloy
+
+prometheus_servers:
+  - adguard02.bladewdr.xyz

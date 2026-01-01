@@ -1,0 +1,11 @@
+---
+
+- name: Copy over the Docker Compose stack for Grafana, Prometheus, AlertManager, and Loki.
+  ansible.builtin.template:
+    src: grafana-stack-compose.j2
+    dest: /apps/compose.yaml
+    owner: "{{ admin_username }}"
+    group: "{{ admin_username }}"
+    mode: '0755'
+  notify: grafana compose up
+

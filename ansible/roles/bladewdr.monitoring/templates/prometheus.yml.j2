@@ -37,3 +37,12 @@ scrape_configs:
           - '{{ host }}:12345'
 {% endfor %}
     metrics_path: '/metrics'
+
+alerting:
+  alertmanagers:
+  - static_configs:
+    - targets:
+      - prometheus:9093
+
+rule_files:
+  - "rules.yml"
