@@ -1,0 +1,7 @@
+services:
+  bobbeh_bot:
+    build: https://github.com/BladeWDR/bobbeh_bot.git
+    env_file:
+      - "bobbeh.env"
+    restart: unless-stopped
+    container_name: bobbeh_bot
