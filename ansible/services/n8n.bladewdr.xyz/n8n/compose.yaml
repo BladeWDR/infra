@@ -20,7 +20,7 @@ services:
       retries: 10
 
   n8n:
-    image: docker.n8n.io/n8nio/n8n@sha256:aa499e07898e1599bd50ba07e967fc47cdc7fc78adb2430f588e0f8386b8ff39
+    image: docker.n8n.io/n8nio/n8n@sha256:45cfd148df28e0b4d87a8e53a567204816029efa9736b1b5e35344783b8d1d3d
     restart: unless-stopped
     environment:
       - DB_TYPE=postgresdb
