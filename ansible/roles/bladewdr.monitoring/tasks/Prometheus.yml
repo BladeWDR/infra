@@ -23,8 +23,8 @@
   notify: restart alertmanager
 
 - name: Configure Prometheus AlertManager rules file.
-  ansible.builtin.template:
-    src: rules.yml.j2
+  ansible.builtin.copy:
+    src: rules.yml
     dest: /apps/grafana-stack/prometheus/rules.yml
     owner: 1000
     group: 1000
