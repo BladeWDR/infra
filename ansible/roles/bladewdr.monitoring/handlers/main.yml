@@ -28,3 +28,10 @@
     cmd: docker compose -f /apps/compose.yaml up -d
   when:
     - not ansible_check_mode
+
+- name: Restart zfs_exporter service
+  systemd:
+    name: zfs_exporter
+    enabled: true
+    daemon_reload: true
+    state: restarted

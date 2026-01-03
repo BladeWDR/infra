@@ -1,0 +1,14 @@
+[Unit]
+Description=zfs_exporter
+After=network-online.target
+
+[Service]
+Restart=always
+RestartSec=5
+TimeoutSec=5
+User=root
+Group=root
+ExecStart={{ zfs_exporter_install_location }} {{ zfs_exporter_arguments }}
+
+[Install]
+WantedBy=multi-user.target

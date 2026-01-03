@@ -13,3 +13,18 @@
   ansible.builtin.include_tasks:
     file: Grafana.yml
   when: "inventory_hostname in grafana_servers"
+
+- name: Gather ZFS facts.
+  ansible.builtin.command: zfs list
+  register: zfs_facts
+  failed_when: false
+  changed_when: false
+
+- name: Set fact for ZFS.
+  ansible.builtin.set_fact:
+    has_zfs: "{{ zfs_facts.rc == 0 }}"
+
+- name: Include zfs_exporter tasks.
+  ansible.builtin.include_tasks:
+    file: ZFSExporter.yml
+  when: has_zfs

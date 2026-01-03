@@ -1,0 +1,67 @@
+---
+
+- name: Check to see if zfs_exporter is already installed.
+  ansible.builtin.stat:
+    path: "{{ zfs_exporter_install_location }}"
+  register: zfs_exporter_installed
+
+- name: zfs_exporter installation block.
+  when: not zfs_exporter_installed.stat.exists
+  block:
+
+    - name: Get latest release of pdf/zfs_exporter
+      community.general.github_release:
+        user: pdf
+        repo: zfs_exporter
+        action: latest_release
+      register: zfs_exporter_release
+      delegate_to: 127.0.0.1
+      run_once: true
+      become: false
+
+    - name: Create stripped version of release number for download link.
+      ansible.builtin.set_fact:
+        zfs_exporter_release_stripped: "{{ zfs_exporter_release.tag | regex_replace('^v', '')}}"
+      run_once: true
+
+    - name: Download the latest release.
+      ansible.builtin.get_url:
+        url: "https://github.com/pdf/zfs_exporter/releases/download/{{ zfs_exporter_release.tag }}/zfs_exporter-{{ zfs_exporter_release_stripped }}.linux-amd64.tar.gz"
+        dest: "/tmp/zfs_exporter-{{ zfs_exporter_release_stripped }}.linux-amd64.tar.gz"
+        mode: '0755'
+
+    - name: Unpack the tarball.
+      ansible.builtin.unarchive:
+        src: "/tmp/zfs_exporter-{{ zfs_exporter_release_stripped }}.linux-amd64.tar.gz"
+        dest: "/tmp"
+        remote_src: true
+
+    - name: Move the ZFS exporter binary into the system path.
+      ansible.builtin.copy:
+        src: "/tmp/zfs_exporter-{{ zfs_exporter_release_stripped }}.linux-amd64/zfs_exporter"
+        dest: "{{ zfs_exporter_install_location }}"
+        owner: root
+        group: root
+        mode: '0755'
+        remote_src: true
+
+    - name: Clean up /tmp.
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - "/tmp/zfs_exporter-{{ zfs_exporter_release_stripped }}.linux-amd64.tar.gz"
+        - "/tmp/zfs_exporter-{{ zfs_exporter_release_stripped }}.linux-amd64"
+
+- name: Ensure that zfs_exporter binary has correct ownership and permissions.
+  ansible.builtin.file:
+    path: "{{ zfs_exporter_install_location }}"
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Create the systemd service
+  template:
+    src: zfs_exporter_service.j2
+    dest: /etc/systemd/system/zfs_exporter.service
+  notify: Restart zfs_exporter service

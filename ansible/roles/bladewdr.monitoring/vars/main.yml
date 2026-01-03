@@ -3,3 +3,6 @@ alloy_docker_config_dir: /apps/alloy
 
 prometheus_servers:
   - adguard02.bladewdr.xyz
+
+zfs_exporter_install_location: /usr/local/bin/zfs_exporter
+zfs_exporter_arguments: --collector.dataset-snapshot --web.listen-address=:9134
