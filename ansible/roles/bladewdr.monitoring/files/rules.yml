@@ -1,0 +1,85 @@
+groups:
+- name: system_cpu
+  rules:
+  - alert: HighCPUUsage
+    expr: |
+      sum by (instance) (
+        rate(process_cpu_seconds_total[5m])
+      ) > 0.8
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: High CPU usage on {{ $labels.instance }}
+      description: CPU usage on {{ $labels.instance }} is above 80% for more than 1 minute.
+
+
+- name: system_disk
+  rules:
+  - alert: DiskSpaceHigh
+    expr: |
+      (node_filesystem_avail_bytes / node_filesystem_size_bytes * 100) < 10
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: Low disk space on {{ $labels.instance }} ({{ $labels.mountpoint }})
+      description: Less than 10% disk space left on {{ $labels.instance }} at {{ $labels.mountpoint }}.
+
+- name: system_memory
+  rules:
+  - alert: HighMemoryUsage
+    expr: ((node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes) * 100 > 80
+    for: 2m
+    labels:
+      severity: warning
+    annotations:
+      summary: High memory usage on {{ $labels.instance }}
+      description: Memory usage on {{ $labels.instance }} is above 80% for more than 2 minutes.
+
+- name: system_load
+  rules:
+  - alert: HighLoadAverage
+    expr: |
+      node_load1
+        >
+      2 * count by (instance) (
+        node_cpu_seconds_total{mode="idle"}
+      )
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: High load on {{ $labels.instance }}
+      description: Load average over 1 minute is high relative to CPU cores on {{ $labels.instance }}.
+
+
+- name: zfs
+  rules:
+  - alert: ZfsPoolOutOfSpace
+    expr: zfs_pool_free_bytes * 100 / zfs_pool_size_bytes < 10 and ON (instance, device, mountpoint) zfs_pool_readonly == 0
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: ZFS pool out of space (instance {{ $labels.instance }})
+      description: "Disk is almost full (< 10% left)\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+  - alert: ZfsPoolUnhealthy
+    expr: last_over_time(zfs_pool_health[1h]) > 0
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: ZFS pool unhealthy (instance {{ $labels.instance }})
+      description: "ZFS pool state is {{ $value }}. Where:\n  - 0: ONLINE\n  - 1: DEGRADED\n  - 2: FAULTED\n  - 3: OFFLINE\n  - 4: UNAVAIL\n  - 5: REMOVED\n  - 6: SUSPENDED\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+  - alert: ZfsCollectorFailed
+    expr: zfs_scrape_collector_success != 1
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: ZFS collector failed (instance {{ $labels.instance }})
+      description: "ZFS collector for {{ $labels.instance }} has failed to collect information\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
