@@ -78,6 +78,7 @@
       ansible.builtin.shell: |
         cd {{ docker_compose_generator_output_path }}
         docker compose up -d --remove-orphans
+      changed_when: false
 
 # Remember you can use the nagios-update tag to only update your host definitions.
 - hosts: all
