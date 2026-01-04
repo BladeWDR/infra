@@ -1,0 +1,23 @@
+services:
+  rackula:
+    image: ghcr.io/rackulalives/rackula:latest
+    container_name: rackula
+    restart: unless-stopped
+    networks:
+      - proxy
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.rackula.entrypoints=https
+      - traefik.http.routers.rackula.rule=Host(`rackula.{{ TRAEFIK_HOST_DOMAIN }}`)
+      - traefik.http.routers.rackula.middlewares=default-headers@file
+      - traefik.http.routers.rackula.tls=true
+      - traefik.http.routers.rackula.service=rackula
+      - traefik.http.services.rackula.loadbalancer.server.port=80
+      - traefik.docker.network=proxy
+      - autoheal=true
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:80/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
