@@ -1,0 +1,9 @@
+---
+services:
+  hypermind:
+    container_name: hypermind
+    network_mode: host
+    restart: unless-stopped
+    environment:
+      - PORT=9996
+    image: ghcr.io/lklynet/hypermind:latest
