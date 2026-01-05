@@ -25,7 +25,7 @@ gitlab.bladewdr.xyz nagios_host_template=deb-server nagios_hostgroups=servers,de
 [docker]
 adguard02.bladewdr.xyz
 docker01.bladewdr.xyz
-gitea.bladewdr.xyz
+forgejo.bladewdr.xyz
 docker-ubuntu.bladewdr.xyz nagios_host_template_list=deb-docker,deb-webserver nagios_hostgroups=docker,deb-webserver
 deviant.bladewdr.xyz
 heimdall.bladewdr.xyz
@@ -46,7 +46,7 @@ cerberus.bladewdr.xyz
 deviant.bladewdr.xyz
 docker-ubuntu.bladewdr.xyz
 docker01.bladewdr.xyz
-gitea.bladewdr.xyz
+forgejo.bladewdr.xyz
 gitlab.bladewdr.xyz
 hades.bladewdr.xyz
 heimdall.bladewdr.xyz

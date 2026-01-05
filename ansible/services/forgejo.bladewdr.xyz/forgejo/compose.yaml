@@ -1,0 +1,35 @@
+---
+
+services:
+  server:
+    image: codeberg.org/forgejo/forgejo:13
+    container_name: forgejo
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+      - RUN_MODE=prod
+      - DOMAIN=git.{{ APP0_HOST_DOMAIN }}
+      - SSH_DOMAIN=git.{{ APP0_HOST_DOMAIN }}
+      - HTTP_PORT=3000
+      - ROOT_URL=https://git.{{ APP0_HOST_DOMAIN }}
+      - SSH_PORT=222
+      - DB_TYPE=sqlite3
+      - FORGEJO__SERVICE__ENABLE_NOTIFY_MAIL=true
+      - FORGEJO__SERVICE__NO_REPLY_ADDRESS={{ SMTP_FROM }}
+      - FORGEJO__MAILER__ENABLED=true
+      - FORGEJO__MAILER__SMTP_ADDR={{ SMTP_SERVER_ADDRESS }}
+      - FORGEJO__MAILER__SMTP_PORT=465
+      - FORGEJO__MAILER__SMTP_FROM=Forgejo {{ SMTP_FROM }}
+      - FORGEJO__MAILER__SMTP_USER={{ SMTP_USERNAME }}
+      - FORGEJO__MAILER__SMTP_PASSWD={{ SMTP_PASSWORD }}
+      - FORGEJO__OPENID__SIGNIN=true
+      - FORGEJO__OPENID_SIGNUP=true
+      - DISABLE_REGISTRATION=false
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+      - 222:22
+    volumes:
+      - ./forgejo:/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
