@@ -3,7 +3,7 @@
 services:
 
   kimai-db:
-    image: mysql:8.3@sha256:9de9d54fecee6253130e65154b930978b1fcc336bcc86dfd06e89b72a2588ebe
+    image: mysql:9.5@sha256:c9f0c66a87356518d4b30dbc065eb4567e4a04aff4d0ff194dea0973e5985b57
     networks:
       - kimai-db
     container_name: kimai-db
