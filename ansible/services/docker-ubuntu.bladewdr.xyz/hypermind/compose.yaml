@@ -6,4 +6,4 @@ services:
     restart: unless-stopped
     environment:
       - PORT=9996
-    image: ghcr.io/lklynet/hypermind:latest
+    image: ghcr.io/lklynet/hypermind:latest@sha256:fdc52d176a2da4cc36eb133870843e8b83ae197b440cd80d3cc9b8c6882e0378
