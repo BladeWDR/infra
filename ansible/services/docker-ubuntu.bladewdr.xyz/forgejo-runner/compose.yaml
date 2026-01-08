@@ -1,0 +1,25 @@
+services:
+  forgejo-runner:
+    command: forgejo-runner -c /config.yml daemon
+    #command: '/bin/sh -c "while : ; do sleep 1 ; done ;"'
+    container_name: forgejo-runner1
+    image: code.forgejo.org/forgejo/runner:12@sha256:24fae8e5bff99daa96c7c11a44d82091f04551e69072e673660ca5e35798e0f1
+    networks:
+      - proxy
+    ports:
+      - 6773:6773
+    group_add:
+      - 112
+    restart: unless-stopped
+    environment:
+      -  FORGEJO_INSTANCE_URL: https://{{ FORGEJO_HOST }}
+      -  FORGEJO_REGISTRATION_TOKEN: {{ FORGEJO_RUNNER_REG_TOKEN }}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./forgejo-runner/data:/data
+      - ./forgejo-runner/config.yml:/config.yml:ro
+      - mkdocs-site:/site
+
+volumes:
+  mkdocs-site:
+    external: true
