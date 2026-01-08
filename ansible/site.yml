@@ -37,15 +37,6 @@
     - bladewdr.adguardhome
   tags: dns
 
-- hosts: gitlab
-  become: true
-  vars_files:
-    - secrets.yml
-  roles:
-    - bladewdr.qemu
-    - bladewdr.gitlab
-  tags: gitlab
-
 - hosts: docker
   become: true
   vars_files:

@@ -6,7 +6,6 @@ nagios.bladewdr.xyz
 
 [certbot]
 nc.bladewdr.xyz
-gitlab.bladewdr.xyz
 adguard01.bladewdr.xyz
 adguard02.bladewdr.xyz
 adguard03.bladewdr.xyz
@@ -18,9 +17,6 @@ adguard03.bladewdr.xyz
 [dns:vars]
 nagios_host_template=deb-dns
 nagios_hostgroups=dns
-
-[gitlab]
-gitlab.bladewdr.xyz nagios_host_template=deb-server nagios_hostgroups=servers,deb-webserver
 
 [docker]
 adguard02.bladewdr.xyz
@@ -47,7 +43,6 @@ deviant.bladewdr.xyz
 docker-ubuntu.bladewdr.xyz
 docker01.bladewdr.xyz
 forgejo.bladewdr.xyz
-gitlab.bladewdr.xyz
 hades.bladewdr.xyz
 heimdall.bladewdr.xyz
 janus.bladewdr.xyz
@@ -82,7 +77,6 @@ pve03.bladewdr.xyz
 certbot
 dns
 docker
-gitlab
 lan
 nagios
 nas
