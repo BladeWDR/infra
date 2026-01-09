@@ -30,11 +30,11 @@ remaining_seconds=$(calculate_remaining_seconds "$expiration_epoch")
 if [ "$remaining_seconds" -lt 604800 ]
 then
     echo "1 week remaining on server certificate! CHECK NAO"
-    exit 1
+    exit 2
 elif [ "$remaining_seconds" -lt 2419200 ]
 then
     echo "4 weeks remaining on server certificate. Check status."
-    exit 2
+    exit 1
 else
     echo "Certificate Expiration Date: $expiration_date"
     exit 0
