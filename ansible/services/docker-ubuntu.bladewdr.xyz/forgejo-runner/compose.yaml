@@ -12,8 +12,8 @@ services:
       - 112
     restart: unless-stopped
     environment:
-      -  FORGEJO_INSTANCE_URL: https://{{ FORGEJO_HOST }}
-      -  FORGEJO_REGISTRATION_TOKEN: {{ FORGEJO_RUNNER_REG_TOKEN }}
+      -  FORGEJO_INSTANCE_URL=https://{{ FORGEJO_HOST }}
+      -  FORGEJO_REGISTRATION_TOKEN={{ FORGEJO_RUNNER_REG_TOKEN }}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./forgejo-runner/data:/data
