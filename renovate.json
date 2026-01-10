@@ -26,23 +26,9 @@
         "docker"
       ],
       "matchPackageNames": [
-        "postgres"
-      ],
-      "matchUpdateTypes": [
-        "patch"
-      ],
-      "enabled": true
-    },
-    {
-      "matchDatasources": [
-        "docker"
-      ],
-      "matchPackageNames": [
-        "postgres"
-      ],
-      "matchUpdateTypes": [
-        "major",
-        "minor"
+        "postgres",
+        "mysql",
+        "mariadb"
       ],
       "enabled": false
     }
