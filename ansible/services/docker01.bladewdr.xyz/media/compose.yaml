@@ -112,7 +112,7 @@ services:
       - media:/mnt/media
 
   feishin:
-    image: ghcr.io/jeffvli/feishin:1.2.0
+    image: ghcr.io/jeffvli/feishin:1.2.0@sha256:ac74207b4fb49c4b8c84234f4a593b1320e461602eface311050094956bdbc78
     container_name: feishin
     restart: unless-stopped
     volumes:
