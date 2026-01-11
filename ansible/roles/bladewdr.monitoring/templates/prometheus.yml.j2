@@ -38,11 +38,27 @@ scrape_configs:
 {% endfor %}
     metrics_path: '/metrics'
 
+  - job_name: zfs_exporter
+    metrics_path: /metrics
+    scrape_interval: 90s
+    scrape_timeout: 60s
+    static_configs:
+      - targets: [cerberus.bladewdr.xyz:9134] 
+    metric_relabel_configs:
+      - source_labels: ['name']
+        regex: ^([^@]*).*$
+        target_label: filesystem
+        replacement: ${1}
+      - source_labels: ['name']
+        regex: ^.*:.._(.*)$
+        target_label: snapshot_type
+        replacement: ${1}
+
 alerting:
   alertmanagers:
   - static_configs:
     - targets:
-      - prometheus:9093
+      - alertmanager:9093
 
 rule_files:
   - "rules.yml"
