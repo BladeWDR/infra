@@ -16,6 +16,16 @@ services:
             - OIDC_CLIENT_CRYPTO_KEY={{ FRESHRSS_OIDC_CLIENT_CRYPTO_KEY }}
             - OIDC_SCOPES=openid email profile
             - OIDC_X_FORWARDED_HEADERS=X-Forwarded-Host X-Forwarded-Port X-Forwarded-Proto
+  flaresolverr:
+    container_name: flaresolverr
+    env_file:
+      - .env
+    environment:
+      - LOG_LEVEL=info
+    networks:
+       - proxy
+    restart: unless-stopped
+    image: 'ghcr.io/flaresolverr/flaresolverr:latest'
 
         ports:
             - '49999:80'
