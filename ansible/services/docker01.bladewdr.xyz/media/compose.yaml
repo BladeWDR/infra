@@ -95,7 +95,7 @@ services:
 
   unmanic:
     container_name: unmanic
-    image: josh5/unmanic:latest@sha256:dd7ac366bf3d3ec5abfa57ec92b04e2f69cc0f2bd9494fce18b25c231473fabb
+    image: josh5/unmanic:latest@sha256:0dd283b467f327310eaa972df3b31902cfe7170b66ad8a766496f95eaf030cb8
     devices:
       - /dev/dri:/dev/dri
     ports:
