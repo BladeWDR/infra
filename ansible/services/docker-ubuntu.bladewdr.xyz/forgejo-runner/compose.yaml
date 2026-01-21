@@ -3,7 +3,7 @@ services:
     command: forgejo-runner -c /config.yml daemon
     #command: '/bin/sh -c "while : ; do sleep 1 ; done ;"'
     container_name: forgejo-runner1
-    image: code.forgejo.org/forgejo/runner:12@sha256:d1fa548c336febeb314afb06da8564e06b66b9514ccd06177cce997830233f31
+    image: code.forgejo.org/forgejo/runner:12@sha256:f81b095e785a9b09f7765b24382ec11fd884ceffc058b5eeecd111703a118bc0
     networks:
       - proxy
     ports:
