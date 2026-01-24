@@ -3,10 +3,10 @@
   hosts: all
   become: true
   # remote_user: root
-  remote_user: scott
+  remote_user: "{{ admin_username }}"
 
   vars:
-    ansible_ssh_private_key_file: /home/scott/.ssh/id_ed25519
+    ansible_ssh_private_key_file: /home/{{ admin_username }}/.ssh/id_ed25519
 
   tasks:
 
