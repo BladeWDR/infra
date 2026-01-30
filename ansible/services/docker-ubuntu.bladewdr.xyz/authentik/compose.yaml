@@ -105,7 +105,7 @@ services:
       - postgresql
 
   authentik-proxy:
-    image: ghcr.io/goauthentik/proxy:2025.12.1@sha256:05d08f10759ece45acf498bd09ce99f3bb8a36cd69aaac10d601cbc35c4f47aa
+    image: ghcr.io/goauthentik/proxy:2025.12.2@sha256:738116807cb219ed2d0ded936377d4169a8b7d6336152b00dc77b70561d02a79
     container_name: authentik-proxy
     networks:
       - proxy
