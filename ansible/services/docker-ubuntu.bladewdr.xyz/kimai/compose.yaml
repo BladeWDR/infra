@@ -24,7 +24,7 @@ services:
       retries: 3
 
   kimai:
-    image: kimai/kimai2:apache@sha256:11af348a12b8c7bcf17bfabed8eafe0e478a270806d63f3ef1f444856b98b2ce
+    image: kimai/kimai2:apache@sha256:fd6da8b6ca30110201acdb067c37333819954729f89420dfdc3c68d9396c45de
     container_name: kimai-app
     volumes:
       - ./kimai/data:/opt/kimai/var/data
