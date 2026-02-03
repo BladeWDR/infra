@@ -1,6 +1,6 @@
 services:
   tracearr:
-    image: ghcr.io/connorgallopo/tracearr:latest
+    image: ghcr.io/connorgallopo/tracearr:latest@sha256:3ac79a0cae844ea4642ae8098a12f2bdea191d5f11c03b38b3085d41ccb36b90
     container_name: tracearr
     ports:
       - "${PORT:-3000}:3000"
@@ -36,7 +36,7 @@ services:
       - proxy
 
   timescale:
-    image: timescale/timescaledb:latest-pg16
+    image: timescale/timescaledb:latest-pg16@sha256:9e9f50161784dc57d3f547b89ded4af73553f9acb4677345ed05f45af7c7f664
     container_name: tracearr-db
     shm_size: 512mb
     ulimits:
@@ -60,7 +60,7 @@ services:
       - tracearr-network
 
   redis:
-    image: redis:8-alpine
+    image: redis:8-alpine@sha256:4eec4565e45aa0b3966554c866bc73211e281b0b3d89fe9a33c982e6faca809d
     container_name: tracearr-redis
     command: redis-server --appendonly yes
     volumes:
