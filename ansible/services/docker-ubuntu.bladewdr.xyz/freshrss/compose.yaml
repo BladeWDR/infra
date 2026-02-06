@@ -16,6 +16,7 @@ services:
       - OIDC_CLIENT_CRYPTO_KEY={{ FRESHRSS_OIDC_CLIENT_CRYPTO_KEY }}
       - OIDC_SCOPES=openid email profile
       - OIDC_X_FORWARDED_HEADERS=X-Forwarded-Host X-Forwarded-Port X-Forwarded-Proto
+      - OIDC_SESSION_MAX_DURATION=0
 
     ports:
       - '49999:80'
