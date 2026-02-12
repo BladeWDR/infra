@@ -31,6 +31,6 @@ services:
       - TZ={{ host_timezone }}
       - PORT=20211
     container_name: netalertx
-    image: jokobsk/netalertx:25.11.29@sha256:fd1a4ca4bd4c0f38797b36b4ec5b0928d7add7b9add788d9cedb11fd25a42a65
+    image: jokobsk/netalertx:26.2.6@sha256:f47a8020ae61fd668e1580cd5014e1a34e8ffa80360b1652e6deb3a7347f0238
     tmpfs:
       - "/tmp:uid=20211,gid=20211,mode=1700,rw,noexec,nosuid,nodev,async,noatime,nodiratime"
