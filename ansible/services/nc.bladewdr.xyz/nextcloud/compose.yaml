@@ -14,7 +14,7 @@ services:
     volumes:
       - nextcloud_aio_mastercontainer:/mnt/docker-aio-config
       - /var/run/docker.sock:/var/run/docker.sock:ro
-    image: ghcr.io/nextcloud-releases/all-in-one:latest@sha256:e02f466615e39c5c65bb74530b2b3147ab2621969a542cdcd2e354a20fee3a8f
+    image: ghcr.io/nextcloud-releases/all-in-one:latest@sha256:d1af9d7ceaae2f896418186019ffc11e49701adf61b2abca61aed16b626e62ae
 
   nginx:
     image: nginx:stable@sha256:2ff091485e4828c289b0ba2d552554d19f952eba36b636d7ff9d6d59cf1cd3ed
