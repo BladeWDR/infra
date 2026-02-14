@@ -34,6 +34,11 @@ sync.bladewdr.xyz nagios_host_templates_list=deb-docker,deb-webserver nagios_hos
 nagios_host_template=deb-docker
 nagios_hostgroups=docker
 
+[cloud]
+app01.bladewdr.xyz
+adguard03.bladewdr.xyz
+sync.bladewdr.xyz
+
 [lan]
 adguard01.bladewdr.xyz
 adguard02.bladewdr.xyz
