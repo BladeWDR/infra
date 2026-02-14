@@ -42,7 +42,7 @@ services:
     devices:
       - /dev/dri:/dev/dri
     group_add:
-          - "992"
+      - "992"
     volumes:
       - /apps/jellyfin/config:/config
       - /apps/jellyfin/cache:/cache
