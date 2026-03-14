@@ -1,6 +1,6 @@
 services:
   tracearr:
-    image: ghcr.io/connorgallopo/tracearr:1.4.17@sha256:ad9d9bb10f83d84f3fdb2f69a0bbee8d640d9c7a342de2938d57c35e323f2114
+    image: ghcr.io/connorgallopo/tracearr:1.4.22@sha256:6c0027b6923c5c050a2519caef5b211ba8b87f729893d9aa4b42560504daa479
     container_name: tracearr
     ports:
       - "${PORT:-3000}:3000"
