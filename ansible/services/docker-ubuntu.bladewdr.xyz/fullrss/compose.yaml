@@ -8,7 +8,7 @@ services:
         restart: unless-stopped
         volumes:
             - "./fullrss/rss-cache:/var/www/html/cache"
-        image: heussd/fivefilters-full-text-rss:3.8.1@sha256:30000f66757a59b0fe29c7aee5b13d3f67364cd02eec5d3754c8956bd2594487
+        image: heussd/fivefilters-full-text-rss:3.8.1@sha256:5952778d0f01dad157781e175b7c9bba061203c0780b086dcf9c4620db62a4df
         environment:
             - FTR_ADMIN_PASSWORD={{ FFR_PASSWORD }}
         labels:
