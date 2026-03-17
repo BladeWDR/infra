@@ -30,7 +30,7 @@ services:
         - '/apps/jellyfin-newsletter/config:/app/config'
 
   jellyfin:
-    image: linuxserver/jellyfin:10.11.6@sha256:45814a5515fdb81cd41f5db946cfd53a3c5e91f0665b40b55bae30cab4b3cd2e
+    image: linuxserver/jellyfin:10.11.6@sha256:5c7691c30033c7e880c253090735c4839cc032fcd51f3a794d5689d2c5637046
     container_name: jellyfin
     environment:
       - PUID=1000
