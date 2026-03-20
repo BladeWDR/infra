@@ -96,6 +96,14 @@
     - bladewdr.apache
   tags: webserver
 
+- hosts: unifi
+  become: true
+  vars_files:
+    - secrets.yml
+  roles:
+    - BladeWDR.unifios
+  tags: unifi
+
 - hosts: nextcloud
   become: true
   vars_files:
