@@ -1,0 +1,10 @@
+[Unit]
+Description=Run renovate-bot on a schedule.
+
+[Timer]
+# Run at 6am, 12pm and 6pm.
+OnCalendar=*-*-* 00,06,12,18:00:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target

@@ -127,6 +127,14 @@
         weekday: "6"
         user: root
 
+- hosts: docker-ubuntu.bladewdr.xyz
+  become: true
+  tags: renovate
+  vars_files:
+    - secrets.yml
+  roles:
+    - bladewdr.renovate
+
 - hosts: all
   become: true
   vars_files:

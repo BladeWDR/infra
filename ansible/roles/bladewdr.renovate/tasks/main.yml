@@ -1,0 +1,45 @@
+---
+
+- name: Create the config directory for Renovate.
+  ansible.builtin.file:
+    path: /opt/renovate
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Create the Renovate config file.
+  ansible.builtin.template:
+    src: renovate-config.j2
+    dest: /opt/renovate/config.js
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Copy over the systemd timer.
+  ansible.builtin.copy:
+    src: renovate-timer
+    dest: /etc/systemd/system/renovate-bot.timer
+    owner: root
+    group: root
+    mode: '0644'
+  notify: 
+    - start renovate timer
+    - reload systemd
+
+- name: Copy over the systemd unit file.
+  ansible.builtin.template:
+    src: renovate-service.j2
+    dest: /etc/systemd/system/renovate-bot.service
+    owner: root
+    group: root
+    mode: '0644'
+  notify: reload systemd
+
+- name: Ensure that the service and timer are both enabled.
+  ansible.builtin.service:
+    name: "renovate-bot.{{ item }}"
+    enabled: true
+  with_items:
+    - "timer"
+    - "service"
