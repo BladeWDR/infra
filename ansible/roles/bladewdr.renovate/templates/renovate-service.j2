@@ -2,5 +2,5 @@
 Description=Renovate-Bot
 
 [Service]
-ExecStart=docker run --rm -v /opt/renovate/config.js:/usr/src/app/config.js -e RENOVATE_TOKEN={{ renovate_token }} renovate/renovate:43-full@sha256:e538e702e6668f47697b494f62f7bc954a3078c862d2b27a6e6c55877477604d
+ExecStart=docker run --rm -v /opt/renovate/config.js:/usr/src/app/config.js -e RENOVATE_TOKEN={{ renovate_bot_token }} renovate/renovate:43-full@sha256:e538e702e6668f47697b494f62f7bc954a3078c862d2b27a6e6c55877477604d
 
