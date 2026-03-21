@@ -1,2 +1,2 @@
-\n
-Merge pull request '${PullRequestTitle}' (${PullRequestReference})\n
+
+Merge pull request '${PullRequestTitle}' (${PullRequestReference})
