@@ -25,7 +25,7 @@ services:
       - FORGEJO__MAILER__SMTP_PASSWD={{ SMTP_PASSWORD }}
       - FORGEJO__OPENID__SIGNIN=true
       - FORGEJO__OPENID_SIGNUP=true
-      - FORGEJO__MIGRATIONS__ALLOWED_DOMAINS=github.com,codeberg.org
+      - FORGEJO__MIGRATIONS__ALLOWED_DOMAINS=github.com,api.github.com,codeberg.org
       - DISABLE_REGISTRATION=false
     restart: unless-stopped
     ports:
