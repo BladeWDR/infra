@@ -59,7 +59,7 @@ services:
       POSTGRES_PASSWORD: ${PAPERLESS_DB_PASS:-paperless}
 
   gotenberg:
-    image: docker.io/gotenberg/gotenberg:8.20@sha256:cda4386c7ed38f18bc6897828be01ba7361c99929a5c84ec5e293d7916e29bac
+    image: docker.io/gotenberg/gotenberg:8.28@sha256:f172b1ce5ec7516ab9452d33bfe3f198d778d3de39655825aa550f4a33946666
     container_name: paperless-gotenberg
     restart: unless-stopped
     networks:
