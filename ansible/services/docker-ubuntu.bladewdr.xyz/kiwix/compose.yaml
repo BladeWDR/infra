@@ -15,7 +15,7 @@ networks:
 services:
   kiwix-serve:
     container_name: kiwix
-    image: ghcr.io/kiwix/kiwix-serve:3.8.0@sha256:6e3eece55aadd72dd359c4368cd36638787f4e3fe095acbd61ef8ddede5422c3
+    image: ghcr.io/kiwix/kiwix-serve:3.8.2@sha256:acdab28186a66b51bfd4202210c6732931ea95cf41c711148a0c9770b9fcc9e1
     networks:
       - proxy
     volumes:
