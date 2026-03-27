@@ -16,6 +16,7 @@ services:
       - db
     ports:
       - 127.0.0.1:8008:8008/tcp
+      - 192.168.85.13:8008:8008/tcp
   synapse-admin:
     container_name: synapse-admin
     hostname: synapse-admin
