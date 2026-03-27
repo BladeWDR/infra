@@ -20,6 +20,7 @@ nagios_hostgroups=dns
 
 [docker]
 adguard02.bladewdr.xyz
+adguard03.bladewdr.xyz
 docker01.bladewdr.xyz
 forgejo.bladewdr.xyz
 docker-ubuntu.bladewdr.xyz nagios_host_template_list=deb-docker,deb-webserver nagios_hostgroups=docker,deb-webserver
