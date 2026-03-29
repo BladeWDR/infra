@@ -26,6 +26,7 @@
         "docker"
       ],
       "matchPackageNames": [
+        "ghcr.io/nextcloud-releases/all-in-one",
         "postgres",
         "mysql",
         "mariadb"
