@@ -2,7 +2,7 @@
 services:
   nginx:
     container_name: mkdocs-nginx
-    image: nginx:stable@sha256:810ad1346ec7fd3d0a246c178f2b82e73a43640c691774405adfd38a751ecce8
+    image: nginx:stable@sha256:42e026ae5315aa0deec22fb00c364fc5ec8d9af1c4833ad5317e2a433e4de0df
     volumes:
       - ./mkdocs-wiki/html:/usr/share/nginx/html:ro
     networks:

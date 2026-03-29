@@ -1,0 +1,67 @@
+services:
+  synapse:
+    image: ghcr.io/element-hq/synapse:1.150.0@sha256:cba0969087ca70a3ec72ebcd1491a6c8391a7da2c0b92738231dd9c7ad55df4d
+    networks:
+      - matrix-network
+      - matrix-db
+    container_name: matrix-synapse
+    restart: unless-stopped
+    environment:
+      - SYNAPSE_CONFIG_PATH=/data/homeserver.yaml
+    volumes:
+      - /apps/matrix/config:/data
+      - /apps/matrix/uploads:/data/uploads
+      - /apps/matrix/media:/data/media
+    depends_on:
+      - db
+    ports:
+      - 127.0.0.1:8008:8008/tcp
+      - 192.168.85.13:8008:8008/tcp
+  synapse-admin:
+    container_name: synapse-admin
+    hostname: synapse-admin
+    image: awesometechnologies/synapse-admin:0.11.4@sha256:a1c1f4662875f51ff1ca556a9eb7c802d9bc40ef58747b9efc163b42da3ad416
+    networks:
+      - matrix-network
+    depends_on:
+      - synapse
+    volumes:
+      - /apps/matrix/synapse-admin/config.json:/app/config.json:ro
+    ports:
+      - 192.168.85.13:8089:80
+    restart: unless-stopped
+  db:
+    image: docker.io/postgres:16-alpine
+    container_name: matrix-db
+    environment:
+      - POSTGRES_USER=synapse
+      - POSTGRES_PASSWORD={{ matrix_db_password }}
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --lc-collate=C --lc-ctype=C
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U synapse"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - /apps/matrix/schemas:/var/lib/postgresql/data
+    networks:
+      - matrix-db
+  element:
+    image: vectorim/element-web:v1.12.13@sha256:5107e63026c13ed014f743e485821b7d4b56d275a41e76303859bb14f5f94eb6
+    container_name: element-web
+    volumes:
+      - /apps/matrix/element-web/element-config.json:/app/config.json:ro
+    ports:
+      - 127.0.0.1:8088:80
+    depends_on:
+      - synapse
+    networks:
+      - matrix-network
+    restart: unless-stopped
+
+networks:
+  matrix-db:
+    driver: bridge
+  matrix-network:
+    driver: bridge

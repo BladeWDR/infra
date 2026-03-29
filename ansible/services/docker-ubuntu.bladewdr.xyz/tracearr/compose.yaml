@@ -36,7 +36,7 @@ services:
       - proxy
 
   timescale:
-    image: timescale/timescaledb:latest-pg16@sha256:9e9f50161784dc57d3f547b89ded4af73553f9acb4677345ed05f45af7c7f664
+    image: timescale/timescaledb:latest-pg16@sha256:0af03ecf697825f6ddae76fd275d16bf46007bed6d00eb3d754779cb7db96fa6
     container_name: tracearr-db
     shm_size: 512mb
     ulimits:
@@ -60,7 +60,7 @@ services:
       - tracearr-network
 
   redis:
-    image: redis:8-alpine@sha256:4eec4565e45aa0b3966554c866bc73211e281b0b3d89fe9a33c982e6faca809d
+    image: redis:8-alpine@sha256:2afba59292f25f5d1af200496db41bea2c6c816b059f57ae74703a50a03a27d0
     container_name: tracearr-redis
     command: redis-server --appendonly yes
     volumes:

@@ -67,7 +67,7 @@
   tasks:
     - name: Run docker compose up.
       ansible.builtin.shell: |
-        ls {{ docker_compose_generator_output_path }} || exit 0
+        ls {{ docker_compose_generator_output_path }}/compose.yaml || exit 0
         cd {{ docker_compose_generator_output_path }}
         docker compose up -d --remove-orphans
       changed_when: false
