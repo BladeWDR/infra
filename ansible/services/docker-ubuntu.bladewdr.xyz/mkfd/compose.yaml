@@ -1,0 +1,30 @@
+---
+networks:
+  proxy:
+    external: true
+
+services:
+  mkfd:
+    container_name: mkfd
+    networks:
+      - proxy
+    ports:
+      - 5000:5000
+    volumes:
+      - /home/scott/docker/mkfd/config:/app/configs
+    restart: unless-stopped
+    environment:
+      - PASSKEY={{ mkfd_passkey }}
+      - COOKIE_SECRET={{ mkfd_cookie }}
+      - ENCRYPTION_KEY={{ mkfd_encryption_key }}
+      - SSL=false
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.mkfd.rule=Host(`mkfd.{{ TRAEFIK_HOST_DOMAIN }}`)
+      - traefik.http.routers.mkfd.entrypoints=https
+      - traefik.http.routers.mkfd.middlewares=default-headers@file
+      - traefik.http.routers.mkfd.tls=true
+      - traefik.http.routers.mkfd.service=mkfd
+      - traefik.http.services.mkfd.loadbalancer.server.port=5000
+    image: tbosk/mkfd:2.1.1@sha256:24bd5bce7f70a04ad04e57e532f690f18b3b1d8e3184300f04bb57072d1ebedf
+
