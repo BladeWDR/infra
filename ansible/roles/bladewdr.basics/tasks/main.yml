@@ -81,6 +81,9 @@
   ansible.builtin.include_tasks: Lazygit.yml
   when: not lazygit_installed.stat.exists
 
+- name: Set up various cron jobs.
+  ansible.builtin.include_tasks: Cron.yml
+
 - name: Copy sudoers file for Nagios Remote Plugin Executor (NRPE).
   ansible.builtin.copy:
     src: sudoers_sanoid

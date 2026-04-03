@@ -1,0 +1,29 @@
+---
+
+- name: CRON - Clean up old systemd journal entries.
+  ansible.builtin.cron:
+    name: systemd journal cleanup
+    minute: "0"
+    hour: "12"
+    user: root
+    job: "journalctl --vacuum-time=7d --quiet > /dev/null"
+
+- name: CRON - Clean up apt cache weekly.
+  ansible.builtin.cron:
+    name: run apt-get clean
+    minute: "0"
+    hour: "6"
+    weekday: "2"
+    user: root
+    job: "apt-get clean"
+  when: ansible_facts['os_family'] == 'Debian'
+
+- name: CRON - clean up unused Docker images.
+  ansible.builtin.cron:
+    name: Docker Image Cleanup
+    minute: "0"
+    hour: "23"
+    weekday: "4"
+    user: root
+    job: "docker image prune -af"
+  when: "'docker' in group_names"
