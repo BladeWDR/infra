@@ -26,6 +26,7 @@
         "docker"
       ],
       "matchPackageNames": [
+        "getmeili/meilisearch",
         "ghcr.io/nextcloud-releases/all-in-one",
         "postgres",
         "mysql",
