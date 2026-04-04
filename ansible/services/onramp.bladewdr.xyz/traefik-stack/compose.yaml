@@ -250,7 +250,7 @@ services:
     volumes:
       - /apps/pinchflat/config:/config
       - /etc/localtime:/etc/localtime:ro
-      - /apps/pinchflat/media/downloads:/downloads
+      - media:/downloads
     environment:
       - PUID=${PUID:-1000}
       - PGID=${PGID:-1000}
