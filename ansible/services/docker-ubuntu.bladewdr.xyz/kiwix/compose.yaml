@@ -22,3 +22,4 @@ services:
       - kiwix-data:/data
     command:
       - '*.zim'
+    restart: unless-stopped
