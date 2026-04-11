@@ -15,6 +15,18 @@ discovery.relabel "integrations_node_exporter" {
   }
 }
 
+discovery.relabel "integrations_process_exporter" {
+  targets = prometheus.exporter.process.local_processes.targets
+  rule {
+    target_label = "host"
+    replacement  = constants.hostname
+  }
+  rule {
+    target_label = "job"
+    replacement  = "process_exporter"
+  }
+}
+
 prometheus.exporter.unix "local_system" {
   procfs_path = "/proc"
     sysfs_path  = "/sys"
@@ -43,8 +55,25 @@ prometheus.exporter.unix "local_system" {
 
 }
 
+prometheus.exporter.process "local_processes" {
+  procfs_path = "/proc"
+  track_children = false
+  track_threads  = false
+
+{% raw %}
+  matcher {
+    name    = "{{.Comm}}"
+    cmdline = [".+"]
+  }
+}
+{% endraw %}
+
 prometheus.scrape "scrape_metrics" {
-  targets         = discovery.relabel.integrations_node_exporter.output
+  // targets         = discovery.relabel.integrations_node_exporter.output
+  targets = concat(
+    discovery.relabel.integrations_node_exporter.output,
+    discovery.relabel.integrations_process_exporter.output,
+  )
   forward_to      = [prometheus.remote_write.prometheus_server.receiver]
   scrape_interval = "10s"
 }
