@@ -42,7 +42,7 @@ services:
     volumes:
       - /apps/grafana-stack/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - /apps/grafana-stack/prometheus/rules.yml:/etc/prometheus/rules.yml:ro
-      - /apps/grafana-stack/prometheus/data:/prometheus
+      - /mnt/logdata/prometheus_data:/prometheus
     command:
       - --config.file=/etc/prometheus/prometheus.yml
       - --storage.tsdb.path=/prometheus
