@@ -1,0 +1,23 @@
+#!/bin/bash
+
+GRAFANA_DIR='/apps/grafana-stack/grafana-data'
+RSYNC_TARGET='nas01.bladewdr.xyz:30026/grafana'
+HEALTHCHECKS_URL='{{ grafana_healthchecks_url }}'
+LOG_FILE='/var/log/grafana-backup.log'
+
+# Stop all of the docker containers so we can get a clean backup.
+docker stop $(docker ps -aq)
+
+curl -m 10 --retry 5 -X POST -H "Content-Type: text/plain" --data "Starting backup for Grafana" "$HEALTHCHECKS_URL/start"
+
+rsync -av "$GRAFANA_DIR" rsync://"$RSYNC_TARGET" > "$LOG_FILE" 2>&1
+
+if [[ $? -ne 0 ]]; then
+        curl -m 10 --retry 5 -X POST -H "Content-Type: text/plain" --data "Backup for Grafana has failed." "$HEALTHCHECKS_URL/fail"
+else
+        curl -m 10 --retry 5 -X POST -H "Content-Type: text/plain" --data "Backup for Grafana has succeeded." "$HEALTHCHECKS_URL"
+fi
+
+# Start all containers again
+
+docker start $(docker ps -aq)
