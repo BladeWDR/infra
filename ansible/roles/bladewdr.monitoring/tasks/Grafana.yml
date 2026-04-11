@@ -9,3 +9,18 @@
     mode: '0755'
   notify: grafana compose up
 
+- name: Create the backup script.
+  ansible.builtin.template:
+    src: grafana-backup.j2
+    dest: /opt/grafana-backup.sh
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Create a cron job to run the backup script.
+  ansible.builtin.cron:
+    name: Back up Grafana data.
+    job: /opt/grafana-backup.sh
+    minute: "0"
+    hour: "6"
+    user: root
