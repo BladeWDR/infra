@@ -1,0 +1,33 @@
+---
+
+- name: Create matrix database backup script.
+  ansible.builtin.template:
+    src: matrix-backup.sh
+    dest: /opt/matrix-backup.sh
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Create autoretic configuration file.
+  ansible.builtin.template:
+    src: matrix-autorestic.yml
+    dest: /root/.autorestic.yml
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Set up cron job to dump database.
+  ansible.builtin.cron:
+    name: Matrix DB Backup
+    job: /opt/matrix-backup.sh >> /var/log/matrix-backup.log 2>&1
+    minute: "0"
+    hour: "3"
+    user: root
+
+- name: Set up cron job for remote backup.
+  ansible.builtin.cron:
+    name: Matrix autorestic run
+    job: /usr/local/bin/autorestic backup -a
+    minute: "0"
+    hour: "4"
+    user: root

@@ -1,0 +1,57 @@
+backends:
+  backblazeb2:
+    type: b2
+    path: scottb2211-matrix
+    key: {{ matrix_autorestic_key }}
+    requirekey: false
+    env:
+      b2_account_id: {{ matrix_autorestic_b2_id }}
+      b2_account_key: {{ matrix_autorestic_b2_key }}
+    rest:
+      user: ""
+      password: ""
+    options: {}
+extras:
+  healthchecks:
+    hooks:
+      before:
+        - 'curl -m 10 --retry 5 -X POST -H "Content-Type: text/plain" --data "Starting backup for location: ${AUTORESTIC_LOCATION}" {{ matrix_autorestic_healthcheck_url }}/start'
+      failure:
+        - 'curl -m 10 --retry 5 -X POST -H "Content-Type: text/plain" --data "Backup failed for location: ${AUTORESTIC_LOCATION}" {{ matrix_autorestic_healthcheck_url }}/fail'
+      success:
+        - 'curl -m 10 --retry 5 -X POST -H "Content-Type: text/plain" --data "Backup successful for location: ${AUTORESTIC_LOCATION}" {{ matrix_autorestic_healthcheck_url }}'
+locations:
+  matrix:
+    from:
+      - /apps/matrix/config
+      - /apps/matrix/files
+      - /apps/matrix/media
+      - /apps/matrix/synapse-admin
+      - /apps/matrix/element-web
+      - /apps/matrix/uploads
+      - /apps/matrix/db-backup
+    to:
+      - backblazeb2
+    hooks:
+      dir: ""
+      prevalidate: []
+      before:
+        - 'curl -m 10 --retry 5 -X POST -H "Content-Type: text/plain" --data "Starting backup for location: ${AUTORESTIC_LOCATION}" {{ matrix_autorestic_healthcheck_url }}/start'
+      after: []
+      success:
+        - 'curl -m 10 --retry 5 -X POST -H "Content-Type: text/plain" --data "Backup successful for location: ${AUTORESTIC_LOCATION}" {{ matrix_autorestic_healthcheck_url }}'
+      failure:
+        - 'curl -m 10 --retry 5 -X POST -H "Content-Type: text/plain" --data "Backup failed for location: ${AUTORESTIC_LOCATION}" {{ matrix_autorestic_healthcheck_url }}/fail'
+    cron: 5 4 * * *
+    options:
+      forget:
+        keep-last:
+          - 7
+        keep-monthly:
+          - 1
+        keep-weekly:
+          - 1
+        keep-within:
+          - 5
+    copyoption: {}
+version: 2
