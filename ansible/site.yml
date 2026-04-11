@@ -151,3 +151,11 @@
   roles:
     - bladewdr.monitoring
   tags: monitoring
+
+- hosts: adguard03.bladewdr.xyz
+  become: true
+  vars_files:
+    - secrets.yml
+  roles:
+    - bladewdr.matrix
+  tags: matrix
