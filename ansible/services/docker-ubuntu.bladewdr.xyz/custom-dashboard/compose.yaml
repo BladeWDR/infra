@@ -2,7 +2,7 @@
 services:
   nginx-dashboard:
     container_name: dash-nginx
-    image: nginx:stable@sha256:42e026ae5315aa0deec22fb00c364fc5ec8d9af1c4833ad5317e2a433e4de0df
+    image: nginx:stable@sha256:0c3a604353135ac13f3a991e2a98c9958af7b8c0b7251ce1590e0c5ff5e3692c
     volumes:
       - ./dashboard/html:/usr/share/nginx/html:ro
     networks:
