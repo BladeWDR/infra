@@ -2,7 +2,7 @@
 
 services:
   server:
-    image: codeberg.org/forgejo/forgejo:14@sha256:8f4b1f86750e206824c669e1af17b6c6e8da9ed1a8ebda615db7526ee86d3eb2
+    image: codeberg.org/forgejo/forgejo:15@sha256:e87297f8ec332240228d24f2d6f0b408e30749f4ed166c1e5cf30a2288723794
     container_name: forgejo
     environment:
       - USER_UID=1000
