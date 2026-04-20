@@ -93,7 +93,26 @@ services:
       - traefik.http.routers.immich.rule=Host(`immich.{{ ONRAMP_HOST_DOMAIN }}`)
       - traefik.http.services.immich.loadbalancer.server.port=2283
       - autoheal=true
-
+  immichframe:
+    container_name: immichframe1
+    image: ghcr.io/immichframe/immichframe:v1.0.33.0@sha256:1680d2f63a89fa0db6e5a7c5c497bed27a47f314efe18e1f11cff1dea1910f57 
+    restart: unless-stopped
+    volumes:
+      - /apps/immich-frame/config:/app/Config
+    environment:
+      - TZ="{{ host_timezone }}"
+    networks:
+      - traefik
+    depends_on:
+      - immich
+    labels:
+      - joyride.host.name=immichframe1.{{ ONRAMP_HOST_DOMAIN }}
+      - traefik.enable=true
+      - traefik.docker.network=traefik
+      - traefik.http.routers.immichframe1.entrypoints=websecure
+      - traefik.http.routers.immichframe1.rule=Host(`immichframe1.{{ ONRAMP_HOST_DOMAIN }}`)
+      - traefik.http.services.immichframe1.loadbalancer.server.port=8080
+      - autoheal=true
   immich-machine-learning:
     container_name: immich_machine_learning
     user: "1000"
