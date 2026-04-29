@@ -20,6 +20,7 @@ services:
       - OIDC_SESSION_MAX_DURATION=0
     ports:
       - '49999:80'
+    mem_limit: 5G
     volumes:
       - ./freshrss/data:/var/www/FreshRSS/data
       - ./freshrss/extensions:/var/www/FreshRSS/extensions
