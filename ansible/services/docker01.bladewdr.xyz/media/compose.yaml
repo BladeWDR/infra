@@ -21,7 +21,7 @@ services:
 
   jellyfin-newsletter:
       container_name: jellyfin-newsletter
-      image: 'ghcr.io/seaweedbraincy/jellyfin-newsletter:0.10.2@sha256:f6d76753da6b439ed149e85506c2638f7e16e3069ee78a0f52c703fd05a398f4'
+      image: 'ghcr.io/seaweedbraincy/jellyfin-newsletter:1.0.0@sha256:6e29dd7a8735c92a5ff567da0cdb4cd014d88893677eef760f5d7c685c451321'
       environment:
         USER_UID: 1000
         USER_GID: 1000
