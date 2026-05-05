@@ -1,6 +1,6 @@
 services:
   rackula:
-    image: ghcr.io/rackulalives/rackula:latest@sha256:d03a6bf0bbe9389ce88d24319b6df49df35bf96364536399bee6b7ddd6c5ee3f
+    image: ghcr.io/rackulalives/rackula:latest@sha256:495aeb1b0eb490d235b60962e68c05203bf964be38f5f0d00db4d51b6183e526
     container_name: rackula
     restart: unless-stopped
     networks:
