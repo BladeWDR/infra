@@ -346,7 +346,7 @@ services:
           memory: '4G'    # Limit memory usage to 2GB
 
   dawarich_redis:
-    image: redis:7.4-alpine
+    image: redis:8.6-alpine@sha256:69f2c586c8a7e9cce4ae1ee9bbaf60bc4bb5f4bb3880e4ed022b1fd758a7cab9
     container_name: dawarich_redis
     command: redis-server
     networks:
