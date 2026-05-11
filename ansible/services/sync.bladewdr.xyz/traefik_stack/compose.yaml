@@ -163,6 +163,7 @@ services:
 
   shlink-web-client:
     container_name: shlink-web-client
+    restart: unless-stopped
     networks:
       - traefik
     environment:
