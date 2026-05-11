@@ -242,6 +242,8 @@ services:
       - APPLICATION_HOSTS=localhost,::1,127.0.0.1,{{ DAWARICH_HOST_NAME }}.{{ APP0_HOST_DOMAIN }}
       - TIME_ZONE={{ host_timezone }}
       - APPLICATION_PROTOCOL=http
+      - PHOTON_API_HOST=dawarich_photon:2322
+      - PHOTON_API_USE_HTTPS=false
       # Can be either km or mi
       - DISTANCE_UNIT=${DAWARICH_DISTANCE_UNIT:-mi}
       - PROMETHEUS_EXPORTER_ENABLED=false
@@ -313,6 +315,8 @@ services:
       - APPLICATION_HOSTS=localhost,::1,127.0.0.1,{{ DAWARICH_HOST_NAME }}.{{ APP0_HOST_DOMAIN }}
       - BACKGROUND_PROCESSING_CONCURRENCY=10
       - APPLICATION_PROTOCOL=http
+      - PHOTON_API_HOST=dawarich_photon:2322
+      - PHOTON_API_USE_HTTPS=false
       - DISTANCE_UNIT=km
       - PROMETHEUS_EXPORTER_ENABLED=false
       - PROMETHEUS_EXPORTER_HOST=dawarich
@@ -382,6 +386,19 @@ services:
       start_period: 30s
       timeout: 10s
 
+  dawarich_photon:
+      container_name: dawarich_photon
+      image: rtuszik/photon-docker:2.2@sha256:9e0f006e6eb5854fa43c71fb491203ee87905315e265c184e9afcc57c7555367
+      networks:
+        - traefik
+      environment:
+          - UPDATE_STRATEGY=SEQUENTIAL
+          - UPDATE_INTERVAL=720h
+          - REGION=usa
+          # - APPRISE_URLS=pover://user@token  # Optional: notifications
+      volumes:
+          - /apps/photon:/photon/data
+      restart: unless-stopped
 
 networks:
   traefik:
