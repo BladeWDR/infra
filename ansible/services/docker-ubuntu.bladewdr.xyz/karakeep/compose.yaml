@@ -67,7 +67,6 @@ services:
       retries: 3
       test: set -o pipefail;curl -fsS http://localhost:7700/health | grep -q '{"status":"available"}'
       timeout: 5s
-      curl -fsS http://hoarder-meilisearch:7700/health | grep -q '{"status":"available"}'
 
 networks:
   proxy:
