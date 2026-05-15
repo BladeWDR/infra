@@ -7,6 +7,9 @@ services:
     restart: unless-stopped
     volumes:
       - ./karakeep/data:/data
+    depends_on:
+      - meilisearch
+      - chrome
     environment:
       - DATA_DIR=/data
       - HOARDER_VERSION=release
@@ -60,6 +63,11 @@ services:
     restart: unless-stopped
     volumes:
       - ./karakeep/meilisearch:/meili_data
+    healthcheck:
+      retries: 3
+      test: set -o pipefail;curl -fsS http://localhost:7700/health | grep -q '{"status":"available"}'
+      timeout: 5s
+      curl -fsS http://hoarder-meilisearch:7700/health | grep -q '{"status":"available"}'
 
 networks:
   proxy:
