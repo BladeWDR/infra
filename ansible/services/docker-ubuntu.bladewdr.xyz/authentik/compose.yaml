@@ -2,7 +2,7 @@
 
 services:
   postgresql:
-    image: docker.io/library/postgres:16-alpine@sha256:20edbde7749f822887a1a022ad526fde0a47d6b2be9a8364433605cf65099416
+    image: docker.io/library/postgres:16-alpine@sha256:16bc17c64a573ef34162af9298258d1aec548232985b33ed7b1eac33ba35c229
     container_name: authentik-postgresql
     restart: unless-stopped
     networks:
