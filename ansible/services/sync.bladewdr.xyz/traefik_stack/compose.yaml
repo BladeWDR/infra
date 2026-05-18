@@ -351,7 +351,7 @@ services:
           memory: '4G'    # Limit memory usage to 2GB
 
   dawarich_redis:
-    image: redis:7.4-alpine
+    image: redis:7.4-alpine@sha256:6ab0b6e7381779332f97b8ca76193e45b0756f38d4c0dcda72dbb3c32061ab99
     container_name: dawarich_redis
     command: redis-server
     networks:
@@ -367,7 +367,7 @@ services:
       timeout: 10s
 
   dawarich_db:
-    image: postgis/postgis:17-3.5-alpine
+    image: postgis/postgis:17-3.5-alpine@sha256:5a30b4cf0c787aae9e428c1fce1ef736fccc7fc294958ee99d3836fb51b1819b
     shm_size: 1G
     container_name: dawarich_db
     volumes:
