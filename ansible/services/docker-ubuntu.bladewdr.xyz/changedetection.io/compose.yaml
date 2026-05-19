@@ -1,6 +1,6 @@
 services:
   changedetection:
-    image: ghcr.io/dgtlmoon/changedetection.io:0.54.9@sha256:2a7a8325b560e3cb6834c31f2a86b9ef7fac13c63cf0d3bdf5a14bdd3f0fbe77
+    image: ghcr.io/dgtlmoon/changedetection.io:0.55.5@sha256:d89d4187221206f7f9f2c7946e7483815db905ca7d122644081aebd5d23ba391
     container_name: changedetection
     networks:
       - proxy
