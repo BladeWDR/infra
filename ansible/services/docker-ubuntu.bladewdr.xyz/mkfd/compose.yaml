@@ -26,5 +26,5 @@ services:
       - traefik.http.routers.mkfd.tls=true
       - traefik.http.routers.mkfd.service=mkfd
       - traefik.http.services.mkfd.loadbalancer.server.port=5000
-    image: tbosk/mkfd:2.1.1@sha256:24bd5bce7f70a04ad04e57e532f690f18b3b1d8e3184300f04bb57072d1ebedf
+    image: tbosk/mkfd:2.1.2@sha256:ad67d546aa2017f18af90429386dc351335a2abc953d7e47208030abd165445f
 
