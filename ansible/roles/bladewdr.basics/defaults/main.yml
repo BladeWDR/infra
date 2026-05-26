@@ -1,6 +1,26 @@
 #SPDX-License-Identifier: MIT-0
 ---
 
+basic_packages_rpm:
+  - zsh
+  - zsh-autosuggestions
+  - zsh-syntax-highlighting
+  - git
+  - tmux
+  - htop
+  - nrpe
+  - nagios-plugins-all
+  - ncdu
+  - direnv
+  - curl
+  - wget
+  - make
+  - python3-pip
+  - gcc
+  - gcc-c++
+  - kernel-devel
+  - wireguard-tools
+
 basic_packages_deb:
   - zsh
   - zsh-autosuggestions

@@ -1,15 +1,15 @@
 ---
 
 - name: Install basic packages.
-  ansible.builtin.apt:
-    name: "{{ basic_packages_deb }}"
+  ansible.builtin.dnf:
+    name: "{{ basic_packages_rpm }}"
     state: present
     update_cache: true
     cache_valid_time: 3600
-  when: ansible_os_family == 'Debian'
+  when: ansible_os_family == 'RedHat'
 
 - name: Install QEMU Guest Agent on KVM virtual machines.
-  ansible.builtin.apt:
+  ansible.builtin.dnf:
     name: qemu-guest-agent
     state: present
   notify: enable and start guest agent
@@ -18,36 +18,26 @@
     - ansible_virtualization_type == 'kvm'
     - "'cloud' not in group_names"
 
-- name: Configure unattended-upgrades.
+- name: Configure DNF automatic.
   block:
-    - name: Copy 20auto-upgrades.
-      ansible.builtin.template:
-        src: 20auto-upgrades
-        dest: /etc/apt/apt.conf.d/20auto-upgrades
+    - name: Install DNF automatic.
+      ansible.builtin.dnf:
+        name: dnf-automatic
+        state: present
+
+    - name: Set up automatic security updates.
+      ansible.builtin.copy:
+        src: dnf-automatic.conf
+        dest: /etc/dnf/automatic.conf
         owner: root
         group: root
-        mode: '0644'
+        mode: '0744'
 
-    - name: Copy 50unattended-upgrades.
-      ansible.builtin.template:
-        src: 50unattended-upgrades
-        dest: /etc/apt/apt.conf.d/50unattended-upgrades
-        owner: root
-        group: root
-        mode: '0644'
-
-- name: Configure timesyncd.
-  ansible.builtin.template:
-    src: timesyncd.conf
-    dest: /etc/systemd/timesyncd.conf
-    mode: "0644"
-    owner: root
-    group: root
-  notify: restart timesyncd
-
-- name: Set timezone using timedatectl.
-  ansible.builtin.command: "timedatectl set-timezone {{ timezone }}"
-  changed_when: false
+    - name: Enable the DNF automatic systemd timer.
+      ansible.builtin.systemd_service:
+        name: dnf-automatic.timer
+        state: started
+        enabled: true
 
 - name: Check if Homebrew directory already exists.
   ansible.builtin.stat:

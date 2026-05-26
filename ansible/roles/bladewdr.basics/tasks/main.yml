@@ -11,15 +11,6 @@
 #  ansible.builtin.hostname:
 #    name: "{{ machine_hostname }}"
 
-- name: Configure timesyncd.
-  ansible.builtin.template:
-    src: timesyncd.conf
-    dest: /etc/systemd/timesyncd.conf
-    mode: "0644"
-    owner: root
-    group: root
-  notify: restart timesyncd
-
 - name: Set timezone using timedatectl.
   ansible.builtin.command: "timedatectl set-timezone {{ timezone }}"
   changed_when: false
