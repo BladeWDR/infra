@@ -18,6 +18,7 @@ basic_packages_deb:
   - software-properties-gtk
   - python3-pip
   - build-essential
+  - wireguard-tools
 
 brew_packages:
   - ripgrep
