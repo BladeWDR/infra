@@ -79,7 +79,7 @@ services:
       - media:/mnt/media:ro
 
   plex:
-    image: plexinc/pms-docker:1.43.2.10687-563d026ea-armhf@sha256:f063d797f114937439a4f21aa7a9440d880a16b74c19029ba9bc7a6b8d761585
+    image: plexinc/pms-docker:1.43.2.10687-563d026ea@sha256:c37106c57fed7a6624f5dee5a3ce460ff011f09a2aa7f4ee9e8dbbd08ae1b87e
     container_name: plex
     restart: unless-stopped
     volumes:
