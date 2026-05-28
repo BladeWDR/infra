@@ -11,10 +11,6 @@
 #  ansible.builtin.hostname:
 #    name: "{{ machine_hostname }}"
 
-- name: Set timezone using timedatectl.
-  ansible.builtin.command: "timedatectl set-timezone {{ timezone }}"
-  changed_when: false
-
 - name: Check if the .local folder already exists.
   ansible.builtin.stat:
     path: "/home/{{ admin_username }}/.local"
