@@ -1,18 +1,49 @@
 ---
 
+- name: Install EPEL respositories.
+  ansible.builtin.dnf:
+      name: epel-release
+      state: present
+      update_cache: true
+  when: ansible_os_family == 'RedHat'
+  vars:
+    ansible_python_interpreter: /usr/libexec/platform-python
+
+- name: Enable CodeReady Builder on RHEL
+  community.general.rhsm_repository:
+    name: "codeready-builder-for-rhel-{{ ansible_distribution_major_version }}-{{ ansible_architecture }}-rpms"
+    state: enabled
+  when: ansible_distribution == "RedHat"
+
+- name: Enable CRB on Rocky 8.
+  ansible.builtin.command: dnf config-manager --set-enabled powertools
+  changed_when: false
+  when:
+    - ansible_distribution == "Rocky"
+    - ansible_distribution_major_version == "8"
+
+- name: Enable CRB on Rocky 9+.
+  ansible.builtin.command: dnf config-manager --set-enabled crb
+  changed_when: false
+  when:
+    - ansible_distribution == "Rocky"
+    - ansible_distribution_major_version > "8"
+
 - name: Install basic packages.
   ansible.builtin.dnf:
     name: "{{ basic_packages_rpm }}"
     state: present
-    update_cache: true
-    cache_valid_time: 3600
   when: ansible_os_family == 'RedHat'
+  vars:
+    ansible_python_interpreter: /usr/libexec/platform-python
 
 - name: Install QEMU Guest Agent on KVM virtual machines.
   ansible.builtin.dnf:
     name: qemu-guest-agent
     state: present
   notify: enable and start guest agent
+  vars:
+    ansible_python_interpreter: /usr/libexec/platform-python
   when:
     - ansible_virtualization_role == 'guest'
     - ansible_virtualization_type == 'kvm'
@@ -24,6 +55,8 @@
       ansible.builtin.dnf:
         name: dnf-automatic
         state: present
+      vars:
+        ansible_python_interpreter: /usr/libexec/platform-python
 
     - name: Set up automatic security updates.
       ansible.builtin.copy:
@@ -46,7 +79,7 @@
 
 - name: Install Homebrew.
   ansible.builtin.include_tasks: Homebrew.yml
-  when: not brew_installed.stat.exists and ansible_os_family == "Debian"
+  when: not brew_installed.stat.exists and (ansible_os_family == "Debian" or ansible_os_family == "RedHat")
 
 - name: Get the user ID of the Ansible service account.
   ansible.builtin.command: whoami
