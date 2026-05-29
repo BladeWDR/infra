@@ -1,5 +1,17 @@
 ---
 
+- name: Ensure that tar is installed. (Debian)
+  ansible.builtin.apt:
+    name: tar
+    state: present
+  when: ansible_facts['os_family'] == 'Debian'
+
+- name: Ensure that tar is installed. (RHEL)
+  ansible.builtin.dnf:
+    name: tar
+    state: present
+  when: ansible_facts['os_family'] == 'RedHat'
+
 - name: Grant passwordless sudo for Homebrew install
   ansible.builtin.copy:
     dest: "{{ sudoers_file }}"
