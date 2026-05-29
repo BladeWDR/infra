@@ -1,6 +1,9 @@
 #SPDX-License-Identifier: MIT-0
 ---
 
+- name: Load OS-specific variables.
+  ansible.builtin.include_vars: "vars/services_{{ ansible_facts['os_family'] | lower }}.yml"
+
 - name: Post-deploy tasks.
   ansible.builtin.include_tasks: "Deploy.yml"
 
@@ -23,6 +26,14 @@
     path: "/etc/ssh/sshd_config"
     state: present
   notify: restart-ssh
+
+- name: Ensure that the directory /etc/ssh/sshd_config.d exists.
+  ansible.builtin.file:
+    path: /etc/ssh/sshd_config.d
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
 
 - name: Create SSH options.conf.
   ansible.builtin.template:
