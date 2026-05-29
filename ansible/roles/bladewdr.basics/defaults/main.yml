@@ -3,15 +3,14 @@
 
 basic_packages_rpm:
   - zsh
-  - zsh-autosuggestions
   - zsh-syntax-highlighting
   - git
   - tmux
   - htop
   - nrpe
+  - tar
   - nagios-plugins-all
   - ncdu
-  - direnv
   - curl
   - wget
   - make
