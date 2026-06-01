@@ -5,7 +5,7 @@ networks:
 services:
   olivetin:
     container_name: olivetin
-    image: jamesread/olivetin:3000.13.0@sha256:1c69aeb587d90580852b3fee50d53118a424bba862b285248422226d4bcaffae
+    image: jamesread/olivetin:3000.14.0@sha256:494000da6df5d8afe8573e45bee2e44ab6080053785936fac5b0dfaf5e4314da
     user: "root"
     privileged: true
     networks:
