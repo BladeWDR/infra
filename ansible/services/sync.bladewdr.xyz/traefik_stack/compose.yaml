@@ -238,6 +238,7 @@ services:
       - DATABASE_USERNAME=${DAWARICH_POSTGRES_USER:-postgres}
       - DATABASE_PASSWORD={{ DAWARICH_POSTGRES_PW }}
       - DATABASE_NAME=dawarich_production
+      - DOMAIN={{ DAWARICH_HOST_NAME }}.{{ APP0_HOST_DOMAIN }}
       - MIN_MINUTES_SPENT_IN_CITY=${DAWARICH_MIN_MINS:-30}
       - APPLICATION_HOSTS=localhost,::1,127.0.0.1,{{ DAWARICH_HOST_NAME }}.{{ APP0_HOST_DOMAIN }}
       - TIME_ZONE={{ host_timezone }}
@@ -251,12 +252,15 @@ services:
       - SECRET_KEY_BASE={{ DAWARICH_SECRET_KEY_BASE }}
       - RAILS_LOG_TO_STDOUT="true"
       # SMTP settings
-      - SMTP_SERVER={{ DAWARICH_SMTP_SERVER }}
-      - SMTP_PORT={{ DAWARICH_SMTP_PORT }}
-      - SMTP_USERNAME={{ DAWARICH_SMTP_USERNAME }}
-      - SMTP_PASSWORD={{ DAWARICH_SMTP_PASSWORD }}
-      - SMTP_FROM={{ DAWARICH_SMTP_FROM }}
-      - SMTP_DOMAIN={{ DAWARICH_SMTP_DOMAIN }}
+      - SMTP_SERVER={{ SMTP_SERVER_ADDRESS }}
+      - SMTP_PORT=587
+      - SMTP_USERNAME={{ SMTP_USERNAME }}
+      - SMTP_PASSWORD={{ SMTP_PASSWORD }}
+      - SMTP_FROM=Dawarich <{{ SMTP_FROM }}>
+      - SMTP_DOMAIN={{ SMTP_DOMAIN }}
+      - SMTP_AUTHENTICATION=plain
+      - SMTP_OPEN_TIMEOUT=25
+      - SMTP_READ_TIMEOUT=25
     logging:
       driver: "json-file"
       options:
@@ -311,6 +315,7 @@ services:
       - DATABASE_USERNAME=${DAWARICH_POSTGRES_USER:-postgres}
       - DATABASE_PASSWORD={{ DAWARICH_POSTGRES_PW }}
       - DATABASE_NAME=dawarich_production
+      - DOMAIN=trips.bladewdr.xyz
       - APPLICATION_HOSTS=localhost,::1,127.0.0.1,{{ DAWARICH_HOST_NAME }}.{{ APP0_HOST_DOMAIN }}
       - BACKGROUND_PROCESSING_CONCURRENCY=10
       - APPLICATION_PROTOCOL=http
@@ -322,6 +327,15 @@ services:
       - PROMETHEUS_EXPORTER_PORT=9394
       - SECRET_KEY_BASE={{ DAWARICH_SECRET_KEY_BASE }}
       - RAILS_LOG_TO_STDOUT="true"
+      - SMTP_SERVER={{ SMTP_SERVER_ADDRESS }}
+      - SMTP_PORT=587
+      - SMTP_USERNAME={{ SMTP_USERNAME }}
+      - SMTP_PASSWORD={{ SMTP_PASSWORD }}
+      - SMTP_FROM=Dawarich <{{ SMTP_FROM }}>
+      - SMTP_DOMAIN={{ SMTP_DOMAIN }}
+      - SMTP_AUTHENTICATION=plain
+      - SMTP_OPEN_TIMEOUT=25
+      - SMTP_READ_TIMEOUT=25
     logging:
       driver: "json-file"
       options:
