@@ -317,7 +317,7 @@ services:
       - DATABASE_NAME=dawarich_production
       - DOMAIN=trips.bladewdr.xyz
       - APPLICATION_HOSTS=localhost,::1,127.0.0.1,{{ DAWARICH_HOST_NAME }}.{{ APP0_HOST_DOMAIN }}
-      - BACKGROUND_PROCESSING_CONCURRENCY=10
+      - BACKGROUND_PROCESSING_CONCURRENCY=5
       - APPLICATION_PROTOCOL=http
       - SELF_HOSTED=true
       - PHOTON_API_HOST=dawarich_photon:2322
