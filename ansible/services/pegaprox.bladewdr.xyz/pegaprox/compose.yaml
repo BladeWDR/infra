@@ -1,0 +1,18 @@
+---
+services:
+  pegaprox:
+    image: ghcr.io/pegaprox/pegaprox:1.9.12.3@sha256:f1f62e8f35bd7644a447c7cc269933b5f5390534c677f1595913e3c6dc279215
+    container_name: pegaprox
+    ports:
+      - "5000:5000"   # web UI + API
+      - "5001:5001"   # VNC websocket (noVNC console)
+      - "5002:5002"   # SSH websocket (xterm.js)
+    volumes:
+      - /apps/pegaprox/config:/app/config
+      - /apps/pegaprox/logs:/app/logs
+    restart: unless-stopped
+    environment:
+      PEGAPROX_BEHIND_PROXY: "true"           # behind nginx/haproxy
+      PEGAPROX_TRUSTED_PROXIES: "10.13.37.14"
+      PEGAPROX_HOST: "0.0.0.0"
+      PEGAPROX_ALLOWED_ORIGINS: "https://pegaprox.lan.bladewdr.xyz"
