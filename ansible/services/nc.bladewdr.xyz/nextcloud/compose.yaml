@@ -17,7 +17,7 @@ services:
     image: ghcr.io/nextcloud-releases/all-in-one:latest
 
   nginx:
-    image: nginx:stable@sha256:42ff6c6704359b80306f35a0c7bb0bbc9b65a058e63f0cc1e91a48fd22e3e1e5
+    image: nginx:stable@sha256:540858b3a92eed95cbcae475698c12f619b4a6afa122485f439e4d7227cbeb38
     container_name: nextcloud-nginx
     networks:
       - proxy
