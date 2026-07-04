@@ -57,13 +57,14 @@ prometheus.exporter.unix "local_system" {
 
 prometheus.exporter.process "local_processes" {
   procfs_path = "/proc"
-  track_children = false
+  track_children = true
   track_threads  = false
 
 {% raw %}
   matcher {
     name    = "{{.Comm}}"
     cmdline = [".+"]
+    comm    = [".*"]
   }
 }
 {% endraw %}
