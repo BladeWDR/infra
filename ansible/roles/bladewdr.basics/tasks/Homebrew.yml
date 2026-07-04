@@ -15,7 +15,7 @@
 - name: Grant passwordless sudo for Homebrew install
   ansible.builtin.copy:
     dest: "{{ sudoers_file }}"
-    content: "{{ brew_user }} ALL=(ALL) NOPASSWD:ALL"
+    content: "{{ brew_user }} ALL=(ALL) NOPASSWD:ALL\n"
     owner: root
     group: root
     mode: "0440"
