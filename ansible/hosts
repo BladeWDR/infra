@@ -18,13 +18,17 @@ adguard03.bladewdr.xyz nagios_host_template_list=deb-dns nagios_hostgroups=dns
 [docker]
 adguard02.bladewdr.xyz
 adguard03.bladewdr.xyz
+app03.bladewdr.xyz nagios_host_template_list=deb-docker nagios_hostgroups=docker
 docker01.bladewdr.xyz
-forgejo.bladewdr.xyz
+172.16.10.42 nagios_host_template_list=deb-docker nagios_hostgroups=docker
+10.13.37.44
+forgejo.bladewdr.xyz nagios_host_template_list=deb-docker nagios_hostgroups=docker
 docker-ubuntu.bladewdr.xyz nagios_host_template_list=deb-docker,deb-webserver nagios_hostgroups=docker,deb-webserver
 deviant.bladewdr.xyz nagios_host_template_list=deb-docker nagios_hostgroups=docker
 heimdall.bladewdr.xyz nagios_host_template_list=deb-docker nagios_hostgroups=docker
 jmusicbot.bladewdr.xyz
 onramp.bladewdr.xyz nagios_host_template_list=immich-server,deb-docker,deb-webserver nagios_hostgroups=immich,docker,deb-webserver
+pegaprox.bladewdr.xyz nagios_host_template_list=deb-docker nagios_hostgroups=docker ansible_become_exe=sudo.ws
 n8n.bladewdr.xyz nagios_host_template_list=deb-docker
 nc.bladewdr.xyz nagios_host_templates_list=deb-docker,deb-webserver nagios_hostgroups=docker,deb-webserver
 sync.bladewdr.xyz nagios_host_templates_list=deb-docker,deb-webserver nagios_hostgroups=docker,deb-webserver
@@ -34,6 +38,7 @@ nagios_hostgroups=docker
 
 [cloud]
 app01.bladewdr.xyz
+app03.bladewdr.xyz
 adguard03.bladewdr.xyz
 sync.bladewdr.xyz
 
@@ -51,7 +56,10 @@ jmusicbot.bladewdr.xyz
 n8n.bladewdr.xyz
 nagios.bladewdr.xyz
 nc.bladewdr.xyz
+10.13.37.115
+10.13.37.116
 onramp.bladewdr.xyz
+pegaprox.bladewdr.xyz nagios_host_template_list=deb-docker nagios_hostgroups=docker ansible_become_exe=sudo.ws
 unifi.bladewdr.xyz nagios_host_template_list=deb-server
 
 [prometheus]
@@ -68,6 +76,7 @@ hades.bladewdr.xyz
 cerberus.bladewdr.xyz
 [nas:vars]
 nagios_host_template_list=deb-fileserver
+nagios_hostgroups=deb-nas
 
 ; [proxmox]
 ; pve01.bladewdr.xyz
