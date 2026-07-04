@@ -69,7 +69,7 @@ adguard02.bladewdr.xyz
 nc.bladewdr.xyz
 
 [unifi]
-unifi.bladewdr.xyz nagios_host_template_list=deb-server
+unifi.bladewdr.xyz nagios_host_template_list=deb-server nagios_hostgroups=servers
 
 [nas]
 hades.bladewdr.xyz
