@@ -1,5 +1,10 @@
 ---
 
+x-lsio: &lsio
+  PUID: ${PUID}
+  PGID: ${PGID}
+  TZ: ${TZ}
+
 services:
   ersatztv:
     image: jasongdove/ersatztv:v26.3.0@sha256:7c402e5f348184359e0951b44d55fb6db3df671fa77fc91dcbd609034d28778b
@@ -33,8 +38,7 @@ services:
     image: linuxserver/jellyfin:10.11.11@sha256:bb8ff21a879498dbdead9efe4d3de2070dbda2b9fb35b9a43501055f6e526384
     container_name: jellyfin
     environment:
-      - PUID=1000
-      - PGID=1000
+      <<: *lsio
       - DOTNET_USE_POLLING_FILE_WATCHER=1 # Try to avoid hitting inotify-watchers limits with large libraries.
       - LIBVA_DRIVER_NAME=iHD
       - DOCKER_MODS=linuxserver/mods:jellyfin-opencl-intel
@@ -109,9 +113,7 @@ services:
     group_add:
           - "992"
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=America/New_York
+      <<: *lsio
     volumes:
       - ./config:/config
       - ./tmp:/tmp/unmanic
