@@ -6,22 +6,22 @@ nagios.bladewdr.xyz
 
 [certbot]
 nc.bladewdr.xyz
-adguard01.bladewdr.xyz
-adguard02.bladewdr.xyz
+dns01.internal.bladewdr.xyz
+dns02.internal.bladewdr.xyz
+checkmk.bladewdr.xyz host_ip=10.13.37.6
 adguard03.bladewdr.xyz
 
 [dns]
-adguard01.bladewdr.xyz nagios_host_template_list=deb-dns nagios_hostgroups=dns
-adguard02.bladewdr.xyz nagios_host_template_list=deb-dns,deb-docker nagios_hostgroups=dns
+dns01.internal.bladewdr.xyz nagios_host_template_list=deb-dns nagios_hostgroups=dns
+dns02.internal.bladewdr.xyz nagios_host_template_list=deb-dns,deb-docker nagios_hostgroups=dns
 adguard03.bladewdr.xyz nagios_host_template_list=deb-dns nagios_hostgroups=dns
 
 [docker]
-adguard02.bladewdr.xyz
+dns02.internal.bladewdr.xyz
 adguard03.bladewdr.xyz
 app03.bladewdr.xyz nagios_host_template_list=deb-docker nagios_hostgroups=docker
 docker01.bladewdr.xyz
 172.16.10.42 nagios_host_template_list=deb-docker nagios_hostgroups=docker
-10.13.37.44
 forgejo.bladewdr.xyz nagios_host_template_list=deb-docker nagios_hostgroups=docker
 docker-ubuntu.bladewdr.xyz nagios_host_template_list=deb-docker,deb-webserver nagios_hostgroups=docker,deb-webserver
 deviant.bladewdr.xyz nagios_host_template_list=deb-docker nagios_hostgroups=docker
@@ -43,9 +43,8 @@ adguard03.bladewdr.xyz
 sync.bladewdr.xyz
 
 [lan]
-adguard01.bladewdr.xyz
-adguard02.bladewdr.xyz
 cerberus.bladewdr.xyz
+checkmk.bladewdr.xyz
 deviant.bladewdr.xyz
 docker-ubuntu.bladewdr.xyz
 docker01.bladewdr.xyz
@@ -56,14 +55,14 @@ jmusicbot.bladewdr.xyz
 n8n.bladewdr.xyz
 nagios.bladewdr.xyz
 nc.bladewdr.xyz
-10.13.37.115
-10.13.37.116
+dns01.internal.bladewdr.xyz nagios_host_template_list=deb-dns nagios_hostgroups=dns
+dns02.internal.bladewdr.xyz nagios_host_template_list=deb-dns nagios_hostgroups=dns
 onramp.bladewdr.xyz
 pegaprox.bladewdr.xyz nagios_host_template_list=deb-docker nagios_hostgroups=docker ansible_become_exe=sudo.ws
-unifi.bladewdr.xyz nagios_host_template_list=deb-server
+unifi.bladewdr.xyz nagios_host_template_list=deb-server host_ip=10.13.37.8
 
 [prometheus]
-adguard02.bladewdr.xyz
+dns02.internal.bladewdr.xyz
 
 [nextcloud]
 nc.bladewdr.xyz
