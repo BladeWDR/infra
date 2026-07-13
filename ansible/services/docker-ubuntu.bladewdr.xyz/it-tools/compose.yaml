@@ -5,7 +5,7 @@ services:
     restart: unless-stopped
     networks:
       - proxy
-    image: ghcr.io/sharevb/it-tools:latest-en@sha256:2e01704b5ad8ec887428955a723930ed8641ca194ac5d5f4a45ba9b67a0e200e 
+    image: ghcr.io/sharevb/it-tools:latest-en@sha256:dffbd73c6740b9ad48b2c8d630270a4bc5d3b7fccfd70f854a97577262fa7459 
 
 networks:
   proxy:
