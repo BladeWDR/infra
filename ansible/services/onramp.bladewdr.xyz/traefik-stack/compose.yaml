@@ -147,7 +147,7 @@ services:
     restart: ${IMMICH_RESTART_POLICY:-unless-stopped}
 
   lubelog:
-    image: ghcr.io/hargata/lubelogger:v1.6.7@sha256:a9d00d747fcf4fc0f1d0d3007957cdce2b68d4e8ddba200f273c3db460a56e22
+    image: ghcr.io/hargata/lubelogger:v1.7.0@sha256:01bdb486af71e641c3ae41499e0412a21f2e04fa31b25c5c6531b42c112938e5
     container_name: ${LUBELOG_CONTAINER_NAME:-lubelog}
     restart: ${LUBELOG_RESTART:-unless-stopped}
     mem_limit: ${LUBELOG_MEM_LIMIT:-200g}
