@@ -1,6 +1,6 @@
 services:
   sablier:
-    image: ghcr.io/sablierapp/sablier:1.14.0@sha256:f217cea9f0df29f38adcdab2f3ddb60b66cd48972547b629f4afea5ee4633ec3
+    image: ghcr.io/sablierapp/sablier:1.16.1@sha256:4137043766568f4254d30e6c970918bdb522a2213af8ddee4a379f95673510b6
     container_name: ${SABLIER_CONTAINER_NAME:-sablier}
     restart: ${SABLIER_RESTART:-unless-stopped}
     networks:
