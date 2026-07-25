@@ -413,6 +413,27 @@ services:
           - /apps/photon:/photon/data
       restart: unless-stopped
 
+  immich-public-proxy:
+    image: alangrainger/immich-public-proxy:latest
+    container_name: immich-public-proxy
+    restart: unless-stopped
+    networks:
+      - traefik
+    environment:
+      PUBLIC_BASE_URL: https://photos.{{ HOST_DOMAIN }}
+      IMMICH_URL: https://{{ IMMICH_URL }}
+    healthcheck:
+      test: curl -s http://localhost:3000/share/healthcheck -o /dev/null || exit 1
+      start_period: 10s
+      timeout: 5s
+    extra_hosts:
+       - "{{ IMMICH_URL }}:10.13.37.11"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.immichproxy.entrypoints=websecure
+      - traefik.http.routers.immichproxy.rule=Host(`photos.{{ HOST_DOMAIN }}`)
+      - traefik.http.services.immichproxy.loadbalancer.server.port=3000
+
 networks:
   traefik:
     driver: bridge
