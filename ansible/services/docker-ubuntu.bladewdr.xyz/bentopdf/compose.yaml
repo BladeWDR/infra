@@ -1,6 +1,6 @@
 services:
   bentopdf:
-    image: bentopdfteam/bentopdf:2.8.5@sha256:2d867aacb8ab5b196d00ee86944b1899d09d72df355384c5e15cf974737963a0
+    image: bentopdfteam/bentopdf:2.8.7@sha256:165113f4579cc61ea353ad0597ed510cc2101ef879ec5e91875a3df0c0b219a0
     container_name: bentopdf
     restart: unless-stopped
     networks:
