@@ -7,7 +7,7 @@ services:
     volumes:
       - "/home/scott/docker/fulltext/rss-cache:/var/www/html/cache"
       - "/home/scott/docker/fulltext/config:/custom/var/www/html/site_config/custom"
-    image: 'heussd/fivefilters-full-text-rss:latest@sha256:a35e5e78e5d912fdc995dca61a8cf5fdff3938ca0f0c308644c184e4ea626f9f'
+    image: 'heussd/fivefilters-full-text-rss:latest@sha256:de26a84334b2a95533cf2817953c1360144a1c8c4cac6482114d82a968ae6d9c'
     environment:
       - FTR_ADMIN_PASSWORD={{ ffr_admin_password }}
     labels:
