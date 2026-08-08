@@ -1,0 +1,26 @@
+---
+services:
+  memebase:
+    image: ghcr.io/hberg539/memebase:latest
+    networks:
+      - proxy
+    restart: unless-stopped
+    ports:
+      - "7000:5000"
+    volumes:
+      - /apps/memebase/data:/app/data
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.memebase.entrypoints=https
+      - traefik.http.routers.memebase.rule=Host(`memes.{{ TRAEFIK_HOST_DOMAIN }}`)
+      - traefik.http.routers.memebase.tls=true
+      - traefik.http.middlewares.memebase=default-headers@file
+      - traefik.http.middlewares.memebase=https-redirectscheme@file
+      - traefik.http.routers.memebase.middlewares=default-headers@file
+      - traefik.http.services.memebase.loadbalancer.server.port=5000
+      - traefik.http.routers.memebase.service=memebase
+      - traefik.docker.network=proxy
+
+networks:
+  proxy:
+    external: true
