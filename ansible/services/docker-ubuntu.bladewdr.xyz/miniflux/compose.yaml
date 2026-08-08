@@ -1,0 +1,59 @@
+---
+services:
+  miniflux:
+    image: miniflux/miniflux:2.3.3@sha256:49d7b60987616387c306a8023087b31f2c9b7b21288b523026cb04058e8b6dbb
+    container_name: miniflux-app
+    mem_limit: 100m
+    networks:
+      - proxy
+      - miniflux-net
+    depends_on:
+      miniflux-db:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgres://miniflux:{{ miniflux_db_password }}@miniflux-db/miniflux?sslmode=disable
+      - RUN_MIGRATIONS=1
+      - BASE_URL=https://miniflux.lan.bladewdr.xyz
+      - DISABLE_LOCAL_AUTH=1
+      - OAUTH2_PROVIDER=oidc
+      - OAUTH2_CLIENT_ID={{ miniflux_client_id }}
+      - OAUTH2_CLIENT_SECRET={{ miniflux_client_secret }}
+      - OAUTH2_REDIRECT_URL=https://miniflux.lan.bladewdr.xyz/oauth2/oidc/callback
+      - OAUTH2_OIDC_DISCOVERY_ENDPOINT=https://auth.bladewdr.xyz/application/o/miniflux/
+      - OAUTH2_USER_CREATION=1
+      - FETCHER_ALLOW_PRIVATE_NETWORKS=1
+      - POLLING_LIMIT_PER_HOST=1
+      - POLLING_PARSING_ERROR_LIMIT=5
+      - WORKER_POOL_SIZE=2
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.miniflux.entrypoints=https
+      - traefik.http.routers.miniflux.rule=Host(`miniflux.{{ TRAEFIK_HOST_DOMAIN }}`)
+      - traefik.http.routers.miniflux.tls=true
+      - traefik.http.middlewares.miniflux=default-headers@file
+      - traefik.http.middlewares.miniflux=https-redirectscheme@file
+      - traefik.http.routers.miniflux.middlewares=default-headers@file
+      - traefik.http.services.miniflux.loadbalancer.server.port=8080
+      - traefik.http.routers.miniflux.service=miniflux
+      - traefik.docker.network=proxy
+
+  miniflux-db:
+    image: postgres:18@sha256:3a82e1f56c8f0f5616a11103ac3d47e632c3938698946a7ad26da0df1334744a
+    container_name: miniflux-db
+    networks:
+      - miniflux-net
+    environment:
+      - POSTGRES_USER=miniflux
+      - POSTGRES_PASSWORD={{ miniflux_db_password }}
+      - POSTGRES_DB=miniflux
+    volumes:
+      - /home/scott/docker/miniflux/data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "miniflux"]
+      interval: 10s
+      start_period: 30s
+
+networks:
+  proxy:
+    external: true
+  miniflux-net:
