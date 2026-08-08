@@ -26,6 +26,7 @@ services:
       - FORGEJO__OPENID__SIGNIN=true
       - FORGEJO__OPENID_SIGNUP=true
       - FORGEJO__MIGRATIONS__ALLOWED_DOMAINS=github.com,api.github.com,codeberg.org
+      - FORGEJO__security__REVERSE_PROXY_TRUSTED_PROXIES=127.0.0.0/8,::1/128,172.16.X.X/X,10.13.13.14
       - DISABLE_REGISTRATION=false
     restart: unless-stopped
     ports:
