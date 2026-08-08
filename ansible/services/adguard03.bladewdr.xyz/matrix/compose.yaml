@@ -1,6 +1,6 @@
 services:
   synapse:
-    image: ghcr.io/element-hq/synapse:1.150.0@sha256:cba0969087ca70a3ec72ebcd1491a6c8391a7da2c0b92738231dd9c7ad55df4d
+    image: ghcr.io/element-hq/synapse:v1.156.0@sha256:d2215c4a0e0bbd304489af228345b31d6857c1a228175471358d3fda187c0d91
     networks:
       - matrix-network
       - matrix-db
