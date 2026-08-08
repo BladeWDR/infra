@@ -1,0 +1,102 @@
+---
+
+- name: Update Technitium DNS server.
+  hosts: dns
+  become: true
+
+  vars:
+    technitium_dns_url: https://download.technitium.com/dns/DnsServerPortable.tar.gz
+    technitium_dns_download_path: /tmp/DnsServerPortable.tar.gz
+    dnsDir: "/opt/technitium/dns"
+    dnsConfig: "/etc/dns"
+    dnsLog: "/var/log/technitium/dns"
+    dnsChown:
+      - "{{ dnsDir }}"
+      - "{{ dnsConfig }}"
+      - "{{ dnsLog }}"
+
+
+  handlers:
+
+    - name: restart-technitium
+      ansible.builtin.service:
+        name: dns.service
+        state: restarted
+
+  tasks:
+
+    - name: Install exiftool.
+      ansible.builtin.apt:
+        name: libimage-exiftool-perl
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Ensure that DnsServerApp.dll exists.
+      ansible.builtin.stat:
+        path: "{{ dnsDir }}/DnsServerApp.dll"
+      register: technitium_dll
+
+    - name: Fail if the DLL file doesn't exist.
+      ansible.builtin.fail:
+      when: not technitium_dll.stat.exists
+
+    - name: Run exiftool to determine installed version of Technitium DNS Server.
+      ansible.builtin.shell:
+        cmd: "exiftool DnsServerApp.dll | sed -n 's/^Product Version[[:space:]]*:[[:space:]]*//p'"
+        chdir: "{{ dnsDir }}"
+      register: version_output
+      when: technitium_dll.stat.exists
+
+    - name: Technitium DNS Server version block.
+      block:
+
+        - name: Get the latest version of Technitium DNS server from the Github API.
+          ansible.builtin.uri:
+            url: https://api.github.com/repos/TechnitiumSoftware/DnsServer/releases/latest
+            return_content: true
+          register: technitium_release_output
+          run_once: true
+          check_mode: false
+        - name: Set Technitium DNS Server version.
+          ansible.builtin.set_fact:
+            _technitium_version: "{{ technitium_release_output.json.tag_name | replace('v', '') }}"
+
+
+    - name: Decide whether or not we should run an update.
+      ansible.builtin.set_fact:
+        _technitium_install_bool: true
+      when: version_output.stdout != _technitium_version
+
+
+    - name: Download and install Technitium DNS.
+      when: _technitium_install_bool | default(false) 
+      block:
+
+        - name: Download Technitium Portable App package.
+          ansible.builtin.get_url:
+            url: "{{ technitium_dns_url }}"
+            dest: "{{ technitium_dns_download_path }}"
+
+        - name: Extract the Technitium Portable App Package.
+          ansible.builtin.unarchive:
+            src: "{{ technitium_dns_download_path }}"
+            dest: "{{ dnsDir }}"
+            owner: dns-server
+            group: dns-server
+            remote_src: true
+
+        - name: Set permissions on Technitium directories and files.
+          ansible.builtin.file:
+            path: "{{ item }}"
+            owner: dns-server
+            group: dns-server
+            recurse: true
+          loop: "{{ dnsChown }}"
+
+      notify: restart-technitium
+
+    - name: Clean up downloaded tarball.
+      ansible.builtin.file:
+        path: "{{ technitium_dns_download_path }}"
+        state: absent
