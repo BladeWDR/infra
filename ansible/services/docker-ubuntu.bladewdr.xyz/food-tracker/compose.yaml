@@ -1,0 +1,26 @@
+---
+services:
+  food-tracker:
+    image: {{ FORGEJO_HOST }}/scottb/food-tracker:v1.0.3@sha256:7fc7660e903a6ccb0d616e3ceb1970d620ab94911f7ffc29d9f87c3d8848919b
+    container_name: food-tracker
+    restart: unless-stopped
+    volumes:
+      - /home/scott/docker/food-tracker/data:/app/data
+    environment:
+      - PORT=3000
+      - NODE_ENV=production
+      - DATA_DIR=/app/data
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.food-tracker.rule=Host(`food.{{ TRAEFIK_HOST_DOMAIN }}`)"
+      - "traefik.http.routers.food-tracker.entrypoints=https"
+      - "traefik.http.services.food-tracker.loadbalancer.server.port=3000"
+      - "traefik.http.routers.food-tracker.tls=true"
+      - "traefik.http.routers.food-tracker.service=food-tracker"
+      - "traefik.http.routers.food-tracker.middlewares=default-headers@file"
+
+networks:
+  proxy:
+    external: true
