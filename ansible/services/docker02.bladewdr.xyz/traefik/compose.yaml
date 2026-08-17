@@ -49,14 +49,14 @@ services:
       - --certificatesresolvers.letsencrypt.acme.dnschallenge.resolvers=1.1.1.1:53,1.0.0.1:53
       - --certificatesresolvers.letsencrypt.acme.caserver=https://acme-v02.api.letsencrypt.org/directory
     labels:
-      - joyride.host.name=sync.{{ APP0_HOST_DOMAIN }}
-      - traefik.http.routers.traefik.rule=Host(`onramp.{{ APP0_HOST_DOMAIN }}`)  && (PathPrefix(`/traefik`) || PathPrefix(`/api`))
+      - joyride.host.name=docker02.{{ APP0_HOST_DOMAIN }}
+      - traefik.http.routers.traefik.rule=Host(`docker02.{{ APP0_HOST_DOMAIN }}`)  && (PathPrefix(`/traefik`) || PathPrefix(`/api`))
       - traefik.http.routers.traefik.middlewares=traefik_strip
       - traefik.http.middlewares.traefik_strip.stripprefix.prefixes=/traefik
       - traefik.enable=true
       - traefik.http.routers.traefik.entrypoints=websecure
       - traefik.http.routers.traefik.service=api@internal
-      - traefik.http.routers.traefik.rule=Host(`onramp.{{ APP0_HOST_DOMAIN }}`)
+      - traefik.http.routers.traefik.rule=Host(`docker02.{{ APP0_HOST_DOMAIN }}`)
 
 networks:
   traefik:

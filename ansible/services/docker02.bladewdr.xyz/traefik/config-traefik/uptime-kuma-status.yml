@@ -1,0 +1,8 @@
+http:
+  routers:
+    uptime-kuma-status:
+      entryPoints:
+        - "websecure"
+      rule: "Host(`status.bladewdr.xyz`)"
+      tls: {}
+      service: uptimekuma@docker

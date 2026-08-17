@@ -1,0 +1,62 @@
+http:
+  routers:
+    system-init:
+      entryPoints:
+        - websecure
+      rule: "Host(`bladewdr.xyz`) && (PathPrefix(`/win`))"
+      middlewares:
+        - redirect-to-init-ps1
+      tls: {}
+      service: system-init
+    ubuntu-system-init:
+      entryPoints:
+        - websecure
+      rule: "Host(`bladewdr.xyz`) && (PathPrefix(`/ubuntu`))"
+      middlewares:
+        #- default-headers
+        - redirect-to-bash
+      tls: {}
+      service: ubuntu-system-init
+    office365:
+      entryPoints:
+        - websecure
+      rule: "Host(`bladewdr.xyz`) && (PathPrefix(`/365`))"
+      middlewares:
+        - redirect-to-365-ps1
+      tls: {}
+      service: office365
+
+
+  middlewares:
+    redirect-to-init-ps1:
+      redirectRegex:
+        regex: "^https?:\\/\\/(www\\.)?bladewdr\\.xyz\\/win"
+        replacement: "https://raw.githubusercontent.com/BladeWDR/scripts/master/powershell/system-init.ps1${1}"
+        permanent: true
+    redirect-to-bash:
+      redirectRegex:
+        regex: "^https?:\\/\\/(www\\.)?bladewdr\\.xyz\\/ubuntu"
+        replacement: "https://raw.githubusercontent.com/BladeWDR/scripts/master/bash/ubuntu_server_setup.sh"
+        permanent: true
+    redirect-to-365-ps1:
+      redirectRegex:
+        regex: "^https?:\\/\\/(www\\.)?bladewdr\\.xyz\\/365"
+        replacement: "https://raw.githubusercontent.com/BladeWDR/scripts/master/powershell/Office-Install-ODT.ps1${1}"
+        permanent: true
+
+  services:
+    system-init:
+      loadBalancer:
+        servers:
+          - url: "https://raw.githubusercontent.com/BladeWDR/scripts/master/powershell/system-init.ps1"
+            #passHostHeader: true
+    ubuntu-system-init:
+      loadBalancer:
+        servers:
+          - url: "https://raw.githubusercontent.com/BladeWDR/scripts/master/bash/ubuntu_server_setup.sh"
+            #passHostHeader: true
+    office365:
+      loadBalancer:
+        servers:
+          - url: "https://raw.githubusercontent.com/BladeWDR/scripts/master/bash/ubuntu_server_setup.sh"
+            #passHostHeader: true

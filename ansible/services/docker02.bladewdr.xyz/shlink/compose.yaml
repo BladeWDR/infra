@@ -1,0 +1,46 @@
+---
+services:
+  shlink:
+    image: ghcr.io/shlinkio/shlink:${SHLINK_DOCKER_TAG:-latest}
+    container_name: ${SHLINK_CONTAINER_NAME:-shlink}
+    restart: ${SHLINK_RESTART:-unless-stopped}
+    mem_limit: ${SHLINK_MEM_LIMIT:-200g}
+    networks:
+      - traefik
+    volumes:
+      - /apps/shlink:/etc/shlink/data
+      - /etc/localtime:/etc/localtime:ro
+    user: "1001"
+    environment:
+      - PUID=1001
+      - PGID=1001
+      - TZ={{ host_timezone }}
+      - DEFAULT_DOMAIN=l.{{ APP0_HOST_DOMAIN }}
+      - IS_HTTPS_ENABLED=${SHLINK_HTTPS_ENABLED:-true}
+      # - SHELL_VERBOSITY=3 # Uncomment to get better logs
+      # - GEOLITE_LICENSE_KEY=${SHLINK_GEOLITE_KEY} # optional
+    labels:
+      - joyride.host.name=l.{{ APP0_HOST_DOMAIN }}
+      - traefik.enable=${SHLINK_TRAEFIK_ENABLED:-true}
+      - traefik.http.routers.shlink.entrypoints=websecure
+      - traefik.http.routers.shlink.rule=Host(`l.{{ APP0_HOST_DOMAIN }}`)
+      - traefik.http.services.shlink.loadbalancer.server.port=8080
+      - autoheal=${SHLINK_AUTOHEAL_ENABLED:-true}
+
+  shlink-web-client:
+    container_name: shlink-web-client
+    restart: unless-stopped
+    networks:
+      - traefik
+    environment:
+      - SHLINK_SERVER_URL=https://l.{{ APP0_HOST_DOMAIN }}
+      - SHLINK_SERVER_API_KEY={{ SHLINK_API_KEY }}
+      - SHLINK_SERVER_NAME=Local
+    image: shlinkio/shlink-web-client:4.8.1@sha256:dc8bf3565a25bd0602ff11ee352920830ce457ab58a2b2c62f2ebb23e8c8b9ee
+    labels:
+      - joyride.host.name=shlink.{{ APP0_HOST_DOMAIN }}
+      - traefik.enable=true
+      - traefik.http.routers.shlink-web.entrypoints=websecure
+      - traefik.http.routers.shlink-web.rule=Host(`shlink.{{ APP0_HOST_DOMAIN }}`)
+      - traefik.http.services.shlink-web.loadbalancer.server.port=8080
+      - autoheal=${SHLINK_AUTOHEAL_ENABLED:-true}
