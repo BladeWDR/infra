@@ -21,7 +21,7 @@ dns02.internal.bladewdr.xyz
 adguard03.bladewdr.xyz
 app03.bladewdr.xyz nagios_host_template_list=deb-docker nagios_hostgroups=docker
 docker01.bladewdr.xyz
-172.16.10.42 nagios_host_template_list=deb-docker nagios_hostgroups=docker
+docker02.bladewdr.xyz
 forgejo.bladewdr.xyz nagios_host_template_list=deb-docker nagios_hostgroups=docker
 docker-ubuntu.bladewdr.xyz nagios_host_template_list=deb-docker,deb-webserver nagios_hostgroups=docker,deb-webserver
 deviant.bladewdr.xyz nagios_host_template_list=deb-docker nagios_hostgroups=docker
