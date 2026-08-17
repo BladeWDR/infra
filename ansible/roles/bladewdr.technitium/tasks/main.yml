@@ -1,0 +1,52 @@
+---
+- name: Ensure the Technitium log directory exists.
+  ansible.builtin.file:
+    path: "{{ technitium_log_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Install Technitium log-pruning systemd service.
+  ansible.builtin.copy:
+    dest: "/etc/systemd/system/{{ technitium_log_prune_service }}"
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      [Unit]
+      Description=Prune old Technitium DNS Server log files
+      Documentation=https://technitium.com/dns/
+
+      [Service]
+      Type=oneshot
+      ExecStart=/usr/bin/find {{ technitium_log_dir | quote }} -type f -name '*.log' -mtime +{{ technitium_log_retention_days | int }} -delete
+  notify: Reload systemd daemon
+
+- name: Install Technitium log-pruning systemd timer.
+  ansible.builtin.copy:
+    dest: "/etc/systemd/system/{{ technitium_log_prune_timer }}"
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      [Unit]
+      Description=Daily cleanup of old Technitium DNS Server logs
+
+      [Timer]
+      OnCalendar=daily
+      Persistent=true
+      RandomizedDelaySec=15m
+
+      [Install]
+      WantedBy=timers.target
+  notify: Reload systemd daemon
+
+- name: Flush systemd handlers before enabling the timer.
+  ansible.builtin.meta: flush_handlers
+
+- name: Enable and start Technitium log-pruning timer.
+  ansible.builtin.systemd:
+    name: "{{ technitium_log_prune_timer }}"
+    enabled: true
+    state: started
