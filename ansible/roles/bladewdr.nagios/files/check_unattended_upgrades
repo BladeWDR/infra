@@ -22,7 +22,7 @@ LOG_FILE='/var/log/unattended-upgrades/unattended-upgrades.log'
 
 if ! test -f $LOG_FILE ; then
 	echo "CRITICAL - The log file ($LOG_FILE) doesn't exist or you haven't sufficient read permissions."
-	exit $STATE_CRITICAL
+	exit $STATE_WARNING
 fi
 
 LOG_TEXT="$(cat $LOG_FILE)"
@@ -53,10 +53,10 @@ LAST_LOG_LINE=$(echo "$LOG_TEXT" | grep -v ' WARNING ' | grep -v ' ERROR ' | tai
 LAST_RUN_DATE=$(echo $LAST_LOG_LINE | cut -d "," -f 1)
 
 if [ -z "$LAST_RUN_DATE" ]; then
-	echo "CRITICAL - The date on which the command \
+	echo "WARNING - The date on which the command \
 'unattended-upgrades' ran for the last time, could not be determined. \
 The log file '$LOG_FILE' is empty."
-	exit $STATE_CRITICAL
+	exit $STATE_WARNING
 fi
 
 LAST_RUN=$(date +%s -d "$LAST_RUN_DATE")
