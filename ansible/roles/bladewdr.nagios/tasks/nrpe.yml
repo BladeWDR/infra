@@ -26,6 +26,14 @@
         - not ansible_check_mode
         - "'docker' in group_names"
 
+    - name: Add the nagios user to the adm group so that it can read various log files.
+      ansible.builtin.user:
+        name: nagios
+        groups: adm
+        append: true
+      when:
+        - not ansible_check_mode
+
     - name: Set up allowed hosts in NRPE config file.
       ansible.builtin.lineinfile:
         path: /etc/nagios/nrpe.cfg
