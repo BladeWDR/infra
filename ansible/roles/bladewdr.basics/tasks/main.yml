@@ -89,3 +89,9 @@
     owner: root
     group: root
     mode: "0440"
+
+- name: Install and configure Tailscale.
+  ansible.builtin.include_role:
+    name: artis3n.tailscale.machine
+  vars:
+    state: present
