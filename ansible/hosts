@@ -61,6 +61,11 @@ onramp.bladewdr.xyz
 pegaprox.bladewdr.xyz nagios_host_template_list=deb-docker nagios_hostgroups=docker ansible_become_exe=sudo.ws
 unifi.bladewdr.xyz nagios_host_template_list=deb-server host_ip=10.13.37.8
 
+[proxy]
+docker-ubuntu.bladewdr.xyz
+deviant.bladewdr.xyz tailscale_args='--accept-dns=false --accept-routes=false'
+onramp.bladewdr.xyz
+
 [prometheus]
 dns02.internal.bladewdr.xyz
 
