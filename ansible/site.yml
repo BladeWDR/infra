@@ -22,7 +22,7 @@
     - bladewdr.debcache
   tags: debcache
 
-- hosts: all
+- hosts: servers
   become: true
   vars_files:
     - secrets.yml
