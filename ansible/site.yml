@@ -64,7 +64,9 @@
   become: true
   roles:
     - ansible-role-docker-compose-generator
-  tags: compose
+  tags:
+    - compose
+    - never
 
   tasks:
     - name: Run docker compose up.
