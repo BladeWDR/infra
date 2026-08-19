@@ -1,0 +1,7 @@
+---
+tailscale_args: "--accept-routes=true --accept-dns=false"
+tailscale_tags:
+  - proxy
+  - synapse
+  - technitium
+  - dns

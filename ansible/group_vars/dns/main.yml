@@ -1,0 +1,5 @@
+---
+tailscale_tags:
+  - dns
+  - technitium
+tailscale_args: "--accept-dns=false --accept-routes=false"

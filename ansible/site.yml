@@ -159,3 +159,15 @@
   roles:
     - bladewdr.matrix
   tags: matrix
+
+- name: Install and configure Tailscale.
+  hosts: all
+  become: true
+  vars_files:
+    - secrets.yml
+  roles:
+    - artis3n.tailscale.machine
+  vars:
+    state: present
+  tags:
+    - tailscale

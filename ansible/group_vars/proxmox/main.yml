@@ -1,0 +1,4 @@
+---
+tailscale_tags:
+  - proxmox
+tailscale_args: "--accept-dns --accept-routes=false"

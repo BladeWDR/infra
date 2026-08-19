@@ -1,0 +1,4 @@
+---
+tailscale_tags:
+  - monitoring
+tailscale_args: "--accept-dns --accept-routes=true"

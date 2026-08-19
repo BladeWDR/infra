@@ -2,4 +2,3 @@
 tailscale_args: "--accept-dns=true --accept-routes=true"
 tailscale_tags:
   - proxy
-  - docker

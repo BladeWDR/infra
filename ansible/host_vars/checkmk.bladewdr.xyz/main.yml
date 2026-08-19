@@ -1,0 +1,6 @@
+---
+certbot_domains:
+  - '*.bladewdr.xyz'
+tailscale_args: "--accept-dns=true --accept-routes=false"
+tailscale_tags:
+  - monitoring

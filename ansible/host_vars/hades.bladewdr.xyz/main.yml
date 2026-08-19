@@ -1,0 +1,4 @@
+---
+tailscale_args: "--accept-dns=true --accept-routes=false"
+tailscale_tags:
+  - storage

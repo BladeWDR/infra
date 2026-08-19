@@ -7,3 +7,7 @@ alloy_user_groups:
   - docker
 
 alloy_rootfs_path: /rootfs
+
+tailscale_tags:
+  - proxy
+  - docker

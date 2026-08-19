@@ -1,17 +1,23 @@
 ---
 services:
-  uptime-kuma:
-    image: louislam/uptime-kuma:2.5.0@sha256:a8610b3b4c38077922ba51b036691e06887d7cefd91fe620fd3d6d23d03dc240
-    container_name: ${UPTIMEKUMA_CONTAINER_NAME:-uptimekuma}
+  tailscale-uptimekuma:
+    image: tailscale/tailscale:v1.102@sha256:321ce041508c19079b57a28b6666c8d81ab0b08accc0a2585b3ab663d557ac24
+    container_name: ${UPTIMEKUMA_TS_CONTAINER_NAME:-tailscale-uptimekuma}
+    hostname: ${UPTIMEKUMA_TS_HOSTNAME:-uptimekuma}
     restart: unless-stopped
-    mem_limit: ${UPTIMEKUMA_MEM_LIMIT:-500m}
+    environment:
+      - TS_AUTHKEY={{ tailscale_authkey }}
+      - TS_EXTRA_ARGS=${UPTIMEKUMA_TS_EXTRA_ARGS:---advertise-tags=tag:monitoring}
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_USERSPACE=false
+    volumes:
+      - /apps/uptime-kuma/tailscale:/var/lib/tailscale
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
     networks:
       - traefik
-    volumes:
-      - /apps/uptime-kuma:/app/data
-      - ${UPTIMEKUMA_DOCKER_SOCKET:-/var/run/docker.sock}:/var/run/docker.sock
-    environment:
-      - TZ={{ host_timezone }}
     labels:
       - joyride.host.name=${UPTIMEKUMA_HOST_NAME:-uptimekuma}.{{ APP0_HOST_DOMAIN }}
       - traefik.enable=${UPTIMEKUMA_TRAEFIK_ENABLE:-true}
@@ -22,5 +28,22 @@ services:
       - traefik.http.routers.uptimekuma.middlewares=default-headers@file
       - traefik.http.services.uptimekuma.loadbalancer.server.port=3001
       - traefik.docker.network=traefik
+      - com.centurylinklabs.watchtower.enable=${UPTIMEKUMA_TS_WATCHTOWER_ENABLE:-true}
+      - autoheal=${UPTIMEKUMA_TS_AUTOHEAL:-true}
+
+  uptime-kuma:
+    image: louislam/uptime-kuma:2.5.0@sha256:a8610b3b4c38077922ba51b036691e06887d7cefd91fe620fd3d6d23d03dc240
+    container_name: ${UPTIMEKUMA_CONTAINER_NAME:-uptimekuma}
+    restart: unless-stopped
+    mem_limit: ${UPTIMEKUMA_MEM_LIMIT:-500m}
+    network_mode: service:tailscale-uptimekuma
+    depends_on:
+      - tailscale-uptimekuma
+    volumes:
+      - /apps/uptime-kuma:/app/data
+      - ${UPTIMEKUMA_DOCKER_SOCKET:-/var/run/docker.sock}:/var/run/docker.sock
+    environment:
+      - TZ={{ host_timezone }}
+    labels:
       - com.centurylinklabs.watchtower.enable=${UPTIMEKUMA_WATCHTOWER_ENABLE:-true}
       - autoheal=${UPTIMEKUMA_AUTOHEAL:-true}
