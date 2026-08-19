@@ -16,7 +16,7 @@ alloy_env_file_vars:
 chezmoi_dotfiles_repo: "https://github.com/bladewdr/dotfiles.git"
 
 nagios_server_fqdn: "nagios.bladewdr.xyz"
-nagios_allowed_hosts: "10.13.37.25"
+nagios_allowed_hosts: "10.13.37.25,10.0.10.1,100.103.233.48"
 
 # Docker compose generator role
 appdata_path: /apps
