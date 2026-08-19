@@ -44,7 +44,7 @@ sync.bladewdr.xyz
 
 [lan]
 cerberus.bladewdr.xyz
-checkmk.bladewdr.xyz
+; checkmk.bladewdr.xyz
 deviant.bladewdr.xyz
 docker-ubuntu.bladewdr.xyz
 docker01.bladewdr.xyz
@@ -82,10 +82,11 @@ cerberus.bladewdr.xyz
 nagios_host_template_list=deb-fileserver
 nagios_hostgroups=deb-nas
 
-; [proxmox]
-; pve01.bladewdr.xyz
-; pve02.bladewdr.xyz
-; pve03.bladewdr.xyz
+[proxmox]
+pve01.bladewdr.xyz
+pve02.bladewdr.xyz
+pve03.bladewdr.xyz
+; pve04.bladewdr.xyz
 
 [servers:children]
 certbot
