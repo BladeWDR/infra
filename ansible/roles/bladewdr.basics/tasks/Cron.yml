@@ -17,13 +17,3 @@
     user: root
     job: "apt-get clean"
   when: ansible_facts['os_family'] == 'Debian'
-
-- name: CRON - clean up unused Docker images.
-  ansible.builtin.cron:
-    name: Docker Image Cleanup
-    minute: "0"
-    hour: "23"
-    weekday: "4"
-    user: root
-    job: "docker image prune -af"
-  when: "'docker' in group_names"
