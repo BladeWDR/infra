@@ -1,0 +1,15 @@
+---
+
+- name: Ensure that logrotate is installed.
+  ansible.builtin.apt:
+    name: logrotate
+    state: present
+  when: ansible_facts['os_family'] == 'Debian'
+
+- name: Create logrotate policy for Docker.
+  ansible.builtin.copy:
+    src: docker-logrotate
+    dest: /etc/logrotate.d/docker-logs
+    owner: root
+    group: root
+    mode: '0644'
