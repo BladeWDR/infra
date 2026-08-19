@@ -37,7 +37,8 @@ services:
       - BASE_URL=https://recipes.{{ TRAEFIK_HOST_DOMAIN }}
     labels:
       - traefik.enable=true
-      - traefik.http.routers.mealie.Host(`recipes.{{ TRAEFIK_HOST_DOMAIN }}`)
+      - traefik.http.routers.mealie.rule=Host(`recipes.{{ TRAEFIK_HOST_DOMAIN }}`)
       - traefik.http.routers.mealie.middlewares=default-headers@file
       - traefik.http.routers.mealie.tls=true
-      - traefik.http.services.mealie.service.loadbalancer.port=9000
+      - traefik.http.services.mealie.loadbalancer.server.port=9000
+      - traefik.docker.network=proxy

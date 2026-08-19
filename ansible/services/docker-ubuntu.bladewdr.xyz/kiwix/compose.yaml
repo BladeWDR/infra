@@ -23,3 +23,14 @@ services:
     command:
       - '*.zim'
     restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.kiwix.entrypoints=https
+      - traefik.http.routers.kiwix.rule=Host(`kiwix.{{ TRAEFIK_HOST_DOMAIN }}`)
+      - traefik.http.routers.kiwix.tls=true
+      - traefik.http.middlewares.kiwix=default-headers@file
+      - traefik.http.middlewares.kiwix=https-redirectscheme@file
+      - traefik.http.routers.kiwix.middlewares=default-headers@file
+      - traefik.http.services.kiwix.loadbalancer.server.port=8080
+      - traefik.http.routers.kiwix.service=kiwix
+      - traefik.docker.network=proxy

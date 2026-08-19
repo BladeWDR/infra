@@ -3,6 +3,10 @@ services:
     container_name: upsnap
     image: ghcr.io/seriousm4x/upsnap:5.4.4@sha256:4cd0eedb78bc258ab2b28e6e3165070b5befb915ddeb193f19e3fe1cb71a14e0
     network_mode: host
+    cap_add:
+      - NET_RAW # NET_RAW is required for privileged ping and network device scan (nmap)
+    cap_drop:
+      - ALL
     restart: unless-stopped
     volumes:
       - ./upsnap/data:/app/pb_data
@@ -14,7 +18,15 @@ services:
     dns:
       - 10.13.37.2
       - 10.13.37.48
-    entrypoint: /bin/sh -c "./upsnap serve --http 0.0.0.0:5483"
+    # entrypoint: /bin/sh -c "./upsnap serve --http 0.0.0.0:5483"
     healthcheck:
-      test: curl -fs "http://localhost:5000/api/health" || exit 1
+      test: curl -fs "http://localhost:8090/api/health" || exit 1
       interval: 10s
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.upsnap.rule=Host(`wol.{{ TRAEFIK_HOST_DOMAIN }}`)
+      - traefik.http.routers.upsnap.entrypoints=https
+      - traefik.http.routers.upsnap.tls=true
+      - traefik.http.routers.upsnap.middlewares=default-headers@file
+      - traefik.http.routers.upsnap.service=upsnap
+      - traefik.http.services.upsnap.loadbalancer.server.port=8090
