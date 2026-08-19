@@ -1,5 +1,5 @@
 ---
-technitium_log_dir: /etc/dns/config/logs
+technitium_log_dir: /var/log/technitium/dns
 technitium_log_retention_days: 5 
 technitium_log_prune_service: technitium-log-prune.service
 technitium_log_prune_timer: technitium-log-prune.timer
