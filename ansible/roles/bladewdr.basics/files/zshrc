@@ -1,0 +1,106 @@
+# Basic zshrc for remote systems.
+HISTFILE=~/.cache/zshhistory
+HISTORY_IGNORE='(pwd|exit|fg|bg|top|clear|history|ls|uptime|df)'
+
+setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_ALL_DUPS
+setopt HIST_IGNORE_SPACE
+setopt SHARE_HISTORY
+setopt APPEND_HISTORY
+
+# configure PATH
+setopt extended_glob null_glob
+
+path=(
+    $path
+    $HOME/.local/bin
+    $HOME/.local/scripts
+)
+
+# remove duplicate entries from PATH.
+typeset -U path
+# exclude any directories that don't exist.
+path=($^path(N-/))
+
+# finally, set the PATH. Remember that there is a special relationship in zsh
+# between $PATH and $path, which allows you to do to this.
+export PATH
+
+function source_zsh_plugin() {
+    local plugin="$1"
+    local paths=(
+        "$HOMEBREW_PREFIX/share/$plugin"              # Mac Homebrew
+        "/usr/share/zsh/plugins/$plugin"              # Arch
+        "/usr/share/$plugin"                          # Ubuntu/Debian
+        "$HOME/.zsh/plugins/$plugin"                  # Home directory (git install)
+    )
+    
+    for plugin_path in "$paths[@]"; do
+        if [[ -f "$plugin_path/$plugin.zsh" ]]; then
+            source "$plugin_path/$plugin.zsh" 2>/dev/null
+            return 0
+        fi
+    done
+    return 1
+}
+
+# enable vi mode
+bindkey -v
+export KEYTIMEOUT=20
+
+export TERM=tmux-256color
+
+# Basic auto/tab complete:
+autoload -U compinit
+zstyle ':completion:*' menu select
+zmodload zsh/complist
+compinit
+_comp_options+=(globdots)               # Include hidden files.
+
+# Use vim keys in tab complete menu:
+bindkey -M menuselect 'h' vi-backward-char
+bindkey -M menuselect 'j' vi-down-line-or-history
+bindkey -M menuselect 'k' vi-up-line-or-history
+bindkey -M menuselect 'l' vi-forward-char
+bindkey -M menuselect 'left' vi-backward-char
+bindkey -M menuselect 'down' vi-down-line-or-history
+bindkey -M menuselect 'up' vi-up-line-or-history
+bindkey -M menuselect 'right' vi-forward-char
+# Fix backspace bug when switching modes
+bindkey "^?" backward-delete-char
+
+#change ZSH autosuggest highlight color
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=006'
+ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
+# Set ctrl+space to accept suggestion.
+bindkey '^ ' autosuggest-accept
+
+if [ -d /home/linuxbrew/ ]; then
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+fi
+
+# Set EDITOR.
+# Do this AFTER loading brew vars, since it's installed via homebrew now on a lot of my systems.
+if command -v nvim >/dev/null; then
+    export EDITOR=$(which nvim)
+else
+    export EDITOR=/usr/bin/vim
+fi
+
+# Set up fzf key bindings and fuzzy completion
+if [ -f /usr/bin/fzf ] || [ -f "$HOMEBREW_PREFIX/bin/fzf" ]; then
+    source <(fzf --zsh)
+fi
+
+# Use zoxide and eza if available.
+if [ -f "$HOMEBREW_PREFIX/bin/zoxide" ] || [ -f /usr/bin/zoxide ]; then
+    eval "$(zoxide init zsh --cmd cd)"
+fi
+
+if [ -f "$HOMEBREW_PREFIX/bin/eza" ] || [ -f /usr/local/bin/eza ]; then
+    alias ls='eza -l'
+fi
+
+if [ -f /usr/local/bin/atuin ] || [ "$HOMEBREW_PREFIX/bin/atuin" ]; then
+    eval "$(atuin init zsh)"
+fi

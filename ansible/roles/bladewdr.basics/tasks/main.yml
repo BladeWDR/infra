@@ -14,6 +14,25 @@
 #  ansible.builtin.hostname:
 #    name: "{{ machine_hostname }}"
 
+- name: Check to see if .zshrc already exists.
+  ansible.builtin.stat:
+    path: "/home/{{ admin_username }}/.zshrc"
+  register: zshrc_exist
+
+- name: Copy over a basic .zshrc to avoid triggering the zsh startup script.
+  ansible.builtin.copy:
+    src: zshrc
+    dest: "/home/{{ admin_username }}/.zshrc"
+    owner: "{{ admin_username }}"
+    group: "{{ admin_username }}"
+    mode: "0775"
+  when: not zshrc_exist.stat.exists
+
+- name: Set my preferred user options.
+  ansible.builtin.user:
+    name: "{{ admin_username }}"
+    shell: /bin/zsh
+
 - name: Check if the .local folder already exists.
   ansible.builtin.stat:
     path: "/home/{{ admin_username }}/.local"
@@ -89,9 +108,3 @@
     owner: root
     group: root
     mode: "0440"
-
-- name: Install and configure Tailscale.
-  ansible.builtin.include_role:
-    name: artis3n.tailscale.machine
-  vars:
-    state: present
