@@ -45,7 +45,6 @@
   roles:
     - geerlingguy.docker
     - bladewdr.docker
-    # - bladewdr.dockcheck
   tags: docker
 
   tasks:
