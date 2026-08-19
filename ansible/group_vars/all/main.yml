@@ -26,6 +26,15 @@ docker_compose_generator_gid: 1000
 
 # Grafana Alloy settings
 alloy_rootfs_path: /
+
+# Checkmk
+checkmk_agent_version: "2.5.0p8"
+checkmk_agent_server_protocol: https
+checkmk_agent_server: checkmk.bladewdr.xyz
+checkmk_agent_user: ansible
+checkmk_agent_site: 'home'
+checkmk_agent_tls: true
+
 # Tailscale
 tailscale_oauth_ephemeral: false
 tailscale_args: "--accept-dns --accept-routes=false"

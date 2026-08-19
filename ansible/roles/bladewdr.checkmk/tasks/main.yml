@@ -1,0 +1,22 @@
+---
+
+- name: Create or update host in Checkmk.
+  checkmk.general.host:
+    server_url: "{{ checkmk_agent_server_protocol }}://{{ checkmk_agent_server }}"
+    site: "{{ checkmk_agent_site }}"
+    automation_user: "{{ checkmk_agent_user }}"
+    automation_secret: "{{ checkmk_agent_secret }}"
+    name: "{{ inventory_hostname }}"
+    folder: "{{ checkmk_agent_folder | default('/') }}"
+    attributes:
+      tag_address_family: "ip-v4-only"
+      ipaddress: "{{ host_ip }}"
+    state: present
+
+- name: Activate pending changes on Checkmk.
+  checkmk.general.activation:
+    server_url: "{{ checkmk_agent_server_protocol }}://{{ checkmk_agent_server }}"
+    site: "{{ checkmk_agent_site }}"
+    automation_user: "{{ checkmk_agent_user }}"
+    automation_secret: "{{ checkmk_agent_secret }}"
+  run_once: true

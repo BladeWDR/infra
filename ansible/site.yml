@@ -58,6 +58,12 @@
         hour: 23
         job: "docker image prune -af"
 
+    - name: Make sure that python3-docker is installed as it's a dependency for Checkmk's Docker monitoring.
+      ansible.builtin.apt:
+        name: python3-docker
+        state: present
+      when: ansible_facts["os_family"] == 'Debian'
+
 - hosts: docker
   vars_files:
     - secrets.yml
@@ -84,6 +90,16 @@
   roles:
     - bladewdr.nagios
   tags: nagios
+
+# - hosts: all
+#   become: true
+#   vars_files:
+#     - secrets.yml
+#   roles:
+#     - bladewdr.checkmk
+#     #- checkmk.general.agent
+#   tags:
+#     - checkmk-hosts
 
 - hosts: certbot
   become: true
