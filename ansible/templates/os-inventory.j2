@@ -1,0 +1,7 @@
+# Operating System Inventory
+
+| Hostname | Distribution | Distribution Version |
+| -------- | ------------ | -------------------- |
+{% for host in ansible_play_hosts_all %}
+| {{ host }} | {{ hostvars[host].report_distro | default('N/A') }} | {{ hostvars[host].report_distro_version | default('N/A') }} |
+{% endfor %}

@@ -1,0 +1,34 @@
+---
+
+- name: Inventory OS versions.
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: Check for Proxmox VE
+      ansible.builtin.command: pveversion
+      register: pve_cmd
+      changed_when: false
+      failed_when: false
+      when: ansible_facts.os_family == 'Debian'
+
+    - name: Set normalized OS facts
+      ansible.builtin.set_fact:
+        report_distro: >-
+          {{
+            'Proxmox VE'
+            if (pve_cmd is defined and pve_cmd.rc == 0)
+            else (ansible_facts.distribution | default('N/A'))
+          }}
+        report_distro_version: >-
+          {{
+            (pve_cmd.stdout.split('/')[1])
+            if (pve_cmd is defined and pve_cmd.rc == 0)
+            else (ansible_facts.distribution_version | default('N/A'))
+          }}
+
+    - name: Generate OS report
+      ansible.builtin.template:
+        src: ../templates/os-inventory.j2
+        dest: ./output/os-versions.md
+      delegate_to: localhost
+      run_once: true
