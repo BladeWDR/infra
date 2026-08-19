@@ -31,7 +31,6 @@ onramp.bladewdr.xyz nagios_host_template_list=immich-server,deb-docker,deb-webse
 pegaprox.bladewdr.xyz nagios_host_template_list=deb-docker nagios_hostgroups=docker ansible_become_exe=sudo.ws
 n8n.bladewdr.xyz nagios_host_template_list=deb-docker
 nc.bladewdr.xyz nagios_host_templates_list=deb-docker,deb-webserver nagios_hostgroups=docker,deb-webserver
-sync.bladewdr.xyz nagios_host_templates_list=deb-docker,deb-webserver nagios_hostgroups=docker,deb-webserver
 [docker:vars]
 nagios_host_template_list=deb-docker
 nagios_hostgroups=docker
@@ -40,7 +39,6 @@ nagios_hostgroups=docker
 app01.bladewdr.xyz
 app03.bladewdr.xyz
 adguard03.bladewdr.xyz
-sync.bladewdr.xyz
 
 [lan]
 cerberus.bladewdr.xyz
@@ -86,7 +84,7 @@ nagios_hostgroups=deb-nas
 pve01.bladewdr.xyz
 pve02.bladewdr.xyz
 pve03.bladewdr.xyz
-; pve04.bladewdr.xyz
+pve04.bladewdr.xyz
 
 [servers:children]
 certbot
