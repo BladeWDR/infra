@@ -3,8 +3,8 @@
   ansible.builtin.file:
     path: "{{ technitium_log_dir }}"
     state: directory
-    owner: root
-    group: root
+    owner: dns-server
+    group: dns-server
     mode: "0755"
 
 - name: Install Technitium log-pruning systemd service.
