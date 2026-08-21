@@ -63,6 +63,7 @@ services:
 
 networks:
   matrix-db:
+    internal: true
     driver: bridge
   matrix-network:
     driver: bridge
