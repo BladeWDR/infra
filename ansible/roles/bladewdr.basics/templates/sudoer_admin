@@ -1,0 +1,2 @@
+{{ admin_username }} ALL=(ALL) NOPASSWD: ALL
+

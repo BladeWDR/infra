@@ -33,6 +33,14 @@
     name: "{{ admin_username }}"
     shell: /bin/zsh
 
+- name: Copy admin user sudoers file.
+  ansible.builtin.template:
+    src: sudoer_admin
+    dest: /etc/sudoers.d/sudoer_admin
+    owner: root
+    group: root
+    mode: "0440"
+
 - name: Check if the .local folder already exists.
   ansible.builtin.stat:
     path: "/home/{{ admin_username }}/.local"
