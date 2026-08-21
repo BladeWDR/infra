@@ -6,6 +6,7 @@ services:
     container_name: jellyfin
     networks:
       - traefik
+      - meilisearch
     environment:
       - PUID=1000
       - PGID=1000
@@ -44,6 +45,24 @@ services:
       timeout: 30s
       start_period: 10s
       retries: 3
+  meilisearch:
+    environment:
+      - MEILI_NO_ANALYTICS=true
+      - MEILI_EXPERIMENTAL_DUMPLESS_UPGRADE=true
+      - MEILI_MASTER_KEY={{ jellyfin_meili_master_key }}
+    restart: unless-stopped
+    networks:
+        - meilisearch
+    volumes:
+      - /apps/jellyfin/meili_data:/meili_data
+    image: getmeili/meilisearch:v1.48.2
+    container_name: meilisearch
+
+networks:
+  meilisearch:
+    name: meilisearch
+    internal: true
+    driver: bridge
 
 volumes:
   media:
