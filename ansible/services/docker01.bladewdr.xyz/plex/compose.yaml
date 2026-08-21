@@ -1,0 +1,34 @@
+---
+services:
+  plex:
+    image: plexinc/pms-docker:1.43.2.10687-563d026ea@sha256:c37106c57fed7a6624f5dee5a3ce460ff011f09a2aa7f4ee9e8dbbd08ae1b87e
+    container_name: plex
+    restart: unless-stopped
+    volumes:
+      - media:/media
+      - /apps/plex/config:/config
+      - /apps/plex/config/transcode:/transcode
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 32400:32400
+    devices:
+      - /dev/dri:/dev/dri
+    environment:
+      - TZ=America/New_York
+      - PLEX_UID=${PUID:-1000}
+      - PLEX_GID=${PGID:-1000}
+      - HOSTNAME=plex.lan.bladewdr.xyz
+      - ADVERTISE_IP=https://plex.lan.bladewdr.xyz
+      - VERSION=docker
+    networks:
+      - traefik
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.plex.entrypoints=websecure
+      - traefik.http.routers.plex.rule=Host(`plex.{{ TRAEFIK_HOST_DOMAIN }}`)
+      - traefik.http.routers.plex.service=plex
+      - traefik.http.services.plex.loadbalancer.server.port=32400
+      - traefik.http.routers.plex.middlewares=default-headers@file
+      - traefik.http.routers.plex.tls=true
+      - traefik.docker.network=traefik

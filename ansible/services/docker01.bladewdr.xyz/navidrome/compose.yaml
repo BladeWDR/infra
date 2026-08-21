@@ -1,0 +1,29 @@
+---
+services:
+  navidrome:
+    image: deluan/navidrome:0.62.0@sha256:c4b5cb36a790b3eb63ca6a68bbe2fe149c2d7fa2e586f7a480e61db630e6664b
+    user: 1000:1000
+    restart: unless-stopped
+    container_name: navidrome
+    environment:
+      - ND_SCANSCHEDULE=1h
+      - ND_LOGLEVEL=info
+      - ND_SESSIONTIMEOUT=999h
+      - ND_MUSICFOLDER=/mnt/media/music
+      - ND_BASEURL=https://music.lan.bladewdr.xyz
+      - ND_DEFAULTTHEME=Catppuccin Macchiato
+      - ND_ENABLEINSIGHTSCOLLECTOR=false
+    volumes:
+      - /apps/navidrome/config:/data
+      - media:/mnt/media:ro
+    networks:
+      - traefik
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.navidrome.entrypoints=websecure
+      - traefik.http.routers.navidrome.rule=Host(`music.{{ TRAEFIK_HOST_DOMAIN }}`)
+      - traefik.http.routers.navidrome.service=navidrome
+      - traefik.http.services.navidrome.loadbalancer.server.port=4533
+      - traefik.http.routers.navidrome.middlewares=default-headers@file
+      - traefik.http.routers.navidrome.tls=true
+      - traefik.docker.network=traefik

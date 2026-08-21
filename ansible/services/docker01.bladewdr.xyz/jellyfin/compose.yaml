@@ -1,0 +1,53 @@
+---
+
+services:
+  jellyfin:
+    image: linuxserver/jellyfin:10.11.11@sha256:bb8ff21a879498dbdead9efe4d3de2070dbda2b9fb35b9a43501055f6e526384
+    container_name: jellyfin
+    networks:
+      - traefik
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ={{ host_timezone }}
+      # Try to avoid hitting inotify-watchers limits with large libraries.
+      - DOTNET_USE_POLLING_FILE_WATCHER=1
+      - LIBVA_DRIVER_NAME=iHD
+      - DOCKER_MODS=linuxserver/mods:jellyfin-opencl-intel
+    ports:
+      - 8096:8096
+    devices:
+      - /dev/dri:/dev/dri
+    group_add:
+      - "992"
+    volumes:
+      - /apps/jellyfin/config:/config
+      - /apps/jellyfin/cache:/cache
+      - media:/media
+      - type: tmpfs
+        target: /transcode
+        tmpfs:
+          size: "4294967296"
+    restart: 'unless-stopped'
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.jellyfin.entrypoints=websecure
+      - traefik.http.routers.jellyfin.rule=Host(`stream.{{ APP0_HOST_DOMAIN }}`)
+      - traefik.http.routers.jellyfin.service=jellyfin
+      - traefik.http.services.jellyfin.loadbalancer.server.port=8096
+      - traefik.http.routers.jellyfin.middlewares=default-headers@file
+      - traefik.http.routers.jellyfin.tls=true
+      - traefik.docker.network=traefik
+    healthcheck:
+      test: curl --noproxy 'localhost' -Lk -fsS "http://localhost:8096" || exit 1
+      interval: 30s
+      timeout: 30s
+      start_period: 10s
+      retries: 3
+
+volumes:
+  media:
+    driver_opts:
+      type: nfs
+      o: "addr=10.13.37.22,nolock,noatime,soft,rw"
+      device: ":/mnt/tank/media"

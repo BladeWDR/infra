@@ -1,0 +1,11 @@
+---
+services:
+  jellyfin-newsletter:
+    container_name: jellyfin-newsletter
+    image: 'ghcr.io/seaweedbraincy/jellyfin-newsletter:1.1.0@sha256:e63d21a0550caf563dfed17e90a6eff3fffe14a203b0c8c5520c10a975272777'
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+      - TZ='{{ host_timezone }}'
+    volumes:
+      - '/apps/jellyfin-newsletter/config:/app/config'

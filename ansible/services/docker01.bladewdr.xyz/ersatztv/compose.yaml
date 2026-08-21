@@ -1,0 +1,28 @@
+---
+services:
+  ersatztv:
+    image: jasongdove/ersatztv:v26.3.0@sha256:7c402e5f348184359e0951b44d55fb6db3df671fa77fc91dcbd609034d28778b
+    container_name: ersatztv
+    environment:
+      - TZ=${ERSATZ_TZ:-America/New_York}
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility,video
+    volumes:
+      - /apps/ersatztv/config:/root/.local/share/ersatztv
+      - media:/media:ro
+      - type: tmpfs
+        target: /root/.local/share/etv-transcode
+    devices:
+      - /dev/dri:/dev/dri
+    restart: unless-stopped
+    networks:
+      - traefik
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.ersatztv.entrypoints=websecure
+      - traefik.http.routers.ersatztv.rule=Host(`ersatztv.{{ TRAEFIK_HOST_DOMAIN }}`)
+      - traefik.http.routers.ersatztv.service=ersatztv
+      - traefik.http.services.ersatztv.loadbalancer.server.port=8409
+      - traefik.http.routers.ersatztv.middlewares=default-headers@file
+      - traefik.http.routers.ersatztv.tls=true
+      - traefik.docker.network=traefik
