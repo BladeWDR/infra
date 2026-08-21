@@ -1,7 +1,6 @@
 ---
 certbot_domains:
   - agh.bladewdr.xyz *.agh.bladewdr.xyz
-ssh_listen_address: 192.168.85.13
 tailscale_args: "--accept-dns=false --accept-routes=true"
 tailscale_tags:
   - proxy
