@@ -29,6 +29,7 @@ services:
       - /apps/matrix/synapse-admin/config.json:/app/config.json:ro
     ports:
       - 100.88.128.27:8089:80
+      - 127.0.0.1:8089:80
     restart: unless-stopped
   db:
     image: docker.io/postgres:16-alpine@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777
