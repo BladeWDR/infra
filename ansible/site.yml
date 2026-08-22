@@ -190,3 +190,19 @@
     state: present
   tags:
     - tailscale
+
+- name: Configure Tailscale peer relay
+  hosts: pve04.bladewdr.xyz
+  become: true
+  tasks:
+
+    - name: Query current relay server port
+      ansible.builtin.command: tailscale get relay-server-port
+      register: current_relay_port
+      changed_when: false
+
+    - name: Set peer relay port
+      ansible.builtin.command: tailscale set --relay-server-port=50000
+      when: current_relay_port.stdout != "50000"
+  tags:
+    - tailscale
