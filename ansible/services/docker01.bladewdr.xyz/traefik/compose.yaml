@@ -6,7 +6,8 @@ services:
     restart: ${TRAEFIK_RESTART:-unless-stopped}
     mem_limit: ${TRAEFIK_MEM_LIMIT:-100m}
     networks:
-      - traefik
+      traefik:
+        ipv4_address: 10.150.150.2
     extra_hosts:
       - host.docker.internal:172.17.0.1
     ports:
@@ -65,3 +66,6 @@ networks:
   traefik:
     name: traefik
     driver: bridge
+    ipam:
+      config:
+        - subnet: 10.150.0.0/16
