@@ -1,4 +1,5 @@
 ---
 tailscale_tags:
   - monitoring
-tailscale_args: "--accept-dns --accept-routes=true"
+  - proxmox
+tailscale_args: "--accept-dns --accept-routes=true --advertise-routes=10.0.10.0/24 --snat-subnet-routes=false"
