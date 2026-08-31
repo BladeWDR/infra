@@ -4,6 +4,8 @@ services:
   server:
     image: codeberg.org/forgejo/forgejo:16@sha256:3eb3107bc9de4e9d6d9e539044e6c802dc0b7be351919a145540d4cb5422bf07
     container_name: forgejo
+    networks:
+      - traefik
     environment:
       - USER_UID=1000
       - USER_GID=1000
@@ -30,9 +32,18 @@ services:
       - DISABLE_REGISTRATION=false
     restart: unless-stopped
     ports:
-      - 3000:3000
+      - '3000:3000' 
       - '222:22'
     volumes:
       - ./forgejo:/data
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.forgejo.entrypoints=websecure
+      - traefik.http.routers.forgejo.rule=Host(`git.{{ APP0_HOST_DOMAIN }}`)
+      - traefik.http.routers.forgejo.service=forgejo
+      - traefik.http.services.forgejo.loadbalancer.server.port=3000
+      - traefik.http.routers.forgejo.middlewares=default-headers@file
+      - traefik.http.routers.forgejo.tls=true
+      - traefik.docker.network=traefik
