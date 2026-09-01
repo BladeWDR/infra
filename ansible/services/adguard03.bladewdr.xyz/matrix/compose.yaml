@@ -49,7 +49,7 @@ services:
     networks:
       - matrix-db
   element:
-    image: vectorim/element-web:v1.12.25@sha256:ac50d4eebafd954d7d7e2887d4693bcc91c54c0d00546a3410eeae77e6b342d5
+    image: vectorim/element-web:v1.12.27@sha256:7050130b263bbcf0e4ad8da875a2821cd89dc55b2f04e93aaa13f682d013019e
     container_name: element-web
     volumes:
       - /apps/matrix/element-web/element-config.json:/app/config.json:ro
