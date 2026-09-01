@@ -27,3 +27,15 @@
         regexp: "{{ item[0] | regex_escape() }}"
         replace: "{{ internal_cache_server_name }}/{{ item[1] }}"
       loop: "{{ original_repo_targets.items() }}"
+
+    - name: Keep staged APT sources intact when cloud-init runs at boot.
+      ansible.builtin.copy:
+        dest: /etc/cloud/cloud.cfg.d/99-preserve-apt-sources.cfg
+        owner: root
+        group: root
+        mode: "0644"
+        content: |
+          # Preserve the APT sources configured in this image.
+          apt:
+            preserve_sources_list: true
+      when: ansible_facts['distribution'] == 'Ubuntu'
