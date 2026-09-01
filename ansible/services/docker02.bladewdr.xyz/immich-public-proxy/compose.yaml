@@ -1,7 +1,7 @@
 ---
 services:
   immich-public-proxy:
-    image: alangrainger/immich-public-proxy:latest@sha256:7ca34cc3efa618a11674db00e1d943e4611cb2e14d1f6d73343757db700a6e3c
+    image: alangrainger/immich-public-proxy:3.2.1@sha256:7ca34cc3efa618a11674db00e1d943e4611cb2e14d1f6d73343757db700a6e3c
     container_name: immich-public-proxy
     restart: unless-stopped
     networks:

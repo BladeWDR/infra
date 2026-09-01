@@ -1,7 +1,7 @@
 ---
 services:
   memebase:
-    image: ghcr.io/hberg539/memebase:latest@sha256:7fbecfb04519b2c7dd6cf971a04f3a194361ab4be5de7424cc1cab3c9d6017d4
+    image: ghcr.io/hberg539/memebase:0.8.2@sha256:7fbecfb04519b2c7dd6cf971a04f3a194361ab4be5de7424cc1cab3c9d6017d4 
     networks:
       - proxy
     restart: unless-stopped
