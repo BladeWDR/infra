@@ -1,7 +1,7 @@
 ---
 services:
   dawarich:
-    image: freikin/dawarich:1.11.0@sha256:4e3c55c4cd572373624e75c9e02075ff436c83a3ea952595ae0d4ffc4c7ae52b
+    image: freikin/dawarich:1.14.1@sha256:65be16e1d261ea9a92c885eb8626e33ae46de6bfc6f6d6bce71c24eff2a6ae5f
     container_name: ${DAWARICH_CONTAINER_NAME:-dawarich}
     restart: ${DAWARICH_RESTART:-unless-stopped}
     volumes:
@@ -78,7 +78,7 @@ services:
       - autoheal=${DAWARICH_AUTOHEAL_ENABLED:-true}
 
   dawarich_sidekiq:
-    image: freikin/dawarich:1.11.0@sha256:4e3c55c4cd572373624e75c9e02075ff436c83a3ea952595ae0d4ffc4c7ae52b
+    image: freikin/dawarich:1.14.1@sha256:65be16e1d261ea9a92c885eb8626e33ae46de6bfc6f6d6bce71c24eff2a6ae5f
     container_name: dawarich_sidekiq
     volumes:
       - /apps/dawarich/public:/var/app/public
