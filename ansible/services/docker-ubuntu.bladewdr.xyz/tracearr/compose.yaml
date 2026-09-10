@@ -36,7 +36,7 @@ services:
       - proxy
 
   timescale:
-    image: timescale/timescaledb:latest-pg16@sha256:0af03ecf697825f6ddae76fd275d16bf46007bed6d00eb3d754779cb7db96fa6
+    image: timescale/timescaledb:latest-pg16@sha256:75d58b53f3337a6babd3a1cce5e503f2300bdede62dd7d743651deb1a95b6d76
     container_name: tracearr-db
     shm_size: 512mb
     ulimits:
