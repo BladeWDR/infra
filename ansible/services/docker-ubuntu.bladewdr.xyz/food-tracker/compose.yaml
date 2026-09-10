@@ -1,7 +1,7 @@
 ---
 services:
   food-tracker:
-    image: {{ FORGEJO_HOST }}/scottb/food-tracker:v1.1.0@sha256:4581781782307b192c1e9ff38344f049df3cd37949c263d98dd0c84fb03d1fd0
+    image: {{ FORGEJO_HOST }}/scottb/food-tracker:v1.2.0@sha256:3141de70c45d889f36b881ce164bb563d5566c47636e83c176e8ab509b20c9e6
     container_name: food-tracker
     restart: unless-stopped
     volumes:
