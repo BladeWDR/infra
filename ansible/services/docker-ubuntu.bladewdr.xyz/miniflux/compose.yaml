@@ -13,12 +13,12 @@ services:
     environment:
       - DATABASE_URL=postgres://miniflux:{{ miniflux_db_password }}@miniflux-db/miniflux?sslmode=disable
       - RUN_MIGRATIONS=1
-      - BASE_URL=https://miniflux.lan.bladewdr.xyz
+      - BASE_URL=https://rss.{{ APP0_HOST_DOMAIN }}
       - DISABLE_LOCAL_AUTH=1
       - OAUTH2_PROVIDER=oidc
       - OAUTH2_CLIENT_ID={{ miniflux_client_id }}
       - OAUTH2_CLIENT_SECRET={{ miniflux_client_secret }}
-      - OAUTH2_REDIRECT_URL=https://miniflux.lan.bladewdr.xyz/oauth2/oidc/callback
+      - OAUTH2_REDIRECT_URL=https://rss.{{ APP0_HOST_DOMAIN }}/oauth2/oidc/callback
       - OAUTH2_OIDC_DISCOVERY_ENDPOINT=https://auth.bladewdr.xyz/application/o/miniflux/
       - OAUTH2_USER_CREATION=1
       - FETCHER_ALLOW_PRIVATE_NETWORKS=1
@@ -28,7 +28,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.miniflux.entrypoints=https
-      - traefik.http.routers.miniflux.rule=Host(`miniflux.{{ TRAEFIK_HOST_DOMAIN }}`)
+      - traefik.http.routers.miniflux.rule=Host(`rss.{{ APP0_HOST_DOMAIN }}`)
       - traefik.http.routers.miniflux.tls=true
       - traefik.http.middlewares.miniflux=default-headers@file
       - traefik.http.middlewares.miniflux=https-redirectscheme@file
