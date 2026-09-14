@@ -95,7 +95,7 @@ services:
       - autoheal=true
   immichframe:
     container_name: immichframe1
-    image: ghcr.io/immichframe/immichframe:v1.0.37.0@sha256:edae2c0b9ab6e1384634582b2bab6246429e14bc209ff6ecc091fc9eedd4582c 
+    image: ghcr.io/immichframe/immichframe:v1.0.38.0@sha256:ac01a3afffc170d4a8085476302fd7963ad873955f8dda02a47290de9011c562 
     restart: unless-stopped
     volumes:
       - /apps/immich-frame/config:/app/Config
