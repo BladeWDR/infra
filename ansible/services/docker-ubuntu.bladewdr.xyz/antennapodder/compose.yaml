@@ -1,0 +1,26 @@
+---
+services:
+  antennapodder:
+    build: https://github.com/BladeWDR/antennapodder.git
+    container_name: antennapodder
+    networks:
+      - proxy
+    volumes:
+      - /home/{{ admin_username }}/docker/antennapodder:/data
+    restart: unless-stopped
+    environment:
+      - PORT=3000
+      - DATA_DIR=/data
+      - ANTENNAPODDER_USER={{ admin_username }}
+      - ANTENNAPODDER_PASS={{ antennapodder_pw }}
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.antennapodder.entrypoints=https
+      - traefik.http.routers.antennapodder.rule=Host(`podcast.{{ TRAEFIK_HOST_DOMAIN }}`)
+      - traefik.http.routers.antennapodder.tls=true
+      - traefik.http.middlewares.antennapodder=default-headers@file
+      - traefik.http.middlewares.antennapodder=https-redirectscheme@file
+      - traefik.http.routers.antennapodder.middlewares=default-headers@file
+      - traefik.http.services.antennapodder.loadbalancer.server.port=3000
+      - traefik.http.routers.antennapodder.service=antennapodder
+      - traefik.docker.network=proxy
