@@ -1,11 +1,11 @@
----
-services:
-  jellyfin-newsletter:
-    container_name: jellyfin-newsletter
-    image: 'ghcr.io/seaweedbraincy/jellyfin-newsletter:1.3.0@sha256:ddfd50e1066a5bd3e0a509a591835acd46ea5f59b39093b8af5b23749239135d'
-    environment:
-      - USER_UID=1000
-      - USER_GID=1000
-      - TZ='{{ host_timezone }}'
-    volumes:
-      - '/apps/jellyfin-newsletter/config:/app/config'
+# ---
+# services:
+#   jellyfin-newsletter:
+#     container_name: jellyfin-newsletter
+#     image: 'ghcr.io/seaweedbraincy/jellyfin-newsletter:1.3.0@sha256:ddfd50e1066a5bd3e0a509a591835acd46ea5f59b39093b8af5b23749239135d'
+#     environment:
+#       - USER_UID=1000
+#       - USER_GID=1000
+#       - TZ='{{ host_timezone }}'
+#     volumes:
+#       - '/apps/jellyfin-newsletter/config:/app/config'
