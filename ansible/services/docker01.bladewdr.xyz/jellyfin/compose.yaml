@@ -2,7 +2,7 @@
 
 services:
   jellyfin:
-    image: linuxserver/jellyfin:10.11.11@sha256:bb8ff21a879498dbdead9efe4d3de2070dbda2b9fb35b9a43501055f6e526384
+    image: linuxserver/jellyfin:12.1ubu2604-ls50@sha256:51252e7a416e703cdc3cd91e8a54673a2430cc80409be8a38abe511411577b95
     container_name: jellyfin
     networks:
       - traefik
