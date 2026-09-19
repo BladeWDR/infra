@@ -1,7 +1,7 @@
 ---
 services:
   feishin:
-    image: ghcr.io/jeffvli/feishin:1.15.1@sha256:5c0b3a1f307f8d9508c9fd5dcef04349b6cda1740ae95d478498dc86e3e432bf
+    image: ghcr.io/jeffvli/feishin:1.17.0@sha256:6c75a4d3b99065ac245e2eb2b693fde3e5f2a6fe41c9e255da4fcb8948071965
     container_name: feishin
     restart: unless-stopped
     volumes:
