@@ -26,7 +26,7 @@ services:
         - traefik.http.routers.flare.middlewares=default-headers@file
         - traefik.http.services.flare.loadbalancer.server.port=3000
         - traefik.docker.network=proxy
-      image: flintsh/flare:2.0.0@sha256:702464474069d2b9bc76427844c9d8778a3c6a39f30a4a90c5fa11373686e375
+      image: flintsh/flare:2.1.0@sha256:2d310e823e08a2c68cd09416c2198a9d6d0dca1cde26c89e67718bc44d409f52
       depends_on:
         postgres:
           condition: service_healthy
