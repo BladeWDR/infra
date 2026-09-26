@@ -1,7 +1,7 @@
 services:
   upsnap:
     container_name: upsnap
-    image: ghcr.io/seriousm4x/upsnap:5.7.0@sha256:18c8d4a79c3ce7cfa60799233e085287dc5c984a769d7d1e68358e5a69c42101
+    image: ghcr.io/seriousm4x/upsnap:5.7.2@sha256:1e7c2345c493f9228a5dc2102be06b5a33331100f303fe0078502f4ef1068724
     network_mode: host
     cap_add:
       - NET_RAW # NET_RAW is required for privileged ping and network device scan (nmap)
