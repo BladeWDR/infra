@@ -14,7 +14,7 @@ services:
       start_period: 10s
       timeout: 5s
     extra_hosts:
-       - "{{ IMMICH_URL }}:10.13.37.11"
+       - "{{ IMMICH_URL }}:100.92.59.43"
     labels:
       - traefik.enable=true
       - traefik.http.routers.immichproxy.entrypoints=websecure
