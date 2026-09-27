@@ -115,7 +115,7 @@ services:
       retries: 10
 
   valkey:
-    image: valkey/valkey:8.1-alpine
+    image: valkey/valkey:9.2-alpine@sha256:cdcb7b1c7b6f1c9cb9442c71ac6275e78184657448407b2c1fdde7ee8024f4fb
     restart: unless-stopped
     networks: [traefik]
     command: ["valkey-server", "--save", "", "--appendonly", "no"]
