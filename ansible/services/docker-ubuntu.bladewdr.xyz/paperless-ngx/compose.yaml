@@ -35,7 +35,7 @@ services:
       - traefik.http.services.paperless-ai.loadbalancer.server.port=3000
 
   broker:
-    image: docker.io/library/redis:8@sha256:0a972391db0b24ec336e35d1bc98b237237e26f82bf5120cf2f6b1688d1df973
+    image: docker.io/library/redis:8@sha256:6f81e8915c60b065a524e6967e0ad1c639ba6efa84d669f823683ea04d9150ee
     restart: unless-stopped
     container_name: paperless-broker
     networks:
