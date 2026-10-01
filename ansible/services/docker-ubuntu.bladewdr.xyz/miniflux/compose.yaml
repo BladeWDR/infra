@@ -53,6 +53,25 @@ services:
       interval: 10s
       start_period: 30s
 
+  miniflux-flaresolverr-hook:
+    build: https://git.bladewdr.xyz/ScottB/miniflux-flaresolverr.git
+    container_name: miniflux-flaresolverr
+    environment:
+      - FLARESOLVERR_URL=http://flaresolverr:8191/v1
+    networks:
+      - proxy
+
+  flaresolverr:
+    container_name: flaresolverr
+    env_file:
+      - .env
+    environment:
+      - LOG_LEVEL=info
+    networks:
+       - proxy
+    restart: unless-stopped
+    image: 'ghcr.io/flaresolverr/flaresolverr:3.5.0@sha256:139dfee1c6f89249c8d665d1333a42e8ec74ec0a86bc6bb1c8461e10d3a66a47'
+
 networks:
   proxy:
     external: true
