@@ -1,0 +1,27 @@
+---
+services:
+  opengist:
+    image: ghcr.io/thomiceli/opengist:1.15.2@sha256:7edc91273ee7d10a17406da8a08c803158baaff984c39b789c1313473d068f21
+    container_name: opengist
+    restart: unless-stopped
+    user: "1001:1001"
+    ports:
+      - "6157:6157" # HTTP port
+    networks:
+      - traefik
+    volumes:
+      - "/apps/opengist:/opengist"
+    labels:
+      - joyride.host.name=paste.{{ APP0_HOST_DOMAIN }}
+      - traefik.enable=${opengist_TRAEFIK_ENABLED:-true}
+      - traefik.http.routers.opengist.entrypoints=websecure
+      - traefik.http.routers.opengist.rule=Host(`paste.{{ APP0_HOST_DOMAIN }}`)
+      - traefik.http.services.opengist.loadbalancer.server.port=6157
+      - traefik.http.routers.opengist.middlewares=default-headers@file
+      - autoheal=${opengist_AUTOHEAL_ENABLED:-true}
+    environment:
+      - UID=1001
+      - GID=1001
+      - OG_EXTERNAL_URL=https://paste.{{ APP0_HOST_DOMAIN }}
+      # OG_LOG_LEVEL: info
+      # other configuration options
