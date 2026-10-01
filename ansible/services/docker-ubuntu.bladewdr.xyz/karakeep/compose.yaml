@@ -58,8 +58,8 @@ services:
       - MEILI_NO_ANALYTICS=true
       - MEILI_ADDR=http://hoarder-meilisearch:7700
       - MEILI_MASTER_KEY={{ KARAKEEP_MEILI_MASTER_KEY }}
-      - MEILI_EXPERIMENTAL_DUMPLESS_UPGRADE=true
-    image: getmeili/meilisearch:v1.13.3@sha256:bed3fb650e62da53145777204891159242f6ea4ce69e215b36223af4aa64a0ae
+      - MEILI_UPGRADE_DB=true
+    image: getmeili/meilisearch:v1.54.3@sha256:e68913ab7d6f5b159529e472cfd362ce3c741fafd3c127961b2142abbe41b3c9
     restart: unless-stopped
     volumes:
       - ./karakeep/meilisearch:/meili_data
