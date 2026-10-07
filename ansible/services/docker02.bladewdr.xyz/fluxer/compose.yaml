@@ -170,7 +170,7 @@ services:
   #       echo "buckets ready";
 
   livekit:
-    image: livekit/livekit-server:v1.12.0
+    image: livekit/livekit-server:v1.13.9@sha256:d0c04791bf63ca8dcea123571827d56ba9504bd57c8d5de60ee03b5408cc3154
     restart: unless-stopped
     networks: [traefik]
     command: ["--config", "/etc/livekit.yaml"]
