@@ -1,0 +1,40 @@
+---
+
+services:
+  lubelog:
+    image: ghcr.io/hargata/lubelogger:v1.7.3@sha256:c9d2bbb48c7f84d90e54496e2cd60422e56a5f2345c8a539ebe09f77e629d321
+    container_name: ${LUBELOG_CONTAINER_NAME:-lubelog}
+    restart: ${LUBELOG_RESTART:-unless-stopped}
+    mem_limit: ${LUBELOG_MEM_LIMIT:-200g}
+    networks:
+      - traefik
+    volumes:
+      - /apps/lubelog/config:/App/config
+      - /apps/lubelog/data:/App/data
+      - /apps/lubelog/translations:/App/wwwroot/translations
+      - /apps/lubelog/documents:/App/wwwroot/documents
+      - /apps/lubelog/images:/App/wwwroot/images
+      - /apps/lubelog/temp:/App/wwwroot/temp
+      - /apps/lubelog/log:/App/log
+      - /apps/lubelog/keys:/root/.aspnet/DataProtection-Keys
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ={{ host_timezone }}
+      - LC_ALL=${LUBELOG_LC_ALL:-en_US.UTF-8}
+      - LANG=${LUBELOG_LANG:-en_US.UTF-8}
+      - MailConfig__EmailServer={{ SMTP_SERVER_ADDRESS }}
+      - MailConfig__EmailFrom={{ SMTP_FROM }}
+      - MailConfig__UseSSL=true
+      - MailConfig__Port={{ SMTP_PORT }}
+      - MailConfig__Username={{ SMTP_USERNAME }}
+      - MailConfig__Password={{ SMTP_PASSWORD }}
+      - LOGGING__LOGLEVEL__DEFAULT=Error
+    labels:
+      - joyride.host.name=lubelog.{{ ONRAMP_HOST_DOMAIN }}
+      - traefik.enable=${LUBELOG_TRAEFIK_ENABLED:-true}
+      - traefik.http.routers.lubelog.entrypoints=websecure
+      - traefik.http.routers.lubelog.rule=Host(`lubelog.{{ ONRAMP_HOST_DOMAIN }}`)
+      - traefik.http.services.lubelog.loadbalancer.server.port=8080
+      - autoheal=${LUBELOG_AUTOHEAL_ENABLED:-true}

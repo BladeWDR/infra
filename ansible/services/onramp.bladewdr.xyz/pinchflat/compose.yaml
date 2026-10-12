@@ -1,0 +1,33 @@
+---
+
+services:
+  pinchflat:
+    image: ghcr.io/kieraneglin/pinchflat:latest@sha256:01b4f98aabaf3f5fe394213f7a32578c9e84e42080f52e2f8334021a4473b202
+    container_name: ${PINCHFLAT_CONTAINER_NAME:-pinchflat}
+    restart: ${PINCHFLAT_RESTART:-unless-stopped}
+    mem_limit: ${PINCHFLAT_MEM_LIMIT:-200g}
+    networks:
+      - traefik
+    volumes:
+      - /apps/pinchflat/config:/config
+      - /etc/localtime:/etc/localtime:ro
+      - media:/downloads
+    environment:
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ={{ host_timezone }}
+    labels:
+      - joyride.host.name=pinchflat.{{ ONRAMP_HOST_DOMAIN }}
+      - traefik.enable=${PINCHFLAT_TRAEFIK_ENABLED:-true}
+      - traefik.http.routers.pinchflat.entrypoints=websecure
+      - traefik.http.routers.pinchflat.rule=Host(`pinchflat.{{ ONRAMP_HOST_DOMAIN }}`)
+      - traefik.http.routers.pinchflat.middlewares=default-headers@file
+      - traefik.http.services.pinchflat.loadbalancer.server.port=8945
+      - autoheal=${PINCHFLAT_AUTOHEAL_ENABLED:-true}
+
+volumes:
+  media:
+    driver_opts:
+      type: nfs
+      o: "addr={{ IMMICH_ROOT_NFS_SERVER }},nolock,noatime,soft,rw"
+      device: ":/mnt/tank/media"

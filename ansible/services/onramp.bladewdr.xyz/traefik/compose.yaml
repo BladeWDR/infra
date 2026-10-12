@@ -1,0 +1,111 @@
+services:
+  traefik:
+    image: traefik:v3.7.14@sha256:575fa15b135078fe5e50aa847987d96dbddd7b093c172429618404df73f3fa7c
+    container_name: ${TRAEFIK_CONTAINER_NAME:-traefik}
+    restart: ${TRAEFIK_RESTART:-unless-stopped}
+    mem_limit: ${TRAEFIK_MEM_LIMIT:-100m}
+    networks:
+      - traefik
+    extra_hosts:
+      - host.docker.internal:172.17.0.1
+    environment:
+      - CF_API_EMAIL={{ CF_API_EMAIL }}
+      - CF_DNS_API_TOKEN={{ CF_DNS_API_TOKEN }}
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - /apps/traefik/letsencrypt:/letsencrypt
+      - /apps/traefik/enabled:/enabled
+      - /etc/localtime:/etc/localtime:ro
+      - /usr/share/zoneinfo:/usr/share/zoneinfo:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    command:
+      - --api
+      - --api.insecure=${TRAEFIK_API_INSECURE:-true}
+      - --api.dashboard=true
+      - --log.level=ERROR
+      - --accesslog=true
+      - --entryPoints.metrics.address=:8082
+      - --metrics.prometheus.entryPoint=metrics
+      - --providers.docker
+      - --providers.docker.exposedByDefault=false
+      - --providers.file.watch=true
+      - --providers.file.directory=/enabled
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.web.http.redirections.entrypoint.to=websecure
+      - --entrypoints.web.http.redirections.entrypoint.scheme=https
+      - --entrypoints.websecure.http.tls=true
+      - --entrypoints.websecure.http.tls.certResolver=letsencrypt
+      - --entrypoints.websecure.http.tls.domains[0].main={{ ONRAMP_HOST_DOMAIN }}
+      - --entrypoints.websecure.http.tls.domains[0].sans=*.{{ ONRAMP_HOST_DOMAIN }}
+      - --serverstransport.insecureskipverify=true
+      - --certificatesresolvers.letsencrypt.acme.dnschallenge=true
+      - --certificatesresolvers.letsencrypt.acme.dnschallenge.provider=${DNS_CHALLENGE_PROVIDER:-cloudflare}
+      - --certificatesresolvers.letsencrypt.acme.email={{ CF_API_EMAIL }}
+      - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
+      - --certificatesResolvers.letsencrypt.acme.dnsChallenge.delayBeforeCheck=120
+      - --certificatesresolvers.letsencrypt.acme.dnschallenge.resolvers=1.1.1.1:53,1.0.0.1:53
+      - --certificatesresolvers.letsencrypt.acme.caserver=https://acme-v02.api.letsencrypt.org/directory
+    labels:
+      - joyride.host.name=onramp.{{ ONRAMP_HOST_DOMAIN }}
+      - traefik.http.routers.traefik.rule=Host(`onramp.{{ ONRAMP_HOST_DOMAIN }}`)  && (PathPrefix(`/traefik`) || PathPrefix(`/api`))
+      - traefik.http.routers.traefik.middlewares=traefik_strip
+      - traefik.http.middlewares.traefik_strip.stripprefix.prefixes=/traefik
+      - traefik.enable=true
+      - traefik.http.routers.traefik.entrypoints=websecure
+      - traefik.http.routers.traefik.service=api@internal
+      - traefik.http.routers.traefik.rule=Host(`onramp.{{ ONRAMP_HOST_DOMAIN }}`)
+      # https://doc.traefik.io/traefik/operations/dashboard/#insecure-mode
+      # insecure mode is incompatible with the custom API base path option.
+      # we will need to use a custom override if you want the dashboard behind authentication%
+
+  immichframe:
+    container_name: immichframe1
+    image: ghcr.io/immichframe/immichframe:v1.0.39.0@sha256:b4bd2ac6ec75c0117a24bd627dc0b449d485ac87ec3a410c73d5db05a4bbfcaf 
+    restart: unless-stopped
+    volumes:
+      - /apps/immich-frame/config:/app/Config
+    environment:
+      - TZ="{{ host_timezone }}"
+    networks:
+      - traefik
+    depends_on:
+      - immich
+    labels:
+      - joyride.host.name=immichframe1.{{ ONRAMP_HOST_DOMAIN }}
+      - traefik.enable=true
+      - traefik.docker.network=traefik
+      - traefik.http.routers.immichframe1.entrypoints=websecure
+      - traefik.http.routers.immichframe1.rule=Host(`immichframe1.{{ ONRAMP_HOST_DOMAIN }}`)
+      - traefik.http.services.immichframe1.loadbalancer.server.port=8080
+      - autoheal=true
+
+  pinchflat:
+    image: ghcr.io/kieraneglin/pinchflat:latest@sha256:01b4f98aabaf3f5fe394213f7a32578c9e84e42080f52e2f8334021a4473b202
+    container_name: ${PINCHFLAT_CONTAINER_NAME:-pinchflat}
+    restart: ${PINCHFLAT_RESTART:-unless-stopped}
+    mem_limit: ${PINCHFLAT_MEM_LIMIT:-200g}
+    networks:
+      - traefik
+    volumes:
+      - /apps/pinchflat/config:/config
+      - /etc/localtime:/etc/localtime:ro
+      - media:/downloads
+    environment:
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ={{ host_timezone }}
+    labels:
+      - joyride.host.name=pinchflat.{{ ONRAMP_HOST_DOMAIN }}
+      - traefik.enable=${PINCHFLAT_TRAEFIK_ENABLED:-true}
+      - traefik.http.routers.pinchflat.entrypoints=websecure
+      - traefik.http.routers.pinchflat.rule=Host(`pinchflat.{{ ONRAMP_HOST_DOMAIN }}`)
+      - traefik.http.routers.pinchflat.middlewares=default-headers@file
+      - traefik.http.services.pinchflat.loadbalancer.server.port=8945
+      - autoheal=${PINCHFLAT_AUTOHEAL_ENABLED:-true}
+
+networks:
+  traefik:
+    external: true
