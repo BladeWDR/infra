@@ -126,7 +126,7 @@ services:
       retries: 10
 
   nats:
-    image: nats:2.14-alpine@sha256:f9512b17aae6d41b6a615a7afad7b328633639ddae025744623e69b26fe686be
+    image: nats:2.15-alpine@sha256:2ae57dfba3063d5e25fecb75256118c0882a1a2d2cf7d0fba17a7c701df956f6
     restart: unless-stopped
     networks: [traefik]
     command: ["-js", "-sd", "/data", "-m", "8222"]
