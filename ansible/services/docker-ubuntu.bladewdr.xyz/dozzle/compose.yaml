@@ -2,7 +2,7 @@
 
 services:
   dozzle:
-    image: amir20/dozzle:v11.3.1-alpine@sha256:55e5e0686c745314481fc24aef1aa99a741a99785b15bb0cb911b00380279429
+    image: amir20/dozzle:v11.3.2-alpine@sha256:a44080d754fe17712ae485b5b6f031bebd4ce038fa1fc255abe41b14b3c074c0
     container_name: dozzle
     networks:
       - proxy
