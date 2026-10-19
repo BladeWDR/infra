@@ -1,0 +1,45 @@
+---
+
+services:
+  hermes:
+    image: nousresearch/hermes-agent:latest
+    container_name: hermes
+    restart: unless-stopped
+    command: gateway run
+    ports:
+      - "8642:8642"   # gateway API
+      - "9119:9119"   # dashboard (only reached when HERMES_DASHBOARD=1)
+    volumes:
+      - /home/{{ admin_username }}/docker/hermes:/opt/data
+    environment:
+      - HERMES_DASHBOARD=1
+      - OPENROUTER_API_KEY={{ OPENROUTER_API_KEY }}
+      - HERMES_UID=1000
+      - HERMES_GID=1000
+      - HERMES_DASHBOARD_OIDC_ISSUER=https://{{ AUTHENTIK_HOST }}/application/o/hermes/
+      - HERMES_DASHBOARD_OIDC_CLIENT_ID={{ HERMES_OIDC_ID }}
+      - HERMES_DASHBOARD_OIDC_CLIENT_SECRET={{ HERMES_OIDC_SECRET }}
+      - HERMES_DASHBOARD_OIDC_SCOPES="openid profile email"
+      - HERMES_DASHBOARD_PUBLIC_URL=https://hermes.{{ TRAEFIK_HOST_DOMAIN }}
+      # Uncomment to forward specific env vars instead of using .env file:
+      # - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      # - OPENAI_API_KEY=${OPENAI_API_KEY}
+      # - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+    networks:
+      - proxy
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.hermes.entrypoints=https
+      - traefik.http.routers.hermes.rule=Host(`hermes.{{ TRAEFIK_HOST_DOMAIN }}`)
+      - traefik.http.routers.hermes.tls=true
+      - traefik.http.middlewares.hermes=default-headers@file
+      - traefik.http.middlewares.hermes=https-redirectscheme@file
+      - traefik.http.routers.hermes.middlewares=default-headers@file
+      - traefik.http.services.hermes.loadbalancer.server.port=9119
+      - traefik.http.routers.hermes.service=hermes
+      - traefik.docker.network=proxy
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+          cpus: "2.0"
