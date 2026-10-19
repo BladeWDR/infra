@@ -23,17 +23,17 @@ services:
     command: run --server.http.listen-addr=0.0.0.0:12345 --disable-reporting /etc/alloy/config.alloy
 
   cadvisor:
-      volumes:
-          - /:/rootfs:ro
-          - /var/run:/var/run:ro
-          - /sys:/sys:ro
-          - /var/lib/docker/:/var/lib/docker:ro
-          - /dev/disk/:/dev/disk:ro
-      ports:
-        - 7772:8080
-      container_name: cadvisor
-      privileged: true
-      devices:
-          - /dev/kmsg
-      image: ghcr.io/google/cadvisor:0.55.1
-      restart: unless-stopped
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    ports:
+      - 7772:8080
+    container_name: cadvisor
+    privileged: true
+    devices:
+      - /dev/kmsg
+    image: ghcr.io/google/cadvisor:0.55.1
+    restart: unless-stopped

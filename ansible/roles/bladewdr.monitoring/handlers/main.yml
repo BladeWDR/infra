@@ -8,29 +8,39 @@
   ansible.builtin.command:
     cmd: docker compose up -d
     chdir: "{{ alloy_docker_config_dir }}"
+  changed_when: true
   when:
     - not ansible_check_mode
 
 - name: restart alloy container
   ansible.builtin.command:
     cmd: docker restart alloy
+  changed_when: true
   when:
     - not ansible_check_mode
 
 - name: restart prometheus
   ansible.builtin.command: docker restart prometheus
+  changed_when: true
+  when:
+    - not ansible_check_mode
 
 - name: restart alertmanager
   ansible.builtin.command: docker restart alertmanager
+  changed_when: true
+  when:
+    - not ansible_check_mode
+
 
 - name: grafana compose up
   ansible.builtin.command:
     cmd: docker compose -f /apps/compose.yaml up -d
+  changed_when: true
   when:
     - not ansible_check_mode
 
 - name: Restart zfs_exporter service
-  systemd:
+  ansible.builtin.systemd:
     name: zfs_exporter
     enabled: true
     daemon_reload: true

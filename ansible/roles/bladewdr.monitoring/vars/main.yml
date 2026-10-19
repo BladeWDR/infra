@@ -2,7 +2,12 @@
 alloy_docker_config_dir: /apps/alloy
 
 prometheus_servers:
-  - adguard02.bladewdr.xyz
+  - dns02.internal.bladewdr.xyz
+
+grafana_servers:
+  - dns02.internal.bladewdr.xyz
+
+rsyslog_receiver_server: ""
 
 zfs_exporter_install_location: /usr/local/bin/zfs_exporter
 zfs_exporter_arguments: --collector.dataset-snapshot --web.listen-address=:9134

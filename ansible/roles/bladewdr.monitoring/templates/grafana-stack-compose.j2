@@ -130,7 +130,7 @@ services:
       - traefik
       - grafana_net
     environment:
-      - GRAFANA_URL=grafana:3000
+      - GRAFANA_URL=http://grafana:3000
       - GRAFANA_MCP_SERVER_NAME=grafana-mcp.lan.bladewdr.xyz
       - GRAFANA_SERVICE_ACCOUNT_TOKEN={{ grafana_mcp_server_token }}
       - MCP_GRAFANA_SERVER_TOKEN={{ grafana_mcp_server_token }}

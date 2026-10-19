@@ -1,30 +1,45 @@
-- name: Set fact for Alloy config file contents.
+---
+- name: Set fact for baremetal Alloy configuration.
   ansible.builtin.set_fact:
-    alloy_template: "{{ lookup('template', '../templates/alloy.j2') }}"
-    alloy_template_rsyslog: "{{ lookup('template', '../templates/alloy-rsyslog.j2') }}"
-
-- name: Install Alloy
+    baremetal_alloy_config: "{{ lookup('template', 'alloy-baremetal.j2') }}"
   when:
     - "'docker' not in group_names"
-    - "inventory_hostname != rsyslog_receiver_server"
-  ansible.builtin.include_role:
-    name: grafana.grafana.alloy
-  vars:
-    alloy_config: "{{ alloy_template }}"
+    - "rsyslog_receiver_server is not defined or rsyslog_receiver_server | length == 0 or inventory_hostname != rsyslog_receiver_server"
 
-- name: Install Alloy with rsyslog UDP receiver.
-  when: "inventory_hostname == rsyslog_receiver_server"
-  ansible.builtin.include_role:
-    name: grafana.grafana.alloy
-  vars:
-    alloy_config: "{{ alloy_template_rsyslog }}"
-
-- name: Docker Alloy install block
+- name: Set fact for rsyslog Alloy configuration.
+  ansible.builtin.set_fact:
+    rsyslog_alloy_config: "{{ lookup('template', 'alloy-rsyslog.j2') }}"
   when:
-    - "'docker' in group_names" 
-    - "inventory_hostname != rsyslog_receiver_server"
+    - "'docker' not in group_names"
+    - "rsyslog_receiver_server is defined"
+    - "rsyslog_receiver_server | length > 0"
+    - "inventory_hostname == rsyslog_receiver_server"
+
+- name: Install Alloy baremetal.
+  when:
+    - "'docker' not in group_names"
+    - "rsyslog_receiver_server is not defined or rsyslog_receiver_server | length == 0 or inventory_hostname != rsyslog_receiver_server"
+  ansible.builtin.include_role:
+    name: grafana.grafana.alloy
+  vars:
+    alloy_config: "{{ baremetal_alloy_config }}"
+
+- name: Install Alloy with rsyslog UDP receiver baremetal.
+  when:
+    - "'docker' not in group_names"
+    - "rsyslog_receiver_server is defined"
+    - "rsyslog_receiver_server | length > 0"
+    - "inventory_hostname == rsyslog_receiver_server"
+  ansible.builtin.include_role:
+    name: grafana.grafana.alloy
+  vars:
+    alloy_config: "{{ rsyslog_alloy_config }}"
+
+- name: Deploy Alloy container on Docker hosts.
+  when:
+    - "'docker' in group_names"
   block:
-    - name: Create target directory.
+    - name: Create target directory for Alloy Docker configuration.
       ansible.builtin.file:
         path: "{{ alloy_docker_config_dir }}/config"
         state: directory
@@ -34,7 +49,7 @@
 
     - name: Create Alloy config file for Docker.
       ansible.builtin.template:
-        src: alloy-docker.j2 
+        src: alloy-docker.j2
         dest: "{{ alloy_docker_config_dir }}/config/config.alloy"
         owner: "{{ admin_username }}"
         group: "{{ admin_username }}"

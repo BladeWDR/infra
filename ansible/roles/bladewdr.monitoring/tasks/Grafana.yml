@@ -1,4 +1,12 @@
 ---
+- name: Ensure Loki directory exists.
+  ansible.builtin.file:
+    path: /apps/grafana-stack/loki
+    state: directory
+    owner: "{{ admin_username }}"
+    group: "{{ admin_username }}"
+    mode: '0755'
+
 - name: Create Loki config file.
   ansible.builtin.template:
     src: loki-config.yml
