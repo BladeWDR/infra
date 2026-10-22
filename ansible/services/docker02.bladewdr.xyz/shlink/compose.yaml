@@ -2,7 +2,7 @@
 services:
   shlink:
     # image: ghcr.io/shlinkio/shlink:${SHLINK_DOCKER_TAG:-latest}
-    build: https://github.com/Dominikrt/shlink.git#fix-docker-build-musl
+    build: https://github.com/timothystewart6/shlink#security-cve-hardening
     container_name: ${SHLINK_CONTAINER_NAME:-shlink}
     restart: ${SHLINK_RESTART:-unless-stopped}
     mem_limit: ${SHLINK_MEM_LIMIT:-200g}
