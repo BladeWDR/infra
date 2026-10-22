@@ -1,0 +1,36 @@
+---
+
+services:
+  dozzle:
+    image: amir20/dozzle:v11.3.1-alpine@sha256:55e5e0686c745314481fc24aef1aa99a741a99785b15bb0cb911b00380279429
+    container_name: dozzle
+    networks:
+      - traefik
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - dozzle_data:/data
+    labels:
+      - traefik.http.routers.dozzle.rule=Host(`docker01.{{ TRAEFIK_HOST_DOMAIN }}`) && PathPrefix(`/dozzle`)
+      - traefik.enable=true
+      - traefik.http.routers.dozzle.entrypoints=websecure
+      - traefik.http.routers.dozzle.service=dozzle
+      - traefik.http.services.dozzle.loadbalancer.server.port=8080
+      - traefik.http.routers.dozzle.tls=true
+    environment:
+      # - DOZZLE_ENABLE_ACTIONS=true
+      # Uncomment to allow access to container shells. See https://dozzle.dev/guide/shell
+      # - DOZZLE_ENABLE_SHELL=true
+      # Uncomment to enable authentication. See https://dozzle.dev/guide/authentication
+      # - DOZZLE_AUTH_PROVIDER=simple
+      # Label this Dozzle instance (shown in the header and multi-host menu). See https://dozzle.dev/guide/hostname
+      - DOZZLE_HOSTNAME=docker01
+      - DOZZLE_BASE=/dozzle
+      - DOZZLE_AUTH_PROVIDER=oidc
+      - DOZZLE_AUTH_OIDC_ISSUER=https://{{ AUTHENTIK_HOST }}/application/o/dozzle/
+      - DOZZLE_AUTH_OIDC_CLIENT_ID={{ dozzle_oidc_id }}
+      - DOZZLE_AUTH_OIDC_CLIENT_SECRET={{ dozzle_oidc_secret }}
+      - DOZZLE_AUTH_OIDC_ROLES_CLAIM=dozzle_roles
+      - DOZZLE_AUTH_OIDC_SCOPES=roles
+
+volumes:
+  dozzle_data:

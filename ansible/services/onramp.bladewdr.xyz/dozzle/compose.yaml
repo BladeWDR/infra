@@ -8,6 +8,7 @@ services:
       - traefik
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - dozzle_data:/data
     labels:
       - traefik.http.routers.dozzle.rule=Host(`onramp.{{ ONRAMP_HOST_DOMAIN }}`) && PathPrefix(`/dozzle`)
       - traefik.enable=true
@@ -24,3 +25,12 @@ services:
       # Label this Dozzle instance (shown in the header and multi-host menu). See https://dozzle.dev/guide/hostname
       - DOZZLE_HOSTNAME=onramp
       - DOZZLE_BASE=/dozzle
+      - DOZZLE_AUTH_PROVIDER=oidc
+      - DOZZLE_AUTH_OIDC_ISSUER=https://{{ AUTHENTIK_HOST }}/application/o/dozzle/
+      - DOZZLE_AUTH_OIDC_CLIENT_ID={{ dozzle_oidc_id }}
+      - DOZZLE_AUTH_OIDC_CLIENT_SECRET={{ dozzle_oidc_secret }}
+      - DOZZLE_AUTH_OIDC_ROLES_CLAIM=dozzle_roles
+      - DOZZLE_AUTH_OIDC_SCOPES=roles
+
+volumes:
+  dozzle_data:
