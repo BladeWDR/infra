@@ -176,7 +176,7 @@ services:
   #       echo "buckets ready";
 
   livekit:
-    image: livekit/livekit-server:v1.12.0@sha256:b1281e66e35e8f9749ffbcf0fe6ab4d40d1438aa00f36c2ea7e6975e5e261e2e
+    image: livekit/livekit-server:v1.13.10@sha256:89ca9ce0791e18d6e03bf6e2c49ceb27e1c754eae8bd50c989386c1a5963791a
     container_name: fluxer-livekit
     restart: unless-stopped
     networks: [traefik]
