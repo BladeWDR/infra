@@ -1,0 +1,90 @@
+---
+
+- name: Update CPU type of all virtual machines.
+  hosts: proxmox
+  become: true
+  roles:
+    - geerlingguy.pip
+  remote_user: root
+
+  vars:
+      ansible_ssh_private_key_file: /home/scott/.ssh/home_id_rsa
+      pip_install_packages:
+        - proxmoxer
+        - requests
+      pip_executable: pip3
+      excluded_vm_names:
+        - truenas
+
+  tasks:
+
+    - name: Get all virtual machines.
+      community.proxmox.proxmox_vm_info:
+        api_host: "{{ proxmox_api_host }}"
+        api_user: "{{ proxmox_api_user }}"
+        api_token_id: "{{ proxmox_api_token_id }}"
+        api_token_secret: "{{ proxmox_api_token_secret }}"
+        node: "{{ proxmox_node }}"
+        type: qemu
+        config: current
+      register: result
+
+    - name: Create VM inventory with CPU info with possible exclusions.
+      set_fact:
+        vm_inventory: >-
+          {{
+            vm_inventory | default({}) | combine({
+              item.vmid | string: {
+                'name': item.name,
+                'cpu': item.config.cpu | default('not set')
+              }
+            })
+          }}
+      loop: "{{ result.proxmox_vms | rejectattr('name', 'in', excluded_vm_names) | list }}"
+      when: item.config.cpu is not defined or item.config.cpu != 'host'
+
+    - name: Set VM CPU type to x86-64-v2-AES.
+      community.proxmox.proxmox_kvm:
+        api_host: "{{ proxmox_api_host }}"
+        api_user: "{{ proxmox_api_user }}"
+        api_token_id: "{{ proxmox_api_token_id }}"
+        vmid: "{{ item.key }}"
+        name: "{{ item.value.name }}"
+        api_token_secret: "{{ proxmox_api_token_secret }}"
+        cpu: "x86-64-v2-AES"
+        node: "{{ proxmox_node }}"
+        update: true
+        state: present
+      loop: "{{ vm_inventory | dict2items }}"
+      when: item.value.cpu != 'x86-64-v2-AES'
+
+    - name: Stop and restart running VMs that had CPU updated
+      block:
+        - name: Stop running VMs
+          community.proxmox.proxmox_kvm:
+            api_host: "{{ proxmox_api_host }}"
+            api_user: "{{ proxmox_api_user }}"
+            api_token_id: "{{ proxmox_api_token_id }}"
+            api_token_secret: "{{ proxmox_api_token_secret }}"
+            vmid: "{{ item.vmid }}"
+            node: "{{ proxmox_node }}"
+            state: stopped
+          loop: "{{ result.proxmox_vms }}"
+          when: 
+            - item.status == "running"
+            - item.name not in excluded_vm_names
+            - item.config.cpu is not defined or item.config.cpu != 'host'
+            - item.config.cpu | default('not set') != 'x86-64-v2-AES'
+          register: stopped_vms
+
+        - name: Start the VMs again
+          community.proxmox.proxmox_kvm:
+            api_host: "{{ proxmox_api_host }}"
+            api_user: "{{ proxmox_api_user }}"
+            api_token_id: "{{ proxmox_api_token_id }}"
+            api_token_secret: "{{ proxmox_api_token_secret }}"
+            vmid: "{{ item.item.vmid }}"
+            node: "{{ proxmox_node }}"
+            state: started
+          loop: "{{ stopped_vms.results }}"
+          when: not item.skipped | default(false)
