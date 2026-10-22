@@ -17,7 +17,13 @@
   "packageRules": [
     {
       "matchPackageNames": [
-        "immich-app/postgres/"
+        "immich-app/postgres/",
+        "postgres",
+        "library/postgres",
+        "docker.io/library/postgres"
+      ],
+      "matchUpdateTypes": [
+        "major"
       ],
       "enabled": false
     },
