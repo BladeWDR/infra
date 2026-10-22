@@ -1,0 +1,56 @@
+---
+
+- name: Install and configure Wireguard on Ubuntu Linux LXC.
+  hosts: lxc_wireguard
+  become: true
+
+  tasks:
+
+    - name: Install Wireguard userspace tools.
+      ansible.builtin.apt:
+        name: wireguard-tools
+        state: present
+        update_cache: true
+
+    - name: Check to see if Wireguard configuration file exists.
+      ansible.builtin.stat:
+        path: "/etc/wireguard/{{ lxc_wg_interface_name | default('wg0') }}.conf"
+      register: wireguard_configured
+
+    - name: Execute block to generate Wireguard configuration.
+      when: not wireguard_configured.stat.exists
+      block:
+
+        - name: Create wireguard config generation script.
+          ansible.builtin.template:
+            src: ../templates/wireguard-config.j2
+            dest: /opt/wireguard-config.sh
+            owner: root
+            group: root
+            mode: '0755'
+
+        - name: Run the config generator.
+          ansible.builtin.command: /opt/wireguard-config.sh
+          register: wireguard_config_output
+          changed_when: wireguard_config_output.rc == 0
+
+        - name: Fail if the script doesn't exit properly.
+          ansible.builtin.fail:
+            msg: "Wireguard configuration generator script failed."
+          when: wireguard_config_output.rc != 0
+
+    - name: Configure the AllowedIPs stanza in the wireguard config.
+      ansible.builtin.lineinfile:
+        regexp: ^AllowedIPs
+        line: "AllowedIPs={{ lxc_wireguard_allowed_ips }}"
+        path: "/etc/wireguard/{{ lxc_wg_interface_name | default('wg0') }}.conf"
+        state: present
+
+    - name: Fetch the content of the public key.
+      ansible.builtin.slurp:
+        src: /etc/wireguard/publickey
+      register: publickey_data
+
+    - name: Print the public key to the screen.
+      ansible.builtin.debug:
+        msg: "Public key for {{ inventory_hostname }}: {{ publickey_data['content'] | b64decode }}"

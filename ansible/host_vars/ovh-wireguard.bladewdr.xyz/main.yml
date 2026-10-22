@@ -1,0 +1,4 @@
+---
+lxc_wg_ip_address: 192.168.85.20/32
+lxc_wg_ip_subnet: 192.168.85.0/24
+lxc_wireguard_allowed_ips: 192.168.85.0/24
