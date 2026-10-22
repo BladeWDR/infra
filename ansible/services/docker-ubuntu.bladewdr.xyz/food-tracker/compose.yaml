@@ -1,7 +1,7 @@
 ---
 services:
   food-tracker:
-    image: git.bladewdr.xyz/scottb/food-tracker:v1.4.1@sha256:bdf3758c38391d4838d8217c204d65a159c3b61450354d660f77fdcca64806a3
+    image: git.bladewdr.xyz/scottb/food-tracker:v1.4.2@sha256:d57a99ec22773ea9678dd547e7bddbab3cdf230efe3d7220a31dcbdd79abf949
     container_name: food-tracker
     restart: unless-stopped
     volumes:
