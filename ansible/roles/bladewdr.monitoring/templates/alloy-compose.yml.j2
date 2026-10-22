@@ -14,7 +14,10 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /apps/alloy/config:/etc/alloy
+      - /run/log/journal:/run/log/journal:ro
+{% if var_log_journal_check.rc == 0 %}
       - /var/log/journal:/var/log/journal:ro
+{% endif %}
       - /etc/machine-id:/etc/machine-id:ro
       - /:/rootfs:ro
       - /sys:/sys:ro
