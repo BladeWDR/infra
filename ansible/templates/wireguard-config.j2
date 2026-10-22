@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if ! command -v wg &>/dev/null; then
+  echo 'Wireguard userspace tools not installed, exiting.' >&2
+  exit 1
+fi
+
+umask 077
+
+WG_PRIVATE_KEY=$(wg genkey)
+WG_PUBLIC_KEY=$(echo "$WG_PRIVATE_KEY" | wg pubkey)
+
+if [[ -z "$WG_PRIVATE_KEY" || -z "$WG_PUBLIC_KEY" ]]; then
+  echo 'Failed to generate Wireguard key pair.' >&2
+  exit 1
+fi
+
+cat << EOF > /etc/wireguard/{{ lxc_wg_interface_name | default('wg0') }}.conf
+[Interface]
+Address = {{ lxc_wg_ip_address }}
+ListenPort = {{ lxc_wg_listen_port | default('444') }}
+PrivateKey = $WG_PRIVATE_KEY
+EOF
+
+echo "$WG_PUBLIC_KEY" > /etc/wireguard/publickey
