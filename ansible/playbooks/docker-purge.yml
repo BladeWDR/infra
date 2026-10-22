@@ -1,0 +1,9 @@
+---
+- name: Purge old docker images.
+  hosts: docker
+  become: true
+
+  tasks:
+
+    - name: Run the command to remove all dangling Docker images.
+      ansible.builtin.command: docker image prune -af
