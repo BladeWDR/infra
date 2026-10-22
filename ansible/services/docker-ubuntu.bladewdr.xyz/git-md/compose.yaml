@@ -1,0 +1,29 @@
+---
+
+services:
+  git-md:
+    image: git.bladewdr.xyz/scottb/git-md:latest@sha256:a7f1bdc9197607c44746450712466aae621ee05d43e11c3bc169ec1972554e1f
+    container_name: git-md
+    restart: unless-stopped
+    volumes:
+      - git-md_data:/data
+    environment:
+      - GIT_MD_HOST=0.0.0.0
+      - GIT_MD_PORT=3000
+      - GIT_MD_DATA_FILE=/data/config.json
+    networks:
+      - proxy
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.git-md.entrypoints=https
+      - traefik.http.routers.git-md.rule=Host(`git-md.{{ TRAEFIK_HOST_DOMAIN }}`)
+      - traefik.http.routers.git-md.tls=true
+      - traefik.http.middlewares.git-md=default-headers@file
+      - traefik.http.middlewares.git-md=https-redirectscheme@file
+      - traefik.http.routers.git-md.middlewares=default-headers@file
+      - traefik.http.services.git-md.loadbalancer.server.port=3000
+      - traefik.http.routers.git-md.service=git-md
+      - traefik.docker.network=proxy
+
+volumes:
+  git-md_data:
