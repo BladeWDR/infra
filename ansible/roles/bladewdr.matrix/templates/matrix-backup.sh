@@ -18,8 +18,8 @@ if ! docker exec matrix-db \
         exit 1
 fi
 
-# Keep last 7 backups
-find "$BACKUP_DIR" -name "synapse_*.dump" -mtime +7 -delete
+# Keep last 3 backups
+find "$BACKUP_DIR" -name "synapse_*.dump" -mtime +3 -delete
 
 # Ping success
 curl -fsS --retry 3 "${HC_URL}" > /dev/null
