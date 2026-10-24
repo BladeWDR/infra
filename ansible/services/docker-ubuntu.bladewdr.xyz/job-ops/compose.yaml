@@ -1,0 +1,46 @@
+# ---
+#
+# services:
+#   job-ops:
+#     image: ghcr.io/dakheera47/job-ops:v0.13.1@sha256:42831cacd2021d65f808c9f0363e53d081fb55cb2626da7c9d233616618276c9
+#     container_name: job-ops
+#     networks:
+#       - proxy
+#     env_file:
+#       - .env
+#     volumes:
+#       # Persist database and generated PDFs
+#       - /home/{{ admin_username }}/docker/job-ops/data:/app/data
+#       # Persist Codex login/session data for app-server provider
+#       # - codex-home:/app/codex-home
+#     environment:
+#       # Server config
+#       - NODE_ENV=production
+#       - PORT=3001
+#       # Python path (uses system python in container)
+#       - PYTHON_PATH=/usr/bin/python3
+#       # Codex runtime home (stores auth and config)
+#       - CODEX_HOME=/app/codex-home
+#     restart: unless-stopped
+#     healthcheck:
+#       test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+#       interval: 30s
+#       timeout: 10s
+#       retries: 3
+#       start_period: 10s
+#     labels:
+#       - traefik.enable=true
+#       - traefik.http.routers.job-ops.entrypoints=https
+#       - traefik.http.routers.job-ops.rule=Host(`job-ops.{{ TRAEFIK_HOST_DOMAIN }}`)
+#       - traefik.http.routers.job-ops.tls=true
+#       - traefik.http.middlewares.job-ops=default-headers@file
+#       - traefik.http.middlewares.job-ops=https-redirectscheme@file
+#       - traefik.http.routers.job-ops.middlewares=default-headers@file
+#       - traefik.http.services.job-ops.loadbalancer.server.port=3001
+#       - traefik.http.routers.job-ops.service=job-ops
+#       - traefik.docker.network=proxy
+#
+# # Volumes for data persistence
+# volumes:
+#   data:
+#   # codex-home:
