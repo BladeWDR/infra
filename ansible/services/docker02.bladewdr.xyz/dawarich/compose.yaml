@@ -3,6 +3,7 @@ services:
   dawarich:
     image: freikin/dawarich:1.17.0@sha256:207dc86f8baa8fcf5b585f31186bf81b55added9c102a96f308d640e964ea60f
     container_name: ${DAWARICH_CONTAINER_NAME:-dawarich}
+    stop_grace_period: 60s
     restart: ${DAWARICH_RESTART:-unless-stopped}
     volumes:
       - /etc/localtime:/etc/localtime:ro
@@ -14,7 +15,6 @@ services:
     entrypoint: web-entrypoint.sh
     command: ['bin/rails', 'server', '-p', '3000', '-b', '::']
     environment:
-      - BACKGROUND_PROCESSING_CONCURRENCY=3
       - RAILS_ENV=production
       - REDIS_URL=redis://dawarich_redis:6379
       - DATABASE_HOST=dawarich_db
@@ -45,6 +45,9 @@ services:
       - SMTP_AUTHENTICATION=plain
       - SMTP_OPEN_TIMEOUT=25
       - SMTP_READ_TIMEOUT=25
+      - WEB_CONCURRENCY='0'
+      - SIDEKIQ_EMBEDDED='true'
+      - BACKGROUND_PROCESSING_CONCURRENCY=2
     logging:
       driver: "json-file"
       options:
@@ -76,76 +79,6 @@ services:
       # - traefik.http.services.dawarich.loadbalancer.server.scheme=https # enable if the service wants to connect over https
       - traefik.http.services.dawarich.loadbalancer.server.port=3000
       - autoheal=${DAWARICH_AUTOHEAL_ENABLED:-true}
-
-  dawarich_sidekiq:
-    image: freikin/dawarich:1.17.0@sha256:207dc86f8baa8fcf5b585f31186bf81b55added9c102a96f308d640e964ea60f
-    container_name: dawarich_sidekiq
-    volumes:
-      - /apps/dawarich/public:/var/app/public
-      - /apps/dawarich/watched:/var/app/tmp/imports/watched
-      - /apps/dawarich/storage:/var/app/storage
-    networks:
-      - traefik
-    stdin_open: true
-    tty: true
-    entrypoint: sidekiq-entrypoint.sh
-    command: ['bundle', 'exec', 'sidekiq']
-    restart: on-failure
-    environment:
-      - RAILS_ENV=production
-      - REDIS_URL=redis://dawarich_redis:6379
-      - DATABASE_HOST=dawarich_db
-      - DATABASE_PORT=5432
-      - DATABASE_USERNAME=${DAWARICH_POSTGRES_USER:-postgres}
-      - DATABASE_PASSWORD={{ DAWARICH_POSTGRES_PW }}
-      - DATABASE_NAME=dawarich_production
-      - DOMAIN=trips.bladewdr.xyz
-      - APPLICATION_HOSTS=localhost,::1,127.0.0.1,{{ DAWARICH_HOST_NAME }}.{{ APP0_HOST_DOMAIN }}
-      - BACKGROUND_PROCESSING_CONCURRENCY=3
-      - APPLICATION_PROTOCOL=http
-      - SELF_HOSTED=true
-      - PHOTON_API_HOST=dawarich_photon:2322
-      - PHOTON_API_USE_HTTPS=false
-      - PROMETHEUS_EXPORTER_ENABLED=false
-      - PROMETHEUS_EXPORTER_HOST=dawarich
-      - PROMETHEUS_EXPORTER_PORT=9394
-      - SECRET_KEY_BASE={{ DAWARICH_SECRET_KEY_BASE }}
-      - RAILS_LOG_TO_STDOUT="true"
-      - SMTP_SERVER={{ SMTP_SERVER_ADDRESS }}
-      - SMTP_PORT=587
-      - SMTP_USERNAME={{ SMTP_USERNAME }}
-      - SMTP_PASSWORD={{ SMTP_PASSWORD }}
-      - SMTP_FROM=Dawarich <{{ SMTP_FROM }}>
-      - SMTP_DOMAIN={{ SMTP_DOMAIN }}
-      - SMTP_AUTHENTICATION=plain
-      - SMTP_OPEN_TIMEOUT=25
-      - SMTP_READ_TIMEOUT=25
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "100m"
-        max-file: "5"
-    healthcheck:
-      test: [ "CMD-SHELL", "pgrep -f sidekiq" ]
-      interval: 10s
-      retries: 30
-      start_period: 30s
-      timeout: 10s
-    depends_on:
-      dawarich_db:
-        condition: service_healthy
-        restart: true
-      dawarich_redis:
-        condition: service_healthy
-        restart: true
-      dawarich:
-        condition: service_healthy
-        restart: true
-    deploy:
-      resources:
-        limits:
-          cpus: '0.50'
-          memory: '2G'
 
   dawarich_redis:
     image: redis:8.10-alpine@sha256:0bf6577d7774e592b29d093e3ac9390eb91e13d72c21e506afce736de5e0eeb0
