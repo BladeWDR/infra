@@ -11,7 +11,7 @@ volumes:
 
 services:
   paperless-ai:
-    image: clusterzx/paperless-ai:${PAPERLESS_AI_DOCKER_TAG:-latest}
+    image: clusterzx/paperless-ai:3.0.9@sha256:2b65888163fd59716f1c8285b31c5bd0b30c9c3c192c42b516688e3887d4ba60
     container_name: ${PAPERLESS_AI_CONTAINER_NAME:-paperless-ai}
     restart: ${PAPERLESS_AI_RESTART:-unless-stopped}
     mem_limit: ${PAPERLESS_AI_MEM_LIMIT:-200g}
@@ -77,7 +77,7 @@ services:
       - proxy
 
   paperless-ngx-postgres:
-    image: ghcr.io/paperless-ngx/paperless-ngx:${PAPERLESS_NGX_DOCKER_TAG:-latest}
+    image: ghcr.io/paperless-ngx/paperless-ngx:3.3.4@sha256:9bc6e8248891bcfa6f52fffe8b81e4ea8cae75790c3ec1b9906961a7ba55c969 
     container_name: ${PAPERLESS_NGX_CONTAINER_NAME:-paperless-ngx-postgres}
     restart: ${PAPERLESS_NGX_RESTART:-unless-stopped}
     env_file:
@@ -106,7 +106,7 @@ services:
       - PAPERLESS_TIKA_ENABLED=1
       - PAPERLESS_TIKA_GOTENBERG_ENDPOINT=http://gotenberg:3000
       - PAPERLESS_TIKA_ENDPOINT=http://tika:9998
-      - PAPERLESS_DBENGINE=${PAPERLESS_DB_ENGINE:-postgres}
+      - PAPERLESS_DBENGINE=postgresql
       # - PAPERLESS_DBPORT=${PAPERLESS_DB_PORT:-3306}
       - PAPERLESS_DBHOST=${PAPERLESS_DB_HOST:-db}
       - PAPERLESS_DBNAME=${PAPERLESS_DB_NAME:-paperless}
@@ -116,6 +116,7 @@ services:
       - PAPERLESS_ADMIN_MAIL=${PAPERLESS_ADMINMAIL:-admin@yourmail.com}
       - PAPERLESS_ADMIN_PASSWORD=${PAPERLESS_ADMINPASSWORD:-admin}
       - PAPERLESS_CONSUMER_POLLING=300
+      - PAPERLESS_SECRET_KEY={{ paperless_secret_key }}
       - USERMAP_UID=1000
       - USERMAP_GID=1000
     labels:
