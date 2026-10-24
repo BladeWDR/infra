@@ -160,25 +160,40 @@ else
     fi
   else
     # Automatic detection sequence:
-    # 1. Local changes (modified, staged, or untracked new services)
-    LOCAL_SERVICES=$(get_working_tree_files | grep -E '(^|/)services/' || true)
-    if [[ -n "$LOCAL_SERVICES" ]]; then
-      DETECT_SOURCE="local changes (modified, staged, or untracked)"
-      CHANGED_FILES="$LOCAL_SERVICES"
-    else
-      # 2. Check ORIG_HEAD if it differs from HEAD (meaning recent pull/merge)
-      ORIG_HEAD_VAL=$(git -C "$GIT_ROOT" rev-parse --verify ORIG_HEAD 2>/dev/null || true)
-      HEAD_VAL=$(git -C "$GIT_ROOT" rev-parse --verify HEAD 2>/dev/null || true)
-      
-      if [[ -n "$ORIG_HEAD_VAL" && "$ORIG_HEAD_VAL" != "$HEAD_VAL" ]]; then
-        DETECT_SOURCE="latest pull/merge (ORIG_HEAD..HEAD)"
-        CHANGED_FILES=$(git -C "$GIT_ROOT" diff --name-only ORIG_HEAD HEAD)
-      else
-        # 3. Fallback to latest commit
-        DETECT_SOURCE="latest commit (HEAD~1..HEAD)"
-        CHANGED_FILES=$(git -C "$GIT_ROOT" diff --name-only HEAD~1 HEAD)
+    DETECT_SOURCES=()
+    COMBINED_FILES=()
+
+    # 1. Check for pulled changes if ORIG_HEAD differs from HEAD
+    ORIG_HEAD_VAL=$(git -C "$GIT_ROOT" rev-parse --verify ORIG_HEAD 2>/dev/null || true)
+    HEAD_VAL=$(git -C "$GIT_ROOT" rev-parse --verify HEAD 2>/dev/null || true)
+    
+    if [[ -n "$ORIG_HEAD_VAL" && "$ORIG_HEAD_VAL" != "$HEAD_VAL" ]]; then
+      PULLED_FILES=$(git -C "$GIT_ROOT" diff --name-only ORIG_HEAD HEAD 2>/dev/null || true)
+      PULLED_SERVICES=$(echo "$PULLED_FILES" | grep -E '(^|/)services/' || true)
+      if [[ -n "$PULLED_SERVICES" ]]; then
+        DETECT_SOURCES+=("latest git pull (ORIG_HEAD..HEAD)")
+        COMBINED_FILES+=("$PULLED_SERVICES")
       fi
     fi
+
+    # 2. Check for local changes (modified, staged, or untracked)
+    LOCAL_FILES=$(get_working_tree_files)
+    LOCAL_SERVICES=$(echo "$LOCAL_FILES" | grep -E '(^|/)services/' || true)
+    if [[ -n "$LOCAL_SERVICES" ]]; then
+      DETECT_SOURCES+=("local working tree changes")
+      COMBINED_FILES+=("$LOCAL_SERVICES")
+    fi
+
+    # 3. Fallback to latest commit if neither yielded any services
+    if [[ ${#COMBINED_FILES[@]} -eq 0 ]]; then
+      LATEST_COMMIT_FILES=$(git -C "$GIT_ROOT" diff --name-only HEAD~1 HEAD 2>/dev/null || true)
+      DETECT_SOURCES+=("latest commit (HEAD~1..HEAD)")
+      COMBINED_FILES+=("$LATEST_COMMIT_FILES")
+    fi
+
+    DETECT_SOURCE=$(printf " + %s" "${DETECT_SOURCES[@]}")
+    DETECT_SOURCE="${DETECT_SOURCE# + }"
+    CHANGED_FILES=$(printf "%s\n" "${COMBINED_FILES[@]}" | sort -u)
   fi
 
   echo "=========================================================="
