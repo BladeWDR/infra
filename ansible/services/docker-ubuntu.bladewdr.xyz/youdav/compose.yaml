@@ -1,0 +1,101 @@
+---
+
+services:
+  yourdav:
+    image: ghcr.io/fuzzymistborn/yourdav:0.6.0@sha256:9ad385cc444559b0dcf35e75dd51bed2bdc58e66a30308a7181ab29dd4aec0da 
+    container_name: yourdav
+    restart: unless-stopped
+    depends_on:
+      radicale:
+        condition: service_healthy
+    networks:
+      - proxy
+    environment:
+      - SESSION_SECRET={{ yourdav_session_secret }}
+      # Comma-separated allowlist of CalDAV server hostnames this app is
+      # permitted to talk to -- see server/src/dav/hostAllowlist.ts. Unset
+      # (the default) allows any host, which is fine for a trusted personal
+      # instance but worth locking down if this is reachable more broadly.
+      - ALLOWED_DAV_HOSTS=${ALLOWED_DAV_HOSTS:-}
+      - TRUST_PROXY=true
+      - LOGIN_RATE_LIMIT_MAX=${LOGIN_RATE_LIMIT_MAX:-10}
+      - OUTBOUND_TIMEOUT_MS=${OUTBOUND_TIMEOUT_MS:-30000}
+      - SESSION_TTL_DAYS=${SESSION_TTL_DAYS:-1}
+      - CACHE_ENABLED=${CACHE_ENABLED:-false}
+      - SQLITE_PATH=/app/data/cache.db
+      - CACHE_SYNC_TTL_MS=${CACHE_SYNC_TTL_MS:-30000}
+      - DEFAULT_TIMEZONE={{ host_timezone }}
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.yourdav.entrypoints=https
+      - traefik.http.routers.yourdav.rule=Host(`calendar.{{ APP0_HOST_DOMAIN }}`)
+      - traefik.http.routers.yourdav.tls=true
+      - traefik.http.routers.yourdav.middlewares=default-headers@file
+      - traefik.http.services.yourdav.loadbalancer.server.port=3000
+      - traefik.http.routers.yourdav.service=yourdav
+      - traefik.docker.network=proxy
+    # volumes:
+    #   # Only load-bearing when CACHE_ENABLED=true -- otherwise DavCalendarStore
+    #   # is used directly with no local state to persist (see AGENTS.md's
+    #   # "SQLite read-cache" section).
+    #   - yourdav-data:/app/data
+
+  radicale:
+    image: tomsquest/docker-radicale:3.8.3.0@sha256:a3b1b452f4bc3d1aee43015b85bc2d9ee5de0ff7e96d5d2b47f1d889aa682409
+    container_name: radicale
+    environment:
+      - RADICALE_CONFIG_SERVER_HOSTS=0.0.0.0:5232
+      - RADICALE_CONFIG_SERVER_MAX_CONNECTIONS=20
+      - RADICALE_CONFIG_SERVER_MAX_CONTENT_LENGTH=100000000
+      - RADICALE_CONFIG_SERVER_TIMEOUT=30
+      # --- Authentication ---
+      - RADICALE_CONFIG_AUTH_TYPE=htpasswd
+      - RADICALE_CONFIG_AUTH_HTPASSWD_FILENAME=/data/users
+      - RADICALE_CONFIG_AUTH_HTPASSWD_ENCRYPTION=bcrypt
+      # --- Permissions & Access Control ---
+      - RADICALE_CONFIG_RIGHTS_TYPE=owner_only
+      # --- Storage ---
+      - RADICALE_CONFIG_STORAGE_FILESYSTEM_FOLDER=/data/collections
+      # --- Web UI ---
+      # Set to 'internal' for Radicale's built-in UI at '/', or 'none' if only using YourDAV
+      - RADICALE_CONFIG_WEB_TYPE=internal
+      # --- Logging ---
+      - RADICALE_CONFIG_LOGGING_LEVEL=info
+    volumes:
+      - /home/{{ admin_username }}/docker/radicale:/data
+    networks:
+      - proxy
+    init: true
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - SETUID
+      - SETGID
+      - CHOWN
+      - KILL
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          pids: 50
+    healthcheck:
+      test: curl -f http://127.0.0.1:5232 || exit 1
+      interval: 30s
+      retries: 3
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.radicale.entrypoints=https
+      - traefik.http.routers.radicale.rule=Host(`radicale.{{ APP0_HOST_DOMAIN }}`)
+      - traefik.http.routers.radicale.tls=true
+      - traefik.http.services.radicale.loadbalancer.server.port=5232
+      - traefik.http.routers.radicale.service=radicale
+      - traefik.docker.network=proxy
+      # CalDAV discovery redirect for clients (iOS/macOS)
+      - traefik.http.middlewares.radicale-wellknown.redirectregex.regex=^https://radicale\.{{ APP0_HOST_DOMAIN }}/\.well-known/(caldav|carddav)
+      - traefik.http.middlewares.radicale-wellknown.redirectregex.replacement=https://radicale.{{ APP0_HOST_DOMAIN }}/
+      - traefik.http.middlewares.radicale-wellknown.redirectregex.permanent=true
+      - traefik.http.routers.radicale.middlewares=default-headers@file,radicale-wellknown
