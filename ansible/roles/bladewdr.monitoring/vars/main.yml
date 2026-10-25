@@ -1,9 +1,6 @@
 ---
 alloy_docker_config_dir: /apps/alloy
 
-prometheus_servers:
-  - dns02.internal.bladewdr.xyz
-
 grafana_servers:
   - dns02.internal.bladewdr.xyz
 

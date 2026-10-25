@@ -22,7 +22,7 @@
 - name: Include Prometheus tasks.
   ansible.builtin.include_tasks:
     file: Prometheus.yml
-  when: "inventory_hostname in prometheus_servers"
+  when: "inventory_hostname in grafana_servers"
 
 - name: Include Grafana tasks.
   ansible.builtin.include_tasks:

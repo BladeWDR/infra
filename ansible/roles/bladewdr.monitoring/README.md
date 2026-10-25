@@ -11,4 +11,4 @@ Right now it sets up the following:
 - Prometheus
 - AlertManager
 
-You need to set a list variable called `prometheus_servers` with the list of your Prometheus endpoints.
+You need to set a list variable called `grafana_servers` with the list of your Grafana and Prometheus endpoints.
