@@ -11,6 +11,7 @@ services:
     network_mode: host
     restart: unless-stopped
     volumes:
+      - /proc:/host/proc:ro
       - /var/run/docker.sock:/var/run/docker.sock
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /apps/alloy/config:/etc/alloy

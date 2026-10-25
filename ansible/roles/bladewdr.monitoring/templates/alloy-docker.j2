@@ -28,7 +28,7 @@ discovery.relabel "integrations_process_exporter" {
 }
 
 prometheus.exporter.unix "local_system" {
-  procfs_path = "/proc"
+  procfs_path = "/host/proc"
     sysfs_path  = "/sys"
     rootfs_path = "{{ alloy_rootfs_path }}"
 
@@ -56,7 +56,7 @@ prometheus.exporter.unix "local_system" {
 }
 
 prometheus.exporter.process "local_processes" {
-  procfs_path = "/proc"
+  procfs_path = "/host/proc"
   track_children = true
   track_threads  = false
 
