@@ -20,7 +20,7 @@ adguard03.bladewdr.xyz nagios_host_template_list=deb-dns nagios_hostgroups=dns
 [docker]
 dns02.internal.bladewdr.xyz
 adguard03.bladewdr.xyz
-app03.bladewdr.xyz nagios_host_template_list=deb-docker nagios_hostgroups=docker
+; app03.bladewdr.xyz nagios_host_template_list=deb-docker nagios_hostgroups=docker
 docker01.bladewdr.xyz
 docker02.bladewdr.xyz
 forgejo.bladewdr.xyz nagios_host_template_list=deb-docker nagios_hostgroups=docker
@@ -39,7 +39,7 @@ nagios_hostgroups=docker
 
 [cloud]
 app01.bladewdr.xyz
-app03.bladewdr.xyz
+; app03.bladewdr.xyz
 adguard03.bladewdr.xyz
 
 [lan]
@@ -66,7 +66,7 @@ docker-ubuntu.bladewdr.xyz
 deviant.bladewdr.xyz tailscale_args='--accept-dns=false --accept-routes=false'
 onramp.bladewdr.xyz
 
-[prometheus]
+[grafana]
 dns02.internal.bladewdr.xyz
 
 [nextcloud]
@@ -82,11 +82,11 @@ cerberus.bladewdr.xyz
 nagios_host_template_list=deb-fileserver
 nagios_hostgroups=deb-nas
 
-[proxmox]
-pve01.bladewdr.xyz
-pve02.bladewdr.xyz
-pve03.bladewdr.xyz
-pve04.bladewdr.xyz
+; [proxmox]
+; pve01.bladewdr.xyz
+; pve02.bladewdr.xyz
+; pve03.bladewdr.xyz
+; pve04.bladewdr.xyz
 
 [lxc_wireguard]
 ovh-wireguard.bladewdr.xyz
@@ -95,9 +95,9 @@ ovh-wireguard.bladewdr.xyz
 certbot
 dns
 docker
+grafana
 lan
 nagios
 nas
-prometheus
 unifi
 webservers
