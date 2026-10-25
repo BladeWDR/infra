@@ -163,16 +163,6 @@ discovery.relabel "logs_integrations_docker" {
     }
 }
 
-local.file_match "unifi_logs" {
-  path_targets = [{"__path__" = "/var/log/unifi/*.log", "job" = "unifi", "host" = constants.hostname}]
-}
-
-loki.source.file "unifi_logs" {
-  targets = local.file_match.unifi_logs.targets
-  forward_to = [loki.write.loki.receiver]
-  tail_from_end = true
-}
-
 loki.source.docker "docker" {
   host       = "unix:///var/run/docker.sock"
   targets    = discovery.docker.docker.targets
