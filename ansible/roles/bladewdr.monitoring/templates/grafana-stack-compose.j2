@@ -75,8 +75,6 @@ services:
     networks:
       - grafana_net
       - traefik
-    ports:
-      - "3100:3100"
     volumes:
       - /apps/grafana-stack/loki/config.yaml:/etc/loki/config.yaml:ro
       - /mnt/logdata/logs:/loki:rw
@@ -158,8 +156,7 @@ services:
     user: "1000:1000"
     networks:
       - grafana_net
-    ports:
-      - 9090:9090/tcp
+      - traefik
     environment:
       - TZ={{ host_timezone }}
     security_opt:
@@ -168,6 +165,17 @@ services:
       - /apps/grafana-stack/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - /apps/grafana-stack/prometheus/rules.yml:/etc/prometheus/rules.yml:ro
       - /mnt/logdata/prometheus_data:/prometheus
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.prometheus.entrypoints=websecure
+      - traefik.http.routers.prometheus.rule=Host(`prometheus.{{ TRAEFIK_HOST_DOMAIN }}`)
+      - traefik.http.routers.prometheus.tls=true
+      - traefik.http.middlewares.prometheus=default-headers@file
+      - traefik.http.middlewares.prometheus=https-redirectscheme@file
+      - traefik.http.routers.prometheus.middlewares=default-headers@file
+      - traefik.http.services.prometheus.loadbalancer.server.port=9090
+      - traefik.http.routers.prometheus.service=prometheus
+      - traefik.docker.network=traefik
     command:
       - --config.file=/etc/prometheus/prometheus.yml
       - --storage.tsdb.path=/prometheus
