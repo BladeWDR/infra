@@ -53,7 +53,7 @@ loki.relabel "journal" {
 
   rule {
     target_label = "host"
-    replacement  = constants.hostname
+    replacement  = "{{ monitoring_host_label }}"
   }
 
   rule {

@@ -29,6 +29,7 @@ alloy_rootfs_path: /
 alloy_user_groups:
   - systemd-journal
   - adm
+monitoring_host_label: "{{ inventory_hostname_short }}"
 
 # Checkmk
 checkmk_agent_version: "2.5.0p8"

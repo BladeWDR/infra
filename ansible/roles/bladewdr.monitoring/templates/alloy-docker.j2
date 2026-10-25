@@ -5,7 +5,7 @@ discovery.relabel "integrations_node_exporter" {
   rule {
     // Set the instance label to the hostname of the machine
     target_label = "host"
-    replacement  = constants.hostname
+    replacement  = "{{ monitoring_host_label }}"
   }
 
   rule {
@@ -19,7 +19,7 @@ discovery.relabel "integrations_process_exporter" {
   targets = prometheus.exporter.process.local_processes.targets
   rule {
     target_label = "host"
-    replacement  = constants.hostname
+    replacement  = "{{ monitoring_host_label }}"
   }
   rule {
     target_label = "job"
@@ -108,19 +108,19 @@ prometheus.relabel "cadvisor" {
   rule {
     source_labels = ["__address__"]
     target_label = "instance"
-    replacement  = constants.hostname
+    replacement  = "{{ monitoring_host_label }}"
   }
   
   rule {
     target_label = "host"
-    replacement  = constants.hostname
+    replacement  = "{{ monitoring_host_label }}"
   }
 }
 
 // Define where to send the metrics for storage
 prometheus.remote_write "prometheus_server" {
   endpoint {
-    url = "http://{{ prometheus_endpoint }}:9090/api/v1/write"
+    url = "https://{{ prometheus_endpoint }}/api/v1/write"
   }
 }
 
@@ -139,12 +139,12 @@ discovery.relabel "logs_integrations_docker" {
 
      rule {
         target_label = "instance"
-        replacement  = constants.hostname
+        replacement  = "{{ monitoring_host_label }}"
     }
 
     rule {
       target_label = "host"
-      replacement = constants.hostname
+      replacement = "{{ monitoring_host_label }}"
     }
 
     rule {
@@ -184,7 +184,7 @@ loki.relabel "syslog" {
 
   rule {
     target_label = "host"
-    replacement  = constants.hostname
+    replacement  = "{{ monitoring_host_label }}"
   }
 
   rule {
