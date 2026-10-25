@@ -5,3 +5,4 @@ tailscale_tags:
   - docker
   - proxy
   - technitium
+  - grafana
