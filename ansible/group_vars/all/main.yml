@@ -26,6 +26,9 @@ docker_compose_generator_gid: 1000
 
 # Grafana Alloy settings
 alloy_rootfs_path: /
+alloy_user_groups:
+  - systemd-journal
+  - adm
 
 # Checkmk
 checkmk_agent_version: "2.5.0p8"
