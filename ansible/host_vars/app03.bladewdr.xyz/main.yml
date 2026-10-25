@@ -1,2 +1,2 @@
 ---
-tailscale_args: "--accept-dns=false --accept-routes=true"
+tailscale_args: "--accept-dns=true --accept-routes=true"
