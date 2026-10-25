@@ -79,4 +79,9 @@
         mode: '0644'
       notify: reload containers
 
+    - name: Ensure Alloy Docker stack is running.
+      community.docker.docker_compose_v2:
+        project_src: "{{ alloy_docker_config_dir }}"
+        state: present
+
 
