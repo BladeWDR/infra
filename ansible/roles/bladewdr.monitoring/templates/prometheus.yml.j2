@@ -27,7 +27,18 @@ scrape_configs:
     scrape_interval: 90s
     scrape_timeout: 60s
     static_configs:
-      - targets: [cerberus.bladewdr.xyz:9134] 
+      - targets:
+{% set zfs_targets = [] %}
+{% for host in all_hosts %}
+{%   if hostvars[host].has_zfs | default(false) or host in groups['nas'] | default([]) or host == 'cerberus.bladewdr.xyz' %}
+{%     if (host ~ ':9134') not in zfs_targets %}
+{%       set _ = zfs_targets.append(host ~ ':9134') %}
+{%     endif %}
+{%   endif %}
+{% endfor %}
+{% for target in zfs_targets %}
+          - '{{ target }}'
+{% endfor %} 
     metric_relabel_configs:
       - source_labels: ['name']
         regex: ^([^@]*).*$
