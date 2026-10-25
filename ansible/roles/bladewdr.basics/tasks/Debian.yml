@@ -44,10 +44,12 @@
     owner: root
     group: root
   notify: restart timesyncd
+  when: ansible_facts['distribution_version'] != '26.04'
 
 - name: Set timezone using timedatectl.
   ansible.builtin.command: "timedatectl set-timezone {{ timezone }}"
   changed_when: false
+  when: ansible_facts['distribution_version'] != '26.04'
 
 - name: Check if Homebrew directory already exists.
   ansible.builtin.stat:
