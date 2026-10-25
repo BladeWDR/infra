@@ -57,6 +57,11 @@ loki.relabel "journal" {
   }
 
   rule {
+    target_label = "instance"
+    replacement  = "{{ monitoring_host_label }}"
+  }
+
+  rule {
     source_labels = ["__journal__systemd_unit"]
     target_label  = "unit"
   }

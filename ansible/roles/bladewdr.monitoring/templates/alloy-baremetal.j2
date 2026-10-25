@@ -9,6 +9,11 @@ discovery.relabel "integrations_node_exporter" {
   }
 
   rule {
+    target_label = "instance"
+    replacement  = "{{ monitoring_host_label }}"
+  }
+
+  rule {
     // Set a standard job name for all node_exporter metrics
     target_label = "job"
     replacement = "node_exporter"
@@ -19,6 +24,11 @@ discovery.relabel "integrations_process_exporter" {
   targets = prometheus.exporter.process.local_processes.targets
   rule {
     target_label = "host"
+    replacement  = "{{ monitoring_host_label }}"
+  }
+
+  rule {
+    target_label = "instance"
     replacement  = "{{ monitoring_host_label }}"
   }
   rule {
@@ -87,7 +97,7 @@ prometheus.remote_write "prometheus_server" {
 }
 
 local.file_match "unifi_logs" {
-  path_targets = [{"__path__" = "/var/log/unifi/**/*.log", "job" = "unifi", "host" = "{{ monitoring_host_label }}"}]
+  path_targets = [{"__path__" = "/var/log/unifi/**/*.log", "job" = "unifi", "host" = "{{ monitoring_host_label }}", "instance" = "{{ monitoring_host_label }}"}]
 }
 
 loki.source.file "unifi_logs" {
@@ -110,6 +120,11 @@ loki.relabel "syslog" {
 
   rule {
     target_label = "host"
+    replacement  = "{{ monitoring_host_label }}"
+  }
+
+  rule {
+    target_label = "instance"
     replacement  = "{{ monitoring_host_label }}"
   }
 

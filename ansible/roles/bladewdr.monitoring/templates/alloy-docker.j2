@@ -9,6 +9,11 @@ discovery.relabel "integrations_node_exporter" {
   }
 
   rule {
+    target_label = "instance"
+    replacement  = "{{ monitoring_host_label }}"
+  }
+
+  rule {
     // Set a standard job name for all node_exporter metrics
     target_label = "job"
     replacement = "node_exporter"
@@ -19,6 +24,10 @@ discovery.relabel "integrations_process_exporter" {
   targets = prometheus.exporter.process.local_processes.targets
   rule {
     target_label = "host"
+    replacement  = "{{ monitoring_host_label }}"
+  }
+  rule {
+    target_label = "instance"
     replacement  = "{{ monitoring_host_label }}"
   }
   rule {
@@ -184,6 +193,11 @@ loki.relabel "syslog" {
 
   rule {
     target_label = "host"
+    replacement  = "{{ monitoring_host_label }}"
+  }
+
+  rule {
+    target_label = "instance"
     replacement  = "{{ monitoring_host_label }}"
   }
 
