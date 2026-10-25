@@ -48,11 +48,26 @@ loki.relabel "journal" {
 
   rule {
     target_label = "job"
-    replacement  = "journal"
+    replacement  = "syslog"
   }
 
   rule {
-    target_label = "hostname"
+    target_label = "host"
     replacement  = constants.hostname
+  }
+
+  rule {
+    source_labels = ["__journal__systemd_unit"]
+    target_label  = "unit"
+  }
+
+  rule {
+    source_labels = ["__journal_syslog_identifier"]
+    target_label  = "syslog_identifier"
+  }
+
+  rule {
+    source_labels = ["__journal_priority_keyword"]
+    target_label  = "level"
   }
 }
