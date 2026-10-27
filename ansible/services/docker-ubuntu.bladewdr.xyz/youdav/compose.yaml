@@ -2,7 +2,7 @@
 
 services:
   yourdav:
-    image: ghcr.io/fuzzymistborn/yourdav:0.7.1@sha256:781e732ba366b7fa102929ac4f5bf99f207209c6b46bd68c786bea4e4234fc78 
+    image: ghcr.io/fuzzymistborn/yourdav:0.7.2@sha256:52e8e23e043c3d7d11c3d41a19d6e8a03eb7741ec1ad7a32c5dc024b321c375e 
     container_name: yourdav
     restart: unless-stopped
     depends_on:
