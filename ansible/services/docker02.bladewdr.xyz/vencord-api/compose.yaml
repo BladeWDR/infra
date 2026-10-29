@@ -2,7 +2,7 @@
 
 services:
   vencord-redis:
-    image: redis:alpine3.22@sha256:f9b3b74607c14a568cf0bda340432ca7ffd0682e3a53183412a8236974bdf69e
+    image: redis:alpine3.22@sha256:3e393dc9c57e628ebd5e0fc0bc4524f83632b6b873503d619e856af9322d4ef7
     container_name: vencord-redis
     networks:
       - traefik
