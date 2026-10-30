@@ -2,7 +2,7 @@
 
 services:
   dozzle:
-    image: amir20/dozzle:v11.3.5-alpine@sha256:b5b72d78daba9c75b94ec783989e8cb8b04dd42f1e689a7d33cf85b3ca3f67ce
+    image: amir20/dozzle:v11.4.0-alpine@sha256:8754a9235388911646a29aab6d382be6cf2e8d4fc0ff9ef908225a173cf52352
     container_name: dozzle
     networks:
       - traefik
