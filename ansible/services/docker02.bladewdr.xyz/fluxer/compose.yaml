@@ -138,7 +138,7 @@ services:
       - nats-data:/data
 
   meilisearch:
-    image: getmeili/meilisearch:v1.55@sha256:ff546679970126f8822e15d1b6a06bfbff1f2ce2e43f810cfb5258012f92de5c
+    image: getmeili/meilisearch:v1.56@sha256:b7ba431bf6f9b26cc86132798f3640964147a699cf23f026b74c6c05dbb1d60d
     container_name: fluxer-meilisearch
     restart: unless-stopped
     networks: [traefik]
