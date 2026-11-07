@@ -1,7 +1,7 @@
 ---
 services:
   dawarich:
-    image: freikin/dawarich:1.19.0@sha256:d9385242202ae385a5d8064f41a59a0b58218399e60e7e499d2a6afb449bc304
+    image: freikin/dawarich:1.22.0@sha256:b8ee8d9fdff92a9d6ca570f98e0e875624f4bfb24b61363f8246bba124d5849d
     container_name: ${DAWARICH_CONTAINER_NAME:-dawarich}
     stop_grace_period: 60s
     restart: ${DAWARICH_RESTART:-unless-stopped}
