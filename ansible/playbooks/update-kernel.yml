@@ -1,0 +1,57 @@
+---
+- name: Update Ubuntu and Debian kernels and reboot if needed.
+  hosts: all
+  become: true
+  serial: 1
+  tasks:
+
+    - name: Upgrade kernel on Ubuntu and Debian.
+      when: ansible_facts['distribution'] in ['Ubuntu', 'Debian']
+      block:
+        - name: Upgrade installed kernel packages.
+          ansible.builtin.apt:
+            name: "{{ kernel_packages[ansible_facts['distribution']] }}"
+            state: latest
+            only_upgrade: true
+            update_cache: true
+            cache_valid_time: 3600
+          vars:
+            kernel_packages:
+              Debian:
+                - "linux-image-*"
+                - "linux-headers-*"
+              Ubuntu:
+                - "linux-generic*"
+                - "linux-image-*"
+                - "linux-headers-*"
+                - "linux-modules-*"
+                - "linux-virtual*"
+                - "linux-aws*"
+                - "linux-azure*"
+                - "linux-gcp*"
+                - "linux-kvm*"
+                - "linux-oracle*"
+          register: kernel_update
+
+        - name: Check if a reboot is required
+          ansible.builtin.stat:
+            path: /var/run/reboot-required
+          register: reboot_required_file
+
+        - name: Reboot node to apply new kernel
+          ansible.builtin.reboot:
+            msg: "Rebooting via Ansible for Ubuntu kernel update"
+            reboot_timeout: 600
+          when:
+            - kernel_update.changed
+            - reboot_required_file.stat.exists
+
+        - name: Clean up old unused kernels
+          ansible.builtin.apt:
+            autoremove: true
+            purge: true
+
+      rescue:
+        - name: Log kernel update failure and continue to next host.
+          ansible.builtin.debug:
+            msg: "Kernel update failed on {{ inventory_hostname }}: {{ ansible_failed_result.msg | default(ansible_failed_result) }}"
