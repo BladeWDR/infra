@@ -1,0 +1,60 @@
+---
+services:
+  traefik:
+    image: traefik:v3.7.17@sha256:30ff62491aacdb862ceb8c9edcf2627da638d7deafdd4b6dab32fe34f8aa3e90
+    container_name: ${TRAEFIK_CONTAINER_NAME:-traefik}
+    restart: ${TRAEFIK_RESTART:-unless-stopped}
+    mem_limit: ${TRAEFIK_MEM_LIMIT:-100m}
+    networks:
+      - traefik
+    extra_hosts:
+      - host.docker.internal:172.17.0.1
+    ports:
+      - 80:80
+      - 443:443
+    environment:
+      - CF_API_EMAIL={{ CF_API_EMAIL }}
+      - CF_DNS_API_TOKEN={{ CF_DNS_API_TOKEN }}
+    volumes:
+      - /apps/traefik/letsencrypt:/letsencrypt
+      - /apps/traefik/data:/data
+      - /etc/localtime:/etc/localtime:ro
+      - /usr/share/zoneinfo:/usr/share/zoneinfo:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    command:
+      - --api
+      - --api.insecure=${TRAEFIK_API_INSECURE:-false}
+      - --api.dashboard=false
+      - --log.level=ERROR
+      - --accesslog=true
+      - --entryPoints.metrics.address=:8082
+      - --metrics.prometheus.entryPoint=metrics
+      - --providers.docker
+      - --providers.docker.exposedByDefault=false
+      - --providers.file.watch=true
+      - --providers.file.directory=/data
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.web.http.redirections.entrypoint.to=websecure
+      - --entrypoints.web.http.redirections.entrypoint.scheme=https
+      - --entrypoints.websecure.http.tls=true
+      - --entrypoints.websecure.http.tls.certResolver=letsencrypt
+      - --entrypoints.websecure.http.tls.domains[0].main={{ APP0_HOST_DOMAIN }}
+      - --entrypoints.websecure.http.tls.domains[0].sans=*.{{ APP0_HOST_DOMAIN }}
+      - --entrypoints.websecure.http.tls.domains[1].main=ssb-tech.net
+      - --entrypoints.websecure.http.tls.domains[1].sans=*.ssb-tech.net
+      - --entrypoints.websecure.http.tls.domains[2].main=scottbarning.com
+      - --entrypoints.websecure.http.tls.domains[2].sans=*.scottbarning.com
+      - --serverstransport.insecureskipverify=true
+      - --certificatesresolvers.letsencrypt.acme.dnschallenge=true
+      - --certificatesresolvers.letsencrypt.acme.dnschallenge.provider=${DNS_CHALLENGE_PROVIDER:-cloudflare}
+      - --certificatesresolvers.letsencrypt.acme.email={{ CF_API_EMAIL }}
+      - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
+      - --certificatesResolvers.letsencrypt.acme.dnsChallenge.delayBeforeCheck=120
+      - --certificatesresolvers.letsencrypt.acme.dnschallenge.resolvers=1.1.1.1:53,1.0.0.1:53
+      - --certificatesresolvers.letsencrypt.acme.caserver=https://acme-v02.api.letsencrypt.org/directory
+
+networks:
+  traefik:
+    name: traefik
+    driver: bridge

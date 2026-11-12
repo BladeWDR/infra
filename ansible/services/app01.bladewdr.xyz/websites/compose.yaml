@@ -1,0 +1,36 @@
+---
+services:
+  websites:
+    image: nginx:stable@sha256:42c68eab6f7e22611786a9fe1d1c019e275c50185bd54b8f75dc2b9184322703
+    container_name: websites-nginx
+    restart: unless-stopped
+    mem_limit: 50m
+    command: /bin/sh -c "usermod -aG www-data nginx && exec /docker-entrypoint.sh nginx -g 'daemon off;'"
+    networks:
+      - traefik
+    volumes:
+      - /var/www:/var/www:ro
+      - /apps/websites/conf.d:/etc/nginx/conf.d:ro
+      - /etc/apache2/.htpasswd:/etc/nginx/.htpasswd:ro
+      - /etc/localtime:/etc/localtime:ro
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik
+      - traefik.http.services.websites.loadbalancer.server.port=80
+      - traefik.http.routers.blog.entrypoints=websecure
+      - traefik.http.routers.blog.rule=Host(`blog.ssb-tech.net`) || Host(`www.blog.ssb-tech.net`)
+      - traefik.http.routers.blog.middlewares=default-headers@file
+      - traefik.http.routers.blog.service=websites
+      - traefik.http.routers.links.entrypoints=websecure
+      - traefik.http.routers.links.rule=Host(`links.{{ APP0_HOST_DOMAIN }}`) || Host(`www.links.{{ APP0_HOST_DOMAIN }}`)
+      - traefik.http.routers.links.middlewares=default-headers@file
+      - traefik.http.routers.links.service=websites
+      - traefik.http.routers.scottbarning.entrypoints=websecure
+      - traefik.http.routers.scottbarning.rule=Host(`scottbarning.com`) || Host(`www.scottbarning.com`)
+      - traefik.http.routers.scottbarning.middlewares=default-headers@file
+      - traefik.http.routers.scottbarning.service=websites
+      - traefik.http.routers.ssb-tech.entrypoints=websecure
+      - traefik.http.routers.ssb-tech.rule=Host(`ssb-tech.net`)
+      - traefik.http.routers.ssb-tech.middlewares=default-headers@file
+      - traefik.http.routers.ssb-tech.service=websites
+
