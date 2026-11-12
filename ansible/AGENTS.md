@@ -123,4 +123,6 @@ Whenever the user corrects an agent or provides guidance on workflows, conventio
 
 - **Supply Chain Security vs. Auto-Merge**: Do not enable blind automerge for Docker dependency updates. Manual review of Renovate PRs is an intentional defense against supply chain attacks.
 - **Local Service Detection**: When working with or deploying services, always account for newly added, untracked compose definitions in the working tree (not just committed or staged files).
+- **Never Read `secrets.yml`**: Do not attempt to decrypt, view, or inspect `secrets.yml` (even to list variable names). Infer Jinja variable names from existing files in the repository or ask the user directly.
+
 
