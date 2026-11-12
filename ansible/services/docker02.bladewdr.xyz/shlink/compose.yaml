@@ -1,7 +1,7 @@
 ---
 services:
   shlink:
-    image: ghcr.io/shlinkio/shlink:${SHLINK_DOCKER_TAG:-latest}
+    image: ghcr.io/shlinkio/shlink:5.1.8@sha256:68a722f7677008a50ccf3a9e570966bc37d7627fe6a870b86be28c5dcf9085ee 
     container_name: ${SHLINK_CONTAINER_NAME:-shlink}
     restart: ${SHLINK_RESTART:-unless-stopped}
     mem_limit: ${SHLINK_MEM_LIMIT:-200g}
