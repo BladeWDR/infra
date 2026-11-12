@@ -129,7 +129,7 @@ services:
       retries: 10
 
   nats:
-    image: nats:2.15-alpine@sha256:7ae34c25dfd6fe2e01c6483eabef20d796690fdcac6c4d94ca780a6cf9877fde
+    image: nats:2.15-alpine@sha256:558394a23dd3c36f2d3a64b51865fd09908010e80a542cea5e75c2af543ed62a
     container_name: fluxer-nats
     restart: unless-stopped
     networks: [traefik]
