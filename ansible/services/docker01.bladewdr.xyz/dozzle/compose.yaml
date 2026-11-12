@@ -4,6 +4,7 @@ services:
   dozzle:
     image: amir20/dozzle:v11.4.0-alpine@sha256:8754a9235388911646a29aab6d382be6cf2e8d4fc0ff9ef908225a173cf52352
     container_name: dozzle
+    restart: unless-stopped
     networks:
       - traefik
     volumes:
