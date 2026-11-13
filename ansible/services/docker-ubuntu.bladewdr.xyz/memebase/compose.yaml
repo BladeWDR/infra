@@ -12,6 +12,7 @@ services:
       - /apps/memebase/data:/app/data
     environment:
       - PUBLIC_URL=https://memes.{{ APP0_HOST_DOMAIN }}
+      - OLLAMA_API_BASE=http://big-chungus.{{ APP0_HOST_DOMAIN }}
     labels:
       - traefik.enable=true
       - traefik.http.routers.memebase.entrypoints=https
