@@ -25,6 +25,7 @@ services:
       - POLLING_LIMIT_PER_HOST=1
       - POLLING_PARSING_ERROR_LIMIT=5
       - WORKER_POOL_SIZE=2
+      - INTEGRATION_ALLOW_PRIVATE_NETWORKS=1
     labels:
       - traefik.enable=true
       - traefik.http.routers.miniflux.entrypoints=https
