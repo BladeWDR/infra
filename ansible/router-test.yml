@@ -1,0 +1,242 @@
+- name: Playbook to set up my test bootc router.
+  hosts: 10.13.37.139
+  become: true
+
+  vars:
+    wan_interface_name: ens18
+    lan_interface_name: ens19
+    port_forwards:
+      - protocol: "tcp"
+        wan_port: 
+        target_ip: "10.0.100.176"
+        target_port: 8080
+        description: "Forward 8080"
+    ansible_ssh_user: admin
+    ansible_ssh_private_key: /home/scott/.ssh/id_ed25519
+    # Dynamic DNS (ddclient)
+    ddns_enabled: false
+    ddns_protocol: "duckdns"   # e.g. "cloudflare", "duckdns", "namecheap", "dyndns2", "porkbun"
+    ddns_server: ""               # Optional server endpoint override
+    ddns_zone: ""                 # Zone (required for Cloudflare, e.g. "example.com")
+    ddns_login: "token"           # Username or "token"
+    ddns_password: ""             # API Token or DDNS Password
+    ddns_hostname: ""             # Hostname to update, e.g. "router.example.com"
+    ddns_usev4: "webv4, webv4=https://checkip.amazonaws.com/"
+
+
+  vars_files:
+    - secrets.yml
+
+  # roles:
+  #   - role: artis3n.tailscale.machine
+  #     vars:
+  #       tailscale_manage_binaries_skip: true
+
+  tasks:
+
+    - name: Ensure IPv6 is disabled on WAN
+      community.general.nmcli:
+        conn_name: WAN
+        ifname: "{{ wan_interface_name }}" 
+        method4: auto
+        method6: disabled
+        state: present
+
+    - name: Create VLAN 100 - Trusted.
+      community.general.nmcli:
+        type: vlan
+        conn_name: "Trusted"
+        ifname: "VLAN100"
+        vlandev: "{{ lan_interface_name }}"
+        vlanid: 100
+        ip4: 10.0.100.1/24
+        state: present
+
+
+    - name: Create VLAN 200 - DMZ.
+      community.general.nmcli:
+        type: vlan
+        conn_name: "DMZ"
+        ifname: "VLAN200"
+        vlandev: "{{ lan_interface_name }}"
+        vlanid: 200
+        ip4: 10.0.200.1/24
+        state: present
+
+    - name: Configure dnsmasq.
+      ansible.builtin.copy:
+        dest: /etc/dnsmasq.d/11-vlan200.conf
+        owner: root
+        group: root
+        mode: '0644'
+        content: |
+          # Managed by Ansible - DHCP for VLAN 200
+          interface=VLAN200
+          dhcp-range=set:vlan200,10.0.200.50,10.0.200.200,255.255.255.0,24h
+          dhcp-option=tag:vlan200,option:router,10.0.200.1
+          dhcp-option=tag:vlan200,option:dns-server,10.0.200.1
+      notify: Restart dnsmasq
+
+    - name: Configure access to router local services (DHCP, DNS stub, etc)
+      ansible.builtin.copy:
+        dest: /etc/nftables.d/10-local-services.nft
+        owner: root
+        group: root
+        mode: '0644'
+        content: |
+          # Managed by ansible
+          table inet router{ 
+            chain input {
+              # Allow me to connect from outside (Test instance only)
+              ip saddr 10.13.37.36 tcp dport 22 accept
+              ip saddr 10.13.37.0/24 tcp dport 9090 accept
+
+              # Allow VLANs to access DHCP and DNS stub resolver.
+              iifname "VLAN100" udp dport $LAN_SERVICES_UDP accept
+              iifname "VLAN100" tcp dport $LAN_SERVICES_TCP accept
+              iifname "VLAN200" udp dport $LAN_SERVICES_UDP accept
+              iifname "VLAN200" tcp dport $LAN_SERVICES_TCP accept
+
+              # Allow VLAN 100 to access the Cockpit management console.
+              iifname "VLAN100" tcp dport 9090 accept
+            }
+          }
+      notify: Reload nftables
+
+
+    - name: Configure router packet forwarding (masquerade).
+      ansible.builtin.copy:
+        dest: /etc/nftables.d/15-masquerade.nft
+        owner: root
+        group: root
+        mode: '0644'
+        content: |
+          # Managed by ansible
+          table inet router{ 
+            chain forward {
+              iifname "VLAN100" oifname $WAN_IFACES accept
+              iifname "VLAN200" oifname $WAN_IFACES accept
+            }
+          }
+      notify: Reload nftables
+
+   # I think I'll configure nftables like this:
+   # 1 file per table - router, forward, etc, based on where the traffic is going.
+   # Is it destined for the firewall itself (DHCP, etc) or is it going out to the internet?
+   # Port forwards will definitely get their own file though.
+
+    # - name: Configure port forwards in nftables.
+    #   copy:
+    #     dest: /etc/nftables.d/99-port-forwards.nft
+    #     owner: root
+    #     group: root
+    #     mode: '0644'
+    #     content: |
+    #       # Managed by Ansible - Port forwards
+    #       {% if port_forwards | length > 0 %}
+    #       table ip nat {
+    #           chain prerouting {
+    #               {% for fwd in port_forwards %}
+    #               iifname "{{ wan_interface_name }}" {{ fwd.protocol }} dport {{ fwd.wan_port }} dnat to {{ fwd.target_ip }}:{{ fwd.target_port }}
+    #               {% endfor %}
+    #           }
+    #       }
+    #       table inet router {
+    #           chain forward {
+    #               {% for fwd in port_forwards %}
+    #               ip daddr {{ fwd.target_ip }} {{ fwd.protocol }} dport {{ fwd.target_port }} ct state new accept
+    #               {% endfor %}
+    #           }
+    #       }
+    #       {% endif %}
+    #   notify: Reload nftables
+
+    - name: Configure MaxMind GeoIP credentials
+      copy:
+        dest: /etc/GeoIP.conf
+        owner: root
+        group: root
+        mode: '0600'
+        content: |
+          # Managed by Ansible - MaxMind geoipupdate configuration
+          AccountID {{ geoip_account_id }}
+          LicenseKey {{ geoip_license_key }}
+          EditionIDs GeoLite2-Country
+          DatabaseDirectory /var/lib/GeoIP
+      notify: Update GeoIP ruleset
+
+    - name: Configure Azureclaw GeoIP firewall blocking rules
+      copy:
+        dest: /etc/azureclaw/geoip-block.conf
+        owner: root
+        group: root
+        mode: '0644'
+        content: |
+          # Managed by Ansible - MaxMind GeoIP Firewall Configuration
+          GEOIP_ENABLED="{{ 'true' if geoip_enabled else 'false' }}"
+          GEOIP_MODE="{{ geoip_mode }}"
+          GEOIP_COUNTRIES="{{ geoip_countries }}"
+          GEOIP_DIRECTION="{{ geoip_direction }}"
+          GEOIP_MMDB_PATH="/var/lib/GeoIP/GeoLite2-Country.mmdb"
+      notify: Update GeoIP ruleset
+
+    - name: Configure Dynamic DNS client (ddclient)
+      copy:
+        dest: /etc/ddclient.conf
+        owner: ddclient
+        group: ddclient
+        mode: '0600'
+        content: |
+          # Managed by Ansible - ddclient configuration
+          syslog=yes
+          ssl=yes
+          usev4={{ ddns_usev4 }}
+          protocol={{ ddns_protocol }}, \
+          {% if ddns_server | length > 0 %}
+          server={{ ddns_server }}, \
+          {% endif %}
+          {% if ddns_zone | length > 0 %}
+          zone={{ ddns_zone }}, \
+          {% endif %}
+          {% if ddns_login | length > 0 %}
+          login={{ ddns_login }}, \
+          {% endif %}
+          password={{ ddns_password }} \
+          {{ ddns_hostname }}
+      when: ddns_enabled | bool and ddns_hostname | length > 0
+      notify: Restart ddclient
+
+    - name: Check bootc image deployment status
+      command: bootc status
+      register: bootc_status_out
+      changed_when: false
+
+    - name: Display current bootc deployment
+      debug:
+        msg: "{{ bootc_status_out.stdout_lines }}"
+
+
+  handlers:
+    - name: Restart dnsmasq
+      systemd:
+        name: dnsmasq
+        state: restarted
+
+    - name: Reload nftables
+      systemd:
+        name: nftables
+        state: reloaded
+
+    - name: Restart alloy
+      systemd:
+        name: alloy
+        state: restarted
+
+    - name: Update GeoIP ruleset
+      command: /usr/libexec/azureclaw/update-geoip.sh
+
+    - name: Restart ddclient
+      systemd:
+        name: ddclient
+        state: restarted
+        enabled: true
