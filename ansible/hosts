@@ -88,7 +88,7 @@ nagios_hostgroups=deb-nas
 ; pve04.bladewdr.xyz
 
 [lxc_wireguard]
-ovh-wireguard.bladewdr.xyz
+ovh-wireguard.bladewdr.xyz nagios_host_template=deb-server nagios_hostgroups=servers
 
 [servers:children]
 certbot
@@ -99,4 +99,5 @@ lan
 nagios
 nas
 unifi
+lxc_wireguard
 webservers
