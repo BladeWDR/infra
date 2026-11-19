@@ -44,6 +44,7 @@ services:
       - ${UPTIMEKUMA_DOCKER_SOCKET:-/var/run/docker.sock}:/var/run/docker.sock
     environment:
       - TZ={{ host_timezone }}
+      - NODE_OPTIONS=--dns-result-order=ipv4first
     labels:
       - com.centurylinklabs.watchtower.enable=${UPTIMEKUMA_WATCHTOWER_ENABLE:-true}
       - autoheal=${UPTIMEKUMA_AUTOHEAL:-true}
