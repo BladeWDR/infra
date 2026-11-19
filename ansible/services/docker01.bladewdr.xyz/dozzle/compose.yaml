@@ -2,7 +2,7 @@
 
 services:
   dozzle:
-    image: amir20/dozzle:v11.4.3-alpine@sha256:9c6769f2ee3f93b61243e4e6ee2a6a8721f14ed1b0c05588bd7adfaaf9bd545c
+    image: amir20/dozzle:v11.5.0-alpine@sha256:543430862e71aa6dfe802f8a817834760084645b853385b5f86eddbd67253b7f
     container_name: dozzle
     restart: unless-stopped
     networks:
