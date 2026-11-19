@@ -105,6 +105,11 @@
 - name: Set up various cron jobs.
   ansible.builtin.include_tasks: Cron.yml
 
+- name: Ensure that fstrim.timer is enabled
+  ansible.builtin.service:
+    name: fstrim.timer
+    enabled: true
+
 - name: Copy sudoers file for Nagios Remote Plugin Executor (NRPE).
   ansible.builtin.copy:
     src: sudoers_sanoid
