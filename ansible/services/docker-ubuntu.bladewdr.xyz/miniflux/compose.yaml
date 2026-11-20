@@ -3,6 +3,7 @@ services:
   miniflux:
     image: miniflux/miniflux:2.3.5@sha256:8fd6c3c434ecc3d4083306f83e03c0bb74c632e0f8378da5ead7e1773b0b89c9
     container_name: miniflux-app
+    restart: unless-stopped
     mem_limit: 100m
     networks:
       - proxy
@@ -10,6 +11,7 @@ services:
     depends_on:
       miniflux-db:
         condition: service_healthy
+        restart: true
     environment:
       - DATABASE_URL=postgres://miniflux:{{ miniflux_db_password }}@miniflux-db/miniflux?sslmode=disable
       - RUN_MIGRATIONS=1
@@ -41,6 +43,7 @@ services:
   miniflux-db:
     image: postgres:18@sha256:3a82e1f56c8f0f5616a11103ac3d47e632c3938698946a7ad26da0df1334744a
     container_name: miniflux-db
+    restart: unless-stopped
     networks:
       - miniflux-net
     environment:
@@ -50,13 +53,16 @@ services:
     volumes:
       - /home/scott/docker/miniflux/data:/var/lib/postgresql
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "miniflux"]
-      interval: 10s
+      test: ["CMD", "pg_isready", "-U", "miniflux", "-d", "miniflux", "-h", "127.0.0.1"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
       start_period: 30s
 
   miniflux-flaresolverr-hook:
     build: https://git.bladewdr.xyz/ScottB/miniflux-flaresolverr.git
     container_name: miniflux-flaresolverr
+    restart: unless-stopped
     environment:
       - FLARESOLVERR_URL=http://flaresolverr:8191/v1
     networks:
