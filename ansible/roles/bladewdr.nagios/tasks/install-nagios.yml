@@ -15,7 +15,7 @@
         append: true
       when: not ansible_check_mode
 
-    - name: Copy over custom-commands.cfg
+    - name: Copy over custom-commands.cfg.
       ansible.builtin.copy:
         src: custom-commands.cfg
         dest: /usr/local/nagios/etc/objects/custom-commands.cfg
@@ -24,11 +24,27 @@
         mode: '0664'
       notify: Restart nagios
 
-    - name: Copy over hostgroups.cfg
+    - name: Copy over hostgroups.cfg.
       ansible.builtin.copy:
         src: host_templates/hostgroups.cfg
         dest: /usr/local/nagios/etc/objects/hostgroups.cfg
         owner: nagios
         group: nagios
         mode: '0664'
+      notify: Restart nagios
+
+    - name: Create the directory to store custom Nagios plugins.
+      ansible.builtin.file:
+        path: "{{ nagios_custom_plugin_path }}"
+        state: directory
+        mode: "0755"
+
+    - name: Copy over custom Nagios plugins.
+      ansible.builtin.copy:
+        src: "{{ item }}"
+        dest: "{{ nagios_custom_plugin_path }}/{{ item }}"
+        owner: root
+        group: root
+        mode: u=rwx,g=rx,o=rx
+      loop: "{{ nagios_custom_plugins }}"
       notify: Restart nagios

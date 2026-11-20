@@ -8,7 +8,7 @@ if [[ -z "$FQDN" || -z "$DNS_SERVER" ]]; then
     exit 3  # UNKNOWN
 fi
 
-RESULT=$(dig @$DNS_SERVER +short "$FQDN" 2>&1)
+RESULT=$(dig @$DNS_SERVER -4 +short "$FQDN" 2>&1)
 
 if echo "$RESULT" | grep -qE "connection refused|no servers could be reached"; then
     echo "CRITICAL: DNS lookup for $FQDN failed on $DNS_SERVER"
