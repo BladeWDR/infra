@@ -15,3 +15,12 @@ http:
           server: ""
         customRequestHeaders:
           X-Forwarded-Proto: https
+
+    crowdsec-bouncer:
+      plugin:
+        bouncer:
+          enabled: true
+          crowdsecMode: live
+          crowdsecLapiHost: crowdsec:8080
+          crowdsecLapiScheme: http
+          crowdsecLapiKey: "{{ CROWDSEC_BOUNCER_API_KEY }}"

@@ -21,6 +21,7 @@ services:
     volumes:
       - /apps/traefik/letsencrypt:/letsencrypt
       - /apps/traefik/data:/data
+      - /apps/traefik/logs:/var/log/traefik:ro
       - /etc/localtime:/etc/localtime:ro
       - /usr/share/zoneinfo:/usr/share/zoneinfo:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -35,6 +36,8 @@ services:
       - --providers.docker
       - --providers.file.watch=true
       - --providers.file.directory=/data
+      - --experimental.plugins.bouncer.modulename=github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin
+      - --experimental.plugins.bouncer.version=v1.8.1
       - --entrypoints.web.address=:80
       - --entrypoints.web-external.address=:8899
       - --entrypoints.websecure.address=:443

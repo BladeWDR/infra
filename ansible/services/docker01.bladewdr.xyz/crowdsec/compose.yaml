@@ -1,0 +1,21 @@
+---
+services:
+  crowdsec:
+    image: crowdsecurity/crowdsec:v1.8.2@sha256:65b74942f7e7ed5c60fde4ac15fc4ba715904c398c8b16dd451f4907d90347d4
+    container_name: crowdsec
+    environment:
+      GID: "${GID-1000}"
+      COLLECTIONS: "crowdsecurity/linux crowdsecurity/traefik"
+      BOUNCER_KEY_TRAEFIK: "{{ CROWDSEC_BOUNCER_API_KEY }}"
+    volumes:
+      - /apps/crowdsec/acquis.yaml:/etc/crowdsec/acquis.yaml
+      - /apps/crowdsec/db:/var/lib/crowdsec/data/
+      - /apps/crowdsec/config:/etc/crowdsec/
+      - /apps/traefik/logs:/var/log/traefik/:ro
+    networks:
+      - traefik
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=false"

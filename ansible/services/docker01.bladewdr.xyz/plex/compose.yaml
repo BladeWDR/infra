@@ -27,6 +27,6 @@ services:
       - traefik.http.routers.plex.rule=Host(`watch.{{ APP0_HOST_DOMAIN }}`)
       - traefik.http.routers.plex.service=plex
       - traefik.http.services.plex.loadbalancer.server.port=32400
-      - traefik.http.routers.plex.middlewares=default-headers@file
+      - traefik.http.routers.plex.middlewares=default-headers@file,crowdsec-bouncer@file
       - traefik.http.routers.plex.tls=true
       - traefik.docker.network=traefik
