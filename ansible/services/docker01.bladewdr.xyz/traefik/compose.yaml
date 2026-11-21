@@ -13,6 +13,8 @@ services:
     ports:
       - 80:80
       - 443:443
+      - 8899:8899
+      - 4444:4444
     environment:
       - CF_API_EMAIL={{ CF_API_EMAIL }}
       - CF_DNS_API_TOKEN={{ CF_DNS_API_TOKEN }}
@@ -34,10 +36,15 @@ services:
       - --providers.file.watch=true
       - --providers.file.directory=/data
       - --entrypoints.web.address=:80
+      - --entrypoints.web-external.address=:8899
       - --entrypoints.websecure.address=:443
+      - --entrypoints.websecure-external.address=:4444
       - --entrypoints.web.http.redirections.entrypoint.to=websecure
+      - --entrypoints.web-external.http.redirections.entrypoint.to=websecure-external
       - --entrypoints.web.http.redirections.entrypoint.scheme=https
+      - --entrypoints.web-external.http.redirections.entrypoint.scheme=https
       - --entrypoints.websecure.http.tls=true
+      - --entrypoints.websecure-external.http.tls=true
       - --entrypoints.websecure.http.tls.certResolver=letsencrypt
       - --entrypoints.websecure.http.tls.domains[0].main={{ TRAEFIK_HOST_DOMAIN }}
       - --entrypoints.websecure.http.tls.domains[0].sans=*.{{ TRAEFIK_HOST_DOMAIN }}
