@@ -1,0 +1,57 @@
+---
+# zram compressed-swap cushion for low-RAM hosts (e.g. free-tier VPS, no swap).
+# Prevents the OOM/IO "death spiral" that wedges a no-swap host on a memory spike.
+# zram (RAM-compressed) is preferred over a swapfile: the root disk is a shared
+# iSCSI volume that saturates under memory pressure.
+# Tagged [basics, zram] so it runs on full/basics/zram runs but not unrelated targeted runs.
+
+- name: Install zram-tools.
+  ansible.builtin.apt:
+    name: zram-tools
+    state: present
+    update_cache: true
+  tags:
+    - basics
+    - zram
+
+- name: Configure the zram swap device.
+  ansible.builtin.copy:
+    dest: /etc/default/zramswap
+    owner: root
+    group: root
+    mode: '0644'
+    content: |
+      # Managed by Ansible (bladewdr.basics). Do not edit by hand.
+      # One compressed swap device sized to ~50% of RAM, lz4 for low-CPU speed.
+      NUM_DEVICE=1
+      SWAP_ALGORITHM=lz4
+      SWAP_MEMORY_PERCENT={{ zram_swap_memory_percent | default(50) }}
+  tags:
+    - basics
+    - zram
+
+- name: Ensure zramswap service is enabled and running.
+  ansible.builtin.service:
+    name: zramswap
+    state: started
+    enabled: true
+  tags:
+    - basics
+    - zram
+
+- name: Show active swap devices.
+  ansible.builtin.command: swapon --show
+  register: zram_swapon
+  changed_when: false
+  tags:
+    - basics
+    - zram
+
+- name: Fail if no zram device is active.
+  ansible.builtin.assert:
+    that:
+      - "'zram' in zram_swapon.stdout"
+    fail_msg: "zram was not found in `swapon --show` output: {{ zram_swapon.stdout }}"
+  tags:
+    - basics
+    - zram

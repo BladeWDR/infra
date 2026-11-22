@@ -2,3 +2,6 @@
 tailscale_args: "--accept-dns=true --accept-routes=true"
 tailscale_tags:
   - proxy
+
+# zram cushion: free-tier VPS, ~1GB RAM, no swap.
+enable_zram: true

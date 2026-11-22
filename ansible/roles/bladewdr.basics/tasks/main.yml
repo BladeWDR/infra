@@ -110,6 +110,13 @@
     name: fstrim.timer
     enabled: true
 
+- name: Ensure zram compressed swap is enabled on memory-constrained hosts.
+  ansible.builtin.include_tasks: Zram.yml
+  when: enable_zram | default(false) | bool
+  tags:
+    - basics
+    - zram
+
 - name: Copy sudoers file for Nagios Remote Plugin Executor (NRPE).
   ansible.builtin.copy:
     src: sudoers_sanoid
