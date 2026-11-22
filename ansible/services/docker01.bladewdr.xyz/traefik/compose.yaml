@@ -21,7 +21,7 @@ services:
     volumes:
       - /apps/traefik/letsencrypt:/letsencrypt
       - /apps/traefik/data:/data
-      - /apps/traefik/logs:/var/log/traefik:ro
+      - /apps/traefik/logs:/var/log/traefik
       - /etc/localtime:/etc/localtime:ro
       - /usr/share/zoneinfo:/usr/share/zoneinfo:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -29,7 +29,12 @@ services:
       - --api
       - --api.insecure=${TRAEFIK_API_INSECURE:-true}
       - --api.dashboard=true
-      - --log.level=ERROR
+      - --log.level=INFO
+      - --log.filePath=/var/log/traefik/traefik.log
+      - --log.format=common
+      - --log.maxAge=1
+      - --log.maxBackups=1
+      - --log.maxSize=100
       - --accesslog=true
       - --entryPoints.metrics.address=:8082
       - --metrics.prometheus.entryPoint=metrics
