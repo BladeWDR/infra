@@ -57,6 +57,8 @@ services:
     volumes:
       - /apps/jellyfin/meili_data:/meili_data
     container_name: meilisearch
+    labels:
+      - traefik.enable=false
 
 networks:
   meilisearch:
