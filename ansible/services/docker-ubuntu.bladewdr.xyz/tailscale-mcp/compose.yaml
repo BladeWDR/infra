@@ -1,0 +1,15 @@
+services:
+  tailscale-mcp:
+    container_name: tailscale-mcp
+    command:
+      - "--http"
+      - "0.0.0.0:8449"
+      - "--http-allow-host"
+      - "tailscale-mcp:8449"
+    networks:
+      - proxy
+    environment:
+      - TAILSCALE_OAUTH_CLIENT_ID={{ TAILSCALE_OAUTH_CLIENT_ID }}
+      - TAILSCALE_OAUTH_CLIENT_SECRET={{ TAILSCALE_OAUTH_CLIENT_SECRET }}
+      - TAILSCALE_MCP_HTTP_TOKEN={{ TAILSCALE_MCP_HTTP_TOKEN }}
+    image: ghcr.io/tailscale-mcp/tailscale-mcp:2.1.0@sha256:4de0da94996a6a1bb79d142b92a549274d89e3856f2aa0efedd9499dc3d1bb4a 
