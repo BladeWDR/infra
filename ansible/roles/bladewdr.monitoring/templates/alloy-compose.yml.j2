@@ -10,6 +10,9 @@ services:
       - apparmor=unconfined
     network_mode: host
     restart: unless-stopped
+    # Bound memory so a leak OOM-kills the container, not the host.
+    mem_limit: "{{ alloy_mem_limit | default('300m') }}"
+    memsw_limit: "{{ alloy_memsw_limit | default('450m') }}"
     volumes:
       - /proc:/host/proc:ro
       - /var/run/docker.sock:/var/run/docker.sock
@@ -43,5 +46,8 @@ services:
       - /dev/kmsg
     image: ghcr.io/google/cadvisor:0.55.1
     restart: unless-stopped
+    # Bound memory so a leak OOM-kills the container, not the host.
+    mem_limit: "{{ cadvisor_mem_limit | default('192m') }}"
+    memsw_limit: "{{ cadvisor_memsw_limit | default('256m') }}"
     labels:
       - traefik.enable=false
