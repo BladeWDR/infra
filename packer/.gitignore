@@ -1,0 +1,10 @@
+# User's credentials — never commit.
+# Matches debian13.pkrvars.hcl and any *.auto.pkrvars.hcl, but NOT the
+# committable *.example template.
+*.pkrvars.hcl
+
+# Packer plugin binaries + build artifacts
+.packer/
+.packer_cache/
+override/
+*.log

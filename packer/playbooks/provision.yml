@@ -1,0 +1,266 @@
+---
+# Packer provisioning for the Debian 13 cloud-init template.
+
+- name: Provision Debian 13 cloud-init template.
+  hosts: all
+  become: true
+  become_method: sudo
+  become_user: root
+
+  vars:
+    ansible_python_interpreter: auto_silent
+
+    # The build user created by the preseed
+    build_user: "ansible"
+
+    ssh_authorized_key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGvwq83uQlFvN3qLzon1Tueo/ymX11KyBiec6nC7ZAI4 ansible"
+
+    build_packages:
+      - git
+      - tmux
+      - htop
+      - ncdu
+      - curl
+      - wget
+      - zsh
+
+    # Cloud-init stack that makes the template Proxmox cloud-init enabled.
+    cloudinit_packages:
+      - cloud-init
+      - cloud-guest-utils
+      - cloud-initramfs-growroot
+      - qemu-guest-agent
+
+    # Netplan + systemd-resolved so cloud-init's network config renders DNS the
+    # same way Ubuntu's cloud-init VMs do. Debian 13's default ifupdown ("eni")
+    # renderer does not feed DNS into /etc/resolv.conf under cloud-init 25.x, so
+    # we install netplan + resolved and make netplan auto-select by removing the
+    # ifupdown alternatives (task below) instead of pinning renderers -- a pin
+    # would clobber the cloud-init network data.
+    netplan_packages:
+      - netplan.io
+      - systemd-resolved
+
+    # gpg is required by ansible.builtin.apt_repository when it fetches a
+    # signed-by keyring. The standard tasksel task does not pull it, and
+    # Debian 13 netinst does not include it by default.
+    gpg_packages:
+      - gpg
+
+    # Tailscale client is baked in so every VM cloned from this template can
+    # join the mesh. Per-VM auth at first boot is supplied via cloud-init
+    # user-data (see tailscale-userdata.example) — the key is never baked in.
+    # Set install_tailscale: false to skip baking the client into the image.
+    install_tailscale: true
+
+    # Tailscale apt repo track. The Debian codename in the repo line comes from
+    # facts so it tracks the template target; override here to pin it.
+    tailscale_track: "stable"
+
+  tasks:
+
+    - name: Refresh the package index.
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+      changed_when: false
+
+    - name: Install packages.
+      ansible.builtin.apt:
+        name: "{{ build_packages }}"
+        state: present
+
+    - name: Install the cloud-init stack.
+      ansible.builtin.apt:
+        name: "{{ cloudinit_packages }}"
+        state: present
+
+    - name: Install netplan + systemd-resolved.
+      # cloud-init 25.x's default "eni" (ifupdown) renderer on Debian 13 does
+      # not feed DNS into /etc/resolv.conf, so we mirror Ubuntu: netplan renders
+      # the network config and systemd-resolved publishes DNS to resolv.conf.
+      ansible.builtin.apt:
+        name: "{{ netplan_packages }}"
+        state: present
+
+    - name: Make cloud-init auto-select the netplan renderer.
+      # Debian 13 ships ifupdown, so cloud-init's default renderer priority
+      # (eni > sysconfig > netplan) picks "eni" (ifupdown), which does not feed
+      # DNS into /etc/resolv.conf under cloud-init 25.x. We do NOT pin renderers
+      # via a `network:` cloud.cfg: that pin is non-empty and not `config:
+      # disabled`, so it becomes SYSTEM_CFG and clobbers the Proxmox cloud-init
+      # drive's network-config (ipconfig0/nameserver) -> netplan gets `network: {}`
+      # and emits nothing. Instead we make ifupdown "unavailable" (hide its
+      # ifup/ifdown/ifquery symlinks) so eni.available() is False and netplan
+      # auto-selects cleanly -- matching Ubuntu -- WITHOUT clobbering the cloud-init
+      # network data. Then per-clone ipconfig0/nameserver from the Proxmox ISO
+      # render into a working netplan 50-cloud-init.yaml.
+      ansible.builtin.command:
+        cmd: "update-alternatives --remove {{ item }} /usr/sbin/{{ item }}"
+        creates: "/dev/null"
+      loop:
+        - ifup
+        - ifdown
+        - ifquery
+      # Not every alternative may exist (e.g. ifquery absent on minimal installs);
+      # tolerate that. changed_when: true keeps the build log honest on a one-shot
+      # template build.
+      failed_when: false
+      changed_when: true
+
+    - name: Ensure the netplan backend is systemd.
+      # netplan must use the systemd backend so systemd-resolved publishes DNS to
+      # /etc/resolv.conf (the systemd-networkd backend does not). Fixed, template
+      # level, not a per-clone value.
+      ansible.builtin.copy:
+        dest: /etc/netplan/99-netplan-backend.yaml
+        content: |
+          network:
+            renderer: networkd
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Ensure the systemd-resolved drop-in directory exists.
+      ansible.builtin.file:
+        path: /etc/systemd/resolved.conf.d
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Give systemd-resolved a fallback DNS so DNS works during provisioning.
+      # The build VM's network is ifupdown (not systemd-networkd), so nothing feeds
+      # DNS to resolved once it claims /etc/resolv.conf -> stub-resolv.conf, which
+      # breaks every apt lookup mid-provision. FallbackDNS is systemd-resolved's
+      # built-in "no upstream from DHCP" path; it exists ONLY for build-time DNS.
+      # On a clone, cloud-init's netplan (backend: networkd, set above) feeds the
+      # DHCP-provided servers via networkd, which take precedence over this
+      # fallback -- so the clone gets DNS purely via cloud-init, not from this.
+      ansible.builtin.copy:
+        dest: /etc/systemd/resolved.conf.d/10-fallback-dns.conf
+        content: |
+          [Resolve]
+          FallbackDNS=1.1.1.1 9.9.9.9
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Restart systemd-resolved so the fallback DNS takes effect.
+      ansible.builtin.systemd:
+        name: systemd-resolved
+        state: restarted
+
+    - name: Install gpg (required by apt_repository for signed-by keyrings).
+      ansible.builtin.apt:
+        name: "{{ gpg_packages }}"
+        state: present
+
+    - name: Ensure the build user exists with a home directory.
+      ansible.builtin.user:
+        name: "{{ build_user }}"
+        create_home: true
+        shell: /usr/bin/zsh
+
+    - name: Create the build user's .ssh directory.
+      ansible.builtin.file:
+        path: "/home/{{ build_user }}/.ssh"
+        owner: "{{ build_user }}"
+        group: "{{ build_user }}"
+        mode: "0700"
+        state: directory
+
+    - name: Inject your SSH public key for the build user.
+      ansible.posix.authorized_key:
+        user: "{{ build_user }}"
+        key: "{{ ssh_authorized_key }}"
+        state: present
+
+    - name: Ensure cloud-init services are enabled.
+      # Debian 13 (Trixie) does not ship a cloud-init.service unit — that stage
+      # is folded into cloud-init-local + cloud-config + cloud-final (unlike
+      # Ubuntu). Enabling the three that exist is sufficient for a full run.
+      ansible.builtin.systemd:
+        name: "{{ item }}"
+        enabled: true
+        daemon_reload: true
+      loop:
+        - cloud-init-local.service
+        - cloud-config.service
+        - cloud-final.service
+
+    - name: Ensure qemu-guest-agent is enabled and running.
+      ansible.builtin.systemd:
+        name: qemu-guest-agent
+        enabled: true
+        state: started
+        daemon_reload: true
+
+    # -- Tailscale: client + service baked in; per-VM auth at first boot via
+    #    cloud-init user-data. The build VM is intentionally NOT authenticated,
+    #    so no node identity is baked into the image (see tailscale-userdata.example).
+    #
+    # Added explicitly instead of the official `curl ... | sh` installer: that
+    # pipe is non-idempotent and can hang the build for hours on a flaky link.
+    # These steps are idempotent and fail fast when the link is down. The keyring
+    # is a binary file apt_repository can't fetch for us, so it stays a get_url;
+    # the source uses apt_repository, which also refreshes the cache (update_cache).
+    - name: Install the Tailscale archive signing key.
+      ansible.builtin.get_url:
+        url: "https://pkgs.tailscale.com/{{ tailscale_track }}/debian/{{ ansible_facts['distribution_release'] }}.noarmor.gpg"
+        dest: /usr/share/keyrings/tailscale-archive-keyring.gpg
+        owner: root
+        group: root
+        mode: "0644"
+        force: false
+      when: install_tailscale
+
+    - name: Add the Tailscale apt repository.
+      # update_cache folds the "apt-get update" in, so no separate update task.
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/tailscale-archive-keyring.gpg] https://pkgs.tailscale.com/{{ tailscale_track }}/debian {{ ansible_facts['distribution_release'] }} main"
+        state: present
+        update_cache: true
+      when: install_tailscale
+
+    - name: Install the Tailscale client.
+      ansible.builtin.apt:
+        name: tailscale
+        state: present
+      when: install_tailscale
+
+    - name: Ensure tailscaled is enabled.
+      ansible.builtin.systemd:
+        name: tailscaled
+        enabled: true
+        daemon_reload: true
+      when: install_tailscale
+
+    - name: Rebuild the initramfs so cloud-init runs early on boot.
+      # Not idempotent, but this is a one-shot build step.
+      ansible.builtin.command:
+        cmd: update-initramfs -u -k all
+      changed_when: true
+
+    - name: Reset cloud-init state so each cloned VM boots fresh.
+      # Not idempotent, but this is a one-shot build step.
+      ansible.builtin.command:
+        cmd: cloud-init clean --logs --seed
+      failed_when: false
+      changed_when: true
+
+    - name: Clear Tailscale state so cloned VMs start unauthenticated.
+      # The build VM was never authenticated; this is belt-and-suspenders to
+      # ensure no machine identity leaks into the template image.
+      ansible.builtin.file:
+        path: /var/lib/tailscale
+        state: absent
+      failed_when: false
+      changed_when: true
+      when: install_tailscale
+
+    - name: Lock the temporary build password (key auth only).
+      ansible.builtin.user:
+        name: "{{ build_user }}"
+        password: "!"
+
