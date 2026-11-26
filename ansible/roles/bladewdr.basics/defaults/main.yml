@@ -34,7 +34,6 @@ basic_packages_deb:
   - curl
   - wget
   - make
-  - software-properties-gtk
   - python3-pip
   - build-essential
   - wireguard-tools
