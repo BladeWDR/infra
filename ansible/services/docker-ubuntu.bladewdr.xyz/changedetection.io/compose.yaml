@@ -23,6 +23,7 @@ services:
       - DISABLE_VERSION_CHECK=true
       - TZ={{ host_timezone }}
       - PLAYWRIGHT_DRIVER_URL=ws://browser-sockpuppet-chrome:3000
+      - ALLOW_IANA_RESTRICTED_ADDRESSES=true
     restart: unless-stopped
 
   browser-sockpuppet-chrome:
