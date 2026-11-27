@@ -65,13 +65,13 @@ Do this on **pve04** (as root, or a user with admin rights).
 ### 1a. Recommended: a dedicated `PackerUser` role
 
 ```bash
-# 1. Create a least-privilege role
+# 1. Create a least-privilege role (Proxmox VE 9+: VM.GuestAgent.Audit replaces removed VM.Monitor)
 pveum role add PackerUser --privs \
   "Datastore.AllocateSpace Datastore.AllocateTemplate Datastore.Audit \
    SDN.Use Sys.Audit Sys.Modify VM.Allocate VM.Audit VM.Clone \
    VM.Config.CDROM VM.Config.Cloudinit VM.Config.CPU VM.Config.Disk \
    VM.Config.HWType VM.Config.Memory VM.Config.Network VM.Config.Options \
-   VM.Console VM.Monitor VM.PowerMgmt"
+   VM.Console VM.GuestAgent.Audit VM.PowerMgmt"
 
 # 2. Create a group for the build user
 pveum group add packer-users
@@ -83,7 +83,7 @@ pveum acl modify / -group packer-users -role PackerUser
 pveum user add packer@pve -groups packer-users -comment "Packer build user"
 
 # 5. Generate an API token (shown ONCE)
-pveum user token add packer@pve token --priv-sep 0
+pveum user token add packer@pve token --privsep 0
 #   -> prints a secret like:  packer@pve!token=9F3aBc...  (shown ONCE)
 ```
 
