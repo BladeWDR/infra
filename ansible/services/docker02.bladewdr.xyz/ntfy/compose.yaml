@@ -1,7 +1,7 @@
 ---
 services:
   ntfy:
-    image: binwiederhier/ntfy:v2.38.1-amd64@sha256:6ceb27333175e3ce7d021bb883658858f2b8b883db316a73d0755dfa0b306fc4
+    image: binwiederhier/ntfy:v2.38.3-amd64@sha256:2b24c0d8d55e22e27b47417041acbd24a3f3e19f15d26085626e1922e5479138
     container_name: ${NTFY_CONTAINER_NAME:-ntfy}
     restart: ${NTFY_RESTART:-unless-stopped}
     mem_limit: ${NTFY_MEM_LIMIT:-200g}
