@@ -1,7 +1,21 @@
 # User's credentials — never commit.
-# Matches debian13.pkrvars.hcl and any *.auto.pkrvars.hcl, but NOT the
-# committable *.example template.
+#
+# Secrets (API token + build password) live in per-scope *.pkrvars.hcl files at
+# the packer/ root, NOT auto-loaded: they are supplied explicitly per build with
+# `-var-file` (see README.md). Because they are not auto-loaded, a build pulls
+# exactly the secret for its target and can never inherit another target's.
+#
+#   cluster.pkrvars.hcl   -> pve01-03 cluster token + build password
+#   pve04.pkrvars.hcl     -> pve04 token + build password
+#
+# The committed vars/pveXX.pkrvars.hcl files hold LAYOUT ONLY (no secrets).
 *.pkrvars.hcl
+
+# Keep the committed layout files tracked (they match the rule above).
+!vars/*.pkrvars.hcl
+
+# Keep the committable example template tracked (its .example suffix would match).
+!*.pkrvars.hcl.example
 
 # Packer plugin binaries + build artifacts
 .packer/

@@ -47,13 +47,17 @@ variable "proxmox_token" {
 }
 
 # ---- Build host / placement ----
+# Per-node layout (proxmox_url, proxmox_node, bridge, storage, iso) is supplied
+# per target via vars/pveXX.pkrvars.hcl (passed with -var-file). No sensible
+# default exists (every node differs), so the default is left empty and is always
+# overridden by a var file.
 variable "proxmox_node" {
   type        = string
-  description = "Node to build on. Build on pve04."
-  default     = "pve"
+  description = "Node to build on. Supplied per target via vars/pveXX.pkrvars.hcl."
+  default     = ""
 }
 
-# Optional: uncomment and set if pve04 uses a resource pool.
+# Optional: uncomment and set if a node uses a resource pool.
 # variable "resource_pool" {
 #   type    = string
 #   default = ""

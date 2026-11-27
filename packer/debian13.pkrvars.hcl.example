@@ -1,15 +1,21 @@
-# Copy this file to debian13.auto.pkrvars.hcl and fill in the secrets.
-# It is gitignored (see .gitignore) — do NOT commit your real values. The
-# .auto.pkrvars.hcl name means Packer auto-loads it on directory invocation:
-#   cd packer && packer build .
-# (Pointing Packer at the template *file* instead needs
-#  -var-file=debian13.auto.pkrvars.hcl.)
+# Secrets live in per-scope *.pkrvars.hcl files at the packer/ root (NOT
+# auto-loaded). They are gitignored — do NOT commit your real values — and are
+# supplied to a build explicitly with -var-file, so each build pulls exactly the
+# secret for its target. Per-node LAYOUT (url/node/storage/bridge/iso) lives in
+# the committed vars/pveXX.pkrvars.hcl files and is layered on with -var-file too.
 #
-# Alternatively, export these as environment variables instead of a var file:
-#   PROXMOX_URL, PROXMOX_USERNAME, PROXMOX_TOKEN, PACKER_BUILD_PASSWORD
+#   cluster build:  packer build -var-file=cluster.pkrvars.hcl   -var-file=vars/pve01.pkrvars.hcl .
+#   pve04 build:    packer build -var-file=pve04.pkrvars.hcl     -var-file=vars/pve04.pkrvars.hcl .
+#
+# Copy this to a gitignored per-scope file and fill in the secret. Use the file
+# that matches the target you are building (see README.md):
+#   - cluster.pkrvars.hcl  -> the pve01-03 cluster token + build password
+#   - pve04.pkrvars.hcl    -> pve04's token + build password
+#
+# (Alternatively, export PROXMOX_USERNAME, PROXMOX_TOKEN, PACKER_BUILD_PASSWORD as
+#  environment variables instead of a file.)
 
 # ---- Proxmox API (least-privilege token; see README.md for creation) ----
-proxmox_url      = "https://pve.example.com:8006/api2/json"
 proxmox_username = "packer@pve!token"   # <user>@<realm>!<token-id>
 proxmox_token    = "PASTE_THE_TOKEN_SECRET_HERE"
 
@@ -18,15 +24,3 @@ proxmox_token    = "PASTE_THE_TOKEN_SECRET_HERE"
 # after provisioning. Required — the build will not SSH in without it.
 build_user     = "ansible"
 build_password = "PASTE_A_STRONG_TEMP_BUILD_PASSWORD"
-
-# ---- Verify these against pve04's actual layout (defaults assume a stock PVE) ----
-# proxmox_node            = "pve04"
-# network_bridge          = "vmbr0"
-# disk_storage            = "local-lvm"
-# cloud_init_storage_pool = "local"
-# efi_storage_pool        = "local"
-# iso_file                = "local:iso/debian-13.8.0-amd64-netinst.iso"
-# iso_checksum            = "sha256:3770c7a54890f7574a68a8b402e553806a81d6bccfb379554caad3a9a857931e"
-#
-# timezone                = "America/New_York"
-# template_name           = "debian13-cloudinit"

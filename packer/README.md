@@ -9,14 +9,36 @@ configured at boot by Proxmox's **cloud-init ISO** feature.
 
 ```
 packer/
-├── debian13.pkr.hcl        # the Packer build (builder + ansible provisioner)
-├── preseed.cfg             # Debian installer preseed (rendered with your build pw)
+├── debian13.pkr.hcl              # the Packer build (builder + ansible provisioner)
+├── preseed.cfg                  # Debian installer preseed (rendered with your build pw)
 ├── playbooks/
-│   └── provision.yml       # installs packages, your SSH key, and cloud-init
-├── debian13.auto.pkrvars.hcl.example  # COPY to debian13.auto.pkrvars.hcl and fill secrets
-├── .gitignore              # keeps *.pkrvars.hcl and build cache out of git
+│   └── provision.yml            # installs packages, your SSH key, and cloud-init
+├── vars/                        # COMMITTED, non-secret per-node LAYOUT only
+│   ├── pve01.pkrvars.hcl        #   pve01-03 cluster node (fill storage/iso)
+│   └── pve04.pkrvars.hcl        #   pve04 (OVH, not clustered — fill storage/iso)
+├── debian13.pkrvars.hcl.example # template to COPY to a gitignored secret file
+├── cluster.pkrvars.hcl    (gitignored)  # pve01-03 cluster token + build password
+├── pve04.pkrvars.hcl      (gitignored)  # pve04 token + build password
+├── .gitignore                 # keeps *.pkrvars.hcl and build cache out of git
 └── README.md
 ```
+
+### How a build resolves its values
+
+Each `packer build` gets its values from two `-var-file`s, both passed
+explicitly on the command line (later wins if a key repeats):
+
+1. **`<scope>.pkrvars.hcl`** (root, gitignored) — holds the **secrets**
+   (API token + build password). One per credential scope:
+   - `cluster.pkrvars.hcl` → the pve01-03 **cluster** token + build password
+   - `pve04.pkrvars.hcl`   → pve04's token + build password
+2. **`vars/pveXX.pkrvars.hcl`** (committed) — holds the **per-node layout**
+   (`proxmox_url`, `proxmox_node`, bridge, storage pools, ISO).
+
+So a build is one command with two `-var-file`s: the first supplies the
+secrets, the second supplies that node's layout. No environment variables
+required, and — because the secret file is passed explicitly rather than
+auto-loaded — a build can never accidentally pull another target's token.
 
 ---
 
@@ -34,33 +56,47 @@ build VM.
 > The `current` filename moves with each point release. If a newer Trixie point
 > release appears, re-check the filename + SHA256 at
 > <https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/> and update the
-> `iso_file` / `iso_checksum` variables (or the values in `debian13.auto.pkrvars.hcl`).
+> `iso_file` / `iso_checksum` variables (or the values in `vars/pveXX.pkrvars.hcl`).
 > Do **not** use the DVD, live, or `debian-edu` image — netinst is what this
 > template expects.
 
-### Upload it to pve04
+### Upload it to your build node(s)
 
 The template references the ISO at `local:iso/debian-13.8.0-amd64-netinst.iso`
-(the PVE `local` storage's ISO folder). Upload it one of two ways:
+(the PVE `local` storage's ISO folder — the storage name is per-node, set in
+`vars/pveXX.pkrvars.hcl`). Upload it to **every node you will build on** one of
+two ways:
 
 - **Web UI:** Datacenter → Storage → `local` → *ISOs* → **Upload** → choose the
-  ISO. (Works from any node; the ISO is cluster-visible on `local`.)
-- **CLI on pve04:** the `local` storage's ISO directory is
+  ISO. On the pve01-03 cluster the ISO is shared via `local`, so one upload
+  covers the cluster.
+- **CLI on the build node:** the `local` storage's ISO directory is
   `/var/lib/vz/template/iso/`:
   ```bash
-  scp debian-13.8.0-amd64-netinst.iso root@pve04:/var/lib/vz/template/iso/
+  scp debian-13.8.0-amd64-netinst.iso root@pveXX:/var/lib/vz/template/iso/
   ```
 
-If pve04 uses a different ISO storage, update `iso_file` in `debian13.auto.pkrvars.hcl`.
+If a node uses a different ISO storage, update `iso_file` in that node's
+`vars/pveXX.pkrvars.hcl`.
 
 ---
 
-## 1. Create a least-privilege Proxmox API token
+## 1. Create the least-privilege Proxmox API tokens
 
 Packer authenticates with **one API user + one API token** (Proxmox uses API
-tokens, not API "keys"). The token is the secret you paste into `debian13.auto.pkrvars.hcl`.
+tokens, not API "keys"). Each token is the secret you paste into a gitignored
+`*.pkrvars.hcl` secret file (step 2).
 
-Do this on **pve04** (as root, or a user with admin rights).
+There are **two credential scopes**, because your fleet is not one cluster:
+
+- **The pve01-03 cluster** — **one** cluster token authenticates to *any* node in
+  the cluster (create it in the cluster's shared user directory / on one node with
+  cluster-wide ACL). Build on **one** cluster node (pve01), then replicate the
+  template to the others — so only `vars/pve01.pkrvars.hcl` exists for the
+  cluster; pve02/pve03 are never built on, just receive the replicated template.
+- **pve04 (OVH, not in the cluster)** — its **own** token, created on pve04.
+
+Do each scope on its target node (as root, or a user with admin rights).
 
 ### 1a. Recommended: a dedicated `PackerUser` role
 
@@ -89,8 +125,8 @@ pveum user token add packer@pve token --privsep 0
 
 The token **id** is `packer@pve!token`; the **secret** is the
 `packer@pve!token=...` string printed (copy the part after `=`). Paste the
-**id** as `proxmox_username` and the **secret** as `proxmox_token` in
-`debian13.auto.pkrvars.hcl`.
+**id** as `proxmox_username` and the **secret** as `proxmox_token` into the
+gitignored secret file for that scope (step 2).
 
 > **Web UI equivalent:** Datacenter → *Permissions* → *Roles* → add role
 > `PackerUser` with the privileges above; then *Groups* → add group
@@ -98,38 +134,50 @@ The token **id** is `packer@pve!token`; the **secret** is the
 > unchecked**; then *Users* → add `packer` (realm `pve`) in group
 > `packer-users` → select the user → *Add Token* → name `token` and copy the
 > secret shown.
+>
+> For the **cluster** token, create the user in the cluster's shared directory
+> (or on one node) and grant `PackerUser` at `/` so one token works on pve01-03.
+> For **pve04**, repeat the whole block on pve04 itself.
 
 ---
 
-## 2. Fill in `debian13.auto.pkrvars.hcl`
+## 2. Fill in the two gitignored secret files
+
+Copy the template and create **one gitignored secret file per credential scope**
+(the `*.pkrvars.hcl` name at the root is **gitignored** — `*.pkrvars.hcl` in
+`.gitignore` — so the secret never lands in git. It is **not** auto-loaded; it is
+passed explicitly with `-var-file`, so a build pulls exactly its own secret):
 
 ```bash
-cp debian13.auto.pkrvars.hcl.example debian13.auto.pkrvars.hcl
-$EDITOR debian13.auto.pkrvars.hcl
+cp debian13.pkrvars.hcl.example cluster.pkrvars.hcl
+$EDITOR cluster.pkrvars.hcl              # pve01-03 cluster token + build password
+
+# pve04 uses its own token, so it gets its own secret file:
+cp debian13.pkrvars.hcl.example pve04.pkrvars.hcl
+$EDITOR pve04.pkrvars.hcl               # pve04 token + build password
 ```
 
-This file holds the token + build password, so it is **gitignored**
-(`*.pkrvars.hcl`). The `.auto.pkrvars.hcl` name means Packer **auto-loads it on
-directory invocation** (`packer validate .` / `packer build .`) — so no
-`-var-file` is needed, and the secret still never lands in git. (Pointing Packer
-at the template *file* does not auto-load; use the directory form in step 4.)
+Both files are **gitignored** (`*.pkrvars.hcl`). Each holds the **secrets** only:
+`proxmox_username`, `proxmox_token`, and `build_password`. The **per-node layout**
+(`proxmox_url`, `proxmox_node`, bridge, storage, ISO) lives in the committed
+`vars/pveXX.pkrvars.hcl` and is layered on with a second `-var-file` at build
+time.
 
-Set at minimum:
+Set at minimum, in each secret file:
 
 | Variable | Value |
 |---|---|
-| `proxmox_url` | `https://pve04:8006/api2/json` (or `https://pve04.example.com:8006/api2/json`) |
 | `proxmox_username` | `packer@pve!token` |
-| `proxmox_token` | the secret from step 1 (`=…` part) |
+| `proxmox_token` | the secret from step 1 for that scope (`=…` part) |
 | `build_password` | a strong temporary password (locked after the build) |
 
-Also **verify the storage/network defaults against pve04** (uncomment and adjust
-in `debian13.auto.pkrvars.hcl` if different): `network_bridge` (default `vmbr0`),
-`disk_storage` (default `local-lvm`), `cloud_init_storage_pool` / `efi_storage_pool`
-(default `local`), and `iso_file`.
-
-> You can also export `PROXMOX_URL`, `PROXMOX_USERNAME`, `PROXMOX_TOKEN`,
-> `PACKER_BUILD_PASSWORD` as environment variables instead of a var file.
+> Pass only the secret file that matches the target you are building — it is the
+> first `-var-file` (see step 4). Because secret files are passed explicitly
+> rather than auto-loaded, a build can never accidentally use another target's
+> token.
+>
+> You can also export `PROXMOX_USERNAME`, `PROXMOX_TOKEN`, `PACKER_BUILD_PASSWORD`
+> as environment variables instead of a secret file.
 
 ---
 
@@ -149,21 +197,33 @@ to its path.)
 
 ## 4. Run the build (only after the above)
 
+One command per target: the **first** `-var-file` supplies the **secrets**
+(`cluster` or `pve04`), the **second** supplies that node's **layout**.
+
 ```bash
 cd packer
-packer validate .      # auto-loads debian13.auto.pkrvars.hcl; syntax + plugin check, no PVE contact
-packer build    .      # full build → template 'debian13-cloudinit' (also auto-loads the var file)
+
+# --- pve01-03 cluster: build on one node, replicate the template to the rest ---
+packer validate -var-file=cluster.pkrvars.hcl -var-file=vars/pve01.pkrvars.hcl .   # syntax + plugin check
+packer build    -var-file=cluster.pkrvars.hcl -var-file=vars/pve01.pkrvars.hcl .   # → template 'debian13-cloudinit' on pve01
+
+# Then replicate the template to the other two cluster nodes (Proxmox GUI:
+# right-click the template → Replicate → target node pve02, pve03 — or the
+# qm/vzdump template replication CLI). No need to build on pve02/pve03.
+
+# --- pve04 (separate, not in the cluster): build independently ---
+packer build -var-file=pve04.pkrvars.hcl -var-file=vars/pve04.pkrvars.hcl .
 ```
 
-> The **directory form** (`packer validate .`) auto-loads
-> `debian13.auto.pkrvars.hcl` — no `-var-file` needed. Pointing Packer at the
-> template *file* instead requires `-var-file=debian13.auto.pkrvars.hcl`.
-> (Or set the `PROXMOX_*` / `PACKER_BUILD_PASSWORD` env vars instead.)
+> Each target's secret file is the **first** `-var-file`, so the token used is
+> always the one for that target — a cluster build can never inherit pve04's
+> token, or vice versa.
 
 The build will:
 
-1. Create a throwaway VM on **pve04**, boot the netinst, and run the unattended
-   install from the preseed (served by Packer's built-in HTTP server).
+1. Create a throwaway VM on the **build node** (from `vars/pveXX.pkrvars.hcl`),
+   boot the netinst, and run the unattended install from the preseed (served by
+   Packer's built-in HTTP server).
 2. Log in over SSH and run `playbooks/provision.yml` to install:
    `zsh`, `git`, `tmux`, `htop`, `ncdu`, `curl`, `wget`,
    plus the cloud-init stack (`cloud-init`, `cloud-guest-utils`,
@@ -171,7 +231,7 @@ The build will:
    **netplan** + `systemd-resolved` stack so clones configure IP/DNS via
    Proxmox cloud-init, and the **Tailscale** client (installed + enabled,
    but *not* authenticated).
-3. Add **your** SSH key (baked in from `debian13.auto.pkrvars.hcl`) to the `ansible` user.
+3. Add **your** SSH key (baked in from the secret file) to the `ansible` user.
 4. Lock the temporary build password, reset cloud-init state, and clear
    Tailscale state (so cloned VMs start unauthenticated).
 5. Stop the VM and convert it to the template **`debian13-cloudinit`**.
@@ -214,7 +274,9 @@ The build will:
   build's own preseed fetch or Packer's first SSH, both of which happen *before*
   Tailscale exists on the VM.
 - **Storage names** (`local`, `local-lvm`, `vmbr0`) assume a stock Proxmox.
-  Confirm them on your host and adjust `debian13.auto.pkrvars.hcl` if needed.
+  Confirm them per node and fill them in in `vars/pveXX.pkrvars.hcl` (the
+  `<FILL-IN>` placeholders). The disk pool must match across pve01-03 for the
+  template to replicate.
 - **Re-running:** the build is reproducible. Each run uses a fresh VM; delete the
   old `debian13-cloudinit` template first if you rebuild it.
 - **Idempotency:** package/key/service tasks are idempotent; the
