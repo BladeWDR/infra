@@ -4,7 +4,6 @@ original_repo_targets:
   http://us.archive.ubuntu.com/ubuntu: ubuntu
   http://deb.debian.org/debian: debian
   http://ftp.us.debian.org/debian: debian
-  http://security.debian.org: debsec
-  http://deb.debian.org/debian-security: debsec
+  http://security.debian.org/debian-security: debsec
   http://security.ubuntu.com/ubuntu: ubusec
   http://download.proxmox.com/debian: proxmox
