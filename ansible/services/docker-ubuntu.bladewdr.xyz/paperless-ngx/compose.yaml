@@ -11,7 +11,7 @@ volumes:
 
 services:
   paperless-ai:
-    image: clusterzx/paperless-ai:v4.5.1@sha256:d7b827ebfa125d50026714626a1841433452fdffe728abfc1e5ddb6b2abe1eb3
+    image: clusterzx/paperless-ai:4.8.0@sha256:1a015fd3109da1659e454b5827d33b87fb3d43560722916478e06d03edbf8a78
     container_name: ${PAPERLESS_AI_CONTAINER_NAME:-paperless-ai}
     restart: ${PAPERLESS_AI_RESTART:-unless-stopped}
     mem_limit: ${PAPERLESS_AI_MEM_LIMIT:-200g}
